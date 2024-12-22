@@ -3,11 +3,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "paths": {
-      "datetime-picker": [
-        "./dist/datetime-picker"
-      ]
-    },
+    "paths": {},
     "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,
