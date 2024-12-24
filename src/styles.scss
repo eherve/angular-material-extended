@@ -1,1 +1,42 @@
-/* You can add global styles to this file, and also import other style files */
+@use "@angular/material" as mat;
+
+$theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$azure-palette,
+    ),
+  )
+);
+
+:root {
+  @include mat.core-theme($theme);
+  @include mat.all-component-themes($theme);
+  // @include mat.button-theme($theme);
+  // @include mat.icon-theme($theme);
+
+  // @include mat.card-overrides(
+  //   (
+  //     elevated-container-color: red,
+  //   )
+  // );
+  // .test {
+  //   @include mat.card-overrides(
+  //     (
+  //       elevated-container-color: blue,
+  //     )
+  //   );
+  // }
+}
+
+@include mat.color-variants-backwards-compatibility($theme);
+@include mat.typography-hierarchy($theme);
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}

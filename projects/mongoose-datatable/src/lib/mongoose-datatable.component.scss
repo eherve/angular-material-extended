@@ -1,0 +1,181 @@
+:host {
+  display: block;
+
+  --datatable-background: #ffffff;
+  --datatable-border-color: #ccc;
+  --datatable-sticky-background: var(--datatable-background);
+  --datatable-sticky-border: 1px dashed #e6a93a;
+}
+
+#container {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+
+  background-color: var(--datatable-background);
+}
+
+#actions {
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
+  place-content: center space-between;
+  align-items: center;
+  flex-direction: row;
+  border-bottom: 1px solid #ccc;
+
+  #actions-start,
+  #actions-center,
+  #actions-end {
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    flex-direction: row;
+  }
+  #actions-start {
+    place-content: center start;
+  }
+  #actions-center {
+    place-content: center center;
+  }
+  #actions-end {
+    place-content: center end;
+  }
+
+  .action {
+    position: relative;
+    .action-loader {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
+#column-options {
+  .column-options-item {
+    overflow: hidden;
+    display: flex;
+    box-sizing: border-box;
+    align-items: center;
+    flex-direction: row;
+    place-content: center start;
+
+    button.toggle-off {
+      --mdc-icon-button-icon-color: var(--mdc-icon-button-disabled-icon-color);
+    }
+    mat-icon.handle {
+      color: var(--mdc-icon-button-disabled-icon-color);
+    }
+  }
+}
+
+#table-container {
+  flex: 1 1 100%;
+  overflow: auto;
+  width: 100%;
+  scrollbar-width: thin;
+}
+
+#table {
+  width: 100%;
+  height: 100%;
+  --mat-table-background-color: var(--datatable-background);
+  --mat-table-row-item-outline-color: var(--datatable-border-color);
+
+  ::ng-deep {
+    .mat-mdc-table-sticky {
+      opacity: 1;
+      background: var(
+        --datatable-sticky-background,
+        var(--datatable-background, #ffffff)
+      );
+      &.mat-mdc-table-sticky-border-elem-left {
+        border-right: var(--datatable-sticky-border);
+      }
+    }
+
+    .mat-mdc-header-cell {
+      padding: 0 8px;
+      mat-form-field {
+        min-width: auto;
+        flex: 1 1 100%;
+        margin: 6px 0;
+        --mdc-filled-text-field-active-indicator-color: #999;
+        --mat-form-field-hover-state-layer-opacity: 0;
+        --mdc-filled-text-field-container-shape: 0;
+        --mdc-filled-text-field-container-color: var(--datatable-background);
+
+        ::ng-deep {
+          .mat-mdc-form-field-bottom-align {
+            display: none;
+          }
+
+          .mat-mdc-text-field-wrapper {
+            padding: 0;
+          }
+        }
+      }
+    }
+    .mat-mdc-cell {
+      padding: 0 8px;
+    }
+  }
+
+  .header {
+    width: 100%;
+    display: flex;
+    box-sizing: border-box;
+    place-content: center space-between;
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .cell {
+    width: 100%;
+  }
+}
+
+#paginator {
+  --mat-paginator-container-background-color: var(--datatable-background);
+}
+
+#loading {
+  position: absolute;
+  z-index: 200;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.16);
+
+  mat-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.mat-mdc-icon-button[mat-icon-button][size="small"] {
+  --mdc-icon-button-state-layer-size: 30px;
+  --mdc-icon-button-icon-size: 18px;
+
+  ::ng-deep {
+    .mat-mdc-button-touch-target {
+      height: 36px;
+      width: 36px;
+    }
+  }
+
+  mat-icon {
+    height: 18px;
+    width: 18px;
+    font-size: 18px;
+  }
+}

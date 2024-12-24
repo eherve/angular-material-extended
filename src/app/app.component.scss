@@ -1,0 +1,5 @@
+@use "@angular/material" as mat;
+
+button[color="red"] {
+  --mdc-icon-button-icon-color: red;
+}

@@ -1,1 +1,37 @@
-test
+<button mat-icon-button color="primary">
+  <mat-icon>push_pin</mat-icon>
+</button>
+<button mat-icon-button color="red">
+  <mat-icon>push_pin</mat-icon>
+</button>
+<button mat-raised-button>
+  default
+</button>
+<button mat-raised-button class="mat-button-primary" color="primary">
+  primary
+</button>
+<button mat-raised-button class="mat-raised-button-secondary" color="secondary">
+  secondary
+</button>
+<button mat-raised-button class="mat-raised-button-accent" color="accent">
+  accent
+</button>
+
+<mat-card class="test" [style.margin]="'16px auto'" [style.width.px]="800" [style.height.px]="800">
+  <mat-card-header>
+    <mat-card-title>Datatable</mat-card-title>
+  </mat-card-header>
+  <mat-card-content [style.position]="'relative'" [style.overflow]="'hidden'">
+    <ngx-mat-mongoose-datatable [style.height.%]="100" [style.width.%]="100"
+      [options]="datatableOptions"></ngx-mat-mongoose-datatable>
+  </mat-card-content>
+</mat-card>
+
+<mat-card [style.margin]="'16px auto'" [style.width.px]="800" [style.height.px]="800">
+  <mat-card-header>
+    <mat-card-title>Table</mat-card-title>
+  </mat-card-header>
+  <mat-card-content [style.position]="'relative'" [style.overflow]="'hidden'">
+    <app-table></app-table>
+  </mat-card-content>
+</mat-card>
