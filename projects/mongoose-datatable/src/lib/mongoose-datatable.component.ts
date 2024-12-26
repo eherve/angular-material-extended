@@ -15,6 +15,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { debounceTime, Subscription } from 'rxjs';
 import { DatasourceRequestColumn, DatasourceRequestOrder, MongooseDatatableColumn } from '../public-api';
+import { CellSelectValueComponent } from './components/cell-select-value/cell-select-value.component';
+import { HeaderCheckboxFilterComponent } from './components/header-checkbox-filter/header-checkbox-filter.component';
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { DatagridDataSource } from './datasource';
@@ -27,6 +29,7 @@ type UpdateColumn = Pick<MongooseDatatableColumn, 'columnDef' | 'header' | 'stic
     CommonModule,
     DragDropModule,
     FormsModule,
+    HeaderCheckboxFilterComponent,
     HeaderSelectFilterComponent,
     HeaderTextFilterComponent,
     IntersectionObserverModule,
@@ -40,6 +43,7 @@ type UpdateColumn = Pick<MongooseDatatableColumn, 'columnDef' | 'header' | 'stic
     MatTableModule,
     MatTooltipModule,
     ReactiveFormsModule,
+    CellSelectValueComponent,
   ],
   selector: 'ngx-mat-mongoose-datatable',
   templateUrl: 'mongoose-datatable.component.html',
@@ -180,7 +184,9 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
   private buildSearchFormGroup() {
     this.searchFormGroup = new FormGroup(
       this.options.columns.reduce((controls, column) => {
-        if (column.searchable) controls[column.columnDef] = new FormControl({ value: undefined, disabled: false });
+        if (column.searchable !== undefined) {
+          controls[column.columnDef] = new FormControl({ value: undefined, disabled: false });
+        }
         return controls;
       }, {} as any)
     );

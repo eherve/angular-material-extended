@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { DatasourceRequestOrderDir } from './datasource-service.type';
 
-export type MongooseDatatableColumnSearchType = 'text' | 'select';
+export type MongooseDatatableColumnSearchType = 'text' | 'select' | 'checkbox';
 
 export interface IMongooseDatatableBaseColumn {
   columnDef: string;
@@ -32,10 +32,13 @@ export type MongooseDatatableSearchSelectColumnOption = {
   icon?: string;
   iconColor?: string;
 };
-
 export interface IMongooseDatatableSearchSelectColumn extends IMongooseDatatableBaseColumn {
   searchable: 'select';
   options: Observable<MongooseDatatableSearchSelectColumnOption[]>;
+}
+
+export interface IMongooseDatatableSearchCheckboxColumn extends IMongooseDatatableBaseColumn {
+  searchable: 'checkbox';
 }
 
 export type MongooseDatatableColumn =

@@ -19,38 +19,36 @@ import {
   UntypedFormControl,
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
-import { Subscription } from 'rxjs';
-import { IMongooseDatatableSearchSelectColumn } from '../../types/datatable-column.type';
-import { SelectOptionPipe } from '../../pipes/select-option.pipe';
+import { filter, Subscription, tap } from 'rxjs';
+import { IMongooseDatatableSearchCheckboxColumn } from '../../types/datatable-column.type';
 
 @Component({
-  selector: 'lib-header-select-filter',
+  selector: 'lib-header-checkbox-filter',
   imports: [
     CommonModule,
     FormsModule,
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
-    MatSelectModule,
+    MatCheckboxModule,
     ReactiveFormsModule,
-    SelectOptionPipe,
   ],
-  templateUrl: './header-select-filter.component.html',
-  styleUrl: './header-select-filter.component.scss',
+  templateUrl: './header-checkbox-filter.component.html',
+  styleUrl: './header-checkbox-filter.component.scss',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
       multi: true,
-      useExisting: forwardRef(() => HeaderSelectFilterComponent),
+      useExisting: forwardRef(() => HeaderCheckboxFilterComponent),
     },
   ],
 })
-export class HeaderSelectFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderCheckboxFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: IMongooseDatatableSearchSelectColumn;
+  column!: IMongooseDatatableSearchCheckboxColumn;
 
   control!: FormControl<any>;
   selectControl = new FormControl();
@@ -79,12 +77,25 @@ export class HeaderSelectFilterComponent implements AfterViewInit, OnDestroy, Co
   async ngAfterViewInit(): Promise<void> {
     const ngControl: NgControl | null = this.injector.get(NgControl, null);
     if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
+    console.log(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
     this.control = ngControl.control as UntypedFormControl;
+    let previousValue = this.control.value;
     this.subsink.add(
-      this.selectControl.valueChanges.subscribe((value: any) => {
-        if (value === undefined) this.control.setValue(undefined);
-        else this.control.setValue({ value, regex: false });
-      })
+      this.selectControl.valueChanges
+        .pipe(
+          filter((value) => {
+            if (value === true && previousValue === false) {
+              this.selectControl.setValue(undefined);
+              return false;
+            }
+            return true;
+          }),
+          tap((value) => (previousValue = value))
+        )
+        .subscribe((value: any) => {
+          if (value === undefined) this.control.setValue(undefined);
+          else this.control.setValue({ value, regex: false });
+        })
     );
     this.changeDetectorRef.detectChanges();
   }

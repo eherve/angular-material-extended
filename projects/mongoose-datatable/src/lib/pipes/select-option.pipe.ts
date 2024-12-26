@@ -1,9 +1,9 @@
 /** @format */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { MongooseDatatableSearchSelectColumnOption } from '../../types/datatable-column.type';
+import { MongooseDatatableSearchSelectColumnOption } from '../types/datatable-column.type';
 
-@Pipe({ name: 'option' })
+@Pipe({ name: 'selectOption' })
 export class SelectOptionPipe implements PipeTransform {
   transform(
     value: any,

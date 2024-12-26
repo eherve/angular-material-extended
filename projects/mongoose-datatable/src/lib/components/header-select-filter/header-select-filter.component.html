@@ -1,11 +1,11 @@
 @if (selectControl) {
 <mat-form-field appearance="fill">
-  <mat-label>{{column.header}}</mat-label>
+  <mat-label [innerHTML]="column.header"></mat-label>
   <mat-select [formControl]="selectControl">
     @let options = $any(column.options | async);
 
     <mat-select-trigger>
-      @let option = selectControl.value | option:options;
+      @let option = selectControl.value | selectOption:options;
       @if (option) {
       <ng-container *ngTemplateOutlet="selectOption; context: { option }"></ng-container>
       } @else {

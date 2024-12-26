@@ -9,6 +9,10 @@ while (i++ < 100) {
   DATA.push({
     label: `Label ${i}`,
     reference: `Référence ${i}`,
+    checkbox: (() => {
+      const rand = Math.random();
+      return rand < 0.33 ? true : rand < 0.66 ? false : undefined;
+    })(),
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
   });
@@ -68,6 +72,12 @@ export class AppComponent {
         options: of(
           DATA.map((d) => ({ value: d.reference, label: d.reference, color: 'red', icon: 'home', iconColor: 'blue' }))
         ),
+      },
+      {
+        columnDef: 'checkbox',
+        header: 'Checkbox',
+        property: 'checkbox',
+        searchable: 'checkbox',
       },
       {
         columnDef: 'description',

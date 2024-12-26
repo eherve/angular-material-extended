@@ -76,11 +76,12 @@ export class HeaderTextFilterComponent implements AfterViewInit, OnDestroy, Cont
 
   async ngAfterViewInit(): Promise<void> {
     const ngControl: NgControl | null = this.injector.get(NgControl, null);
-    if (!ngControl) throw new Error('HeaderSelectFilterComponent missing control');
+    if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
-        this.control.setValue({ value, regex: true });
+        if (!value) this.control.setValue(undefined);
+        else this.control.setValue({ value, regex: true });
       })
     );
     this.changeDetectorRef.detectChanges();
