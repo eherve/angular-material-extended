@@ -93,9 +93,14 @@
     },
     "mongoose-datatable": {
       "projectType": "library",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "projects/mongoose-datatable",
       "sourceRoot": "projects/mongoose-datatable/src",
-      "prefix": "NgxMat",
+      "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",

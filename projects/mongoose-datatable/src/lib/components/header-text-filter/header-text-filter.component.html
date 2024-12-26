@@ -1,0 +1,10 @@
+@if (selectControl) {
+<mat-form-field appearance="fill" [class.has-value]="selectControl.value">
+  <mat-label>{{column.header}}</mat-label>
+  <input matInput [formControl]="selectControl">
+  <button *ngIf="selectControl.value" mat-icon-button matSuffix size="small"
+    (click)="selectControl.setValue(undefined)">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-form-field>
+}

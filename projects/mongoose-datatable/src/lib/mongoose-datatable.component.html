@@ -106,19 +106,19 @@
 <ng-template #headerTmpl let-column="column">
   <div class="header" [formGroup]="searchFormGroup">
     @switch (column.searchable) {
+
     @case ('text') {
-    <mat-form-field appearance="fill">
-      <mat-label>{{column.header}}</mat-label>
-      <input matInput [formControlName]="column.columnDef">
-      <button *ngIf="searchFormGroup.controls[column.columnDef].value" mat-icon-button matSuffix size="small"
-        (click)="searchFormGroup.controls[column.columnDef].setValue(undefined)">
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>
+    <lib-header-text-filter [column]="column" [formControlName]="column.columnDef"></lib-header-text-filter>
     }
+
+    @case ('select') {
+    <lib-header-select-filter [column]="column" [formControlName]="column.columnDef"></lib-header-select-filter>
+    }
+
     @default {
     <span>{{column.header}}</span>
     }
+
     }
     <ng-container *ngTemplateOutlet="headerActionsTmpl; context: { column }"></ng-container>
   </div>

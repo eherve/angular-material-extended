@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { clone, map, orderBy } from 'lodash-es';
+import { of } from 'rxjs';
 import { MongooseDatatableOptions } from '../../projects/mongoose-datatable/src/public-api';
 
 const DATA: any[] = [];
@@ -22,7 +23,6 @@ while (i++ < 100) {
 export class AppComponent {
   datatableOptions: MongooseDatatableOptions<any> = {
     service: (options) => {
-      console.log(options);
       let data = clone(DATA);
       if (options.order) {
         data = orderBy(
@@ -64,7 +64,10 @@ export class AppComponent {
         property: 'reference',
         minWidth: 400,
         sortable: true,
-        searchable: 'text',
+        searchable: 'select',
+        options: of(
+          DATA.map((d) => ({ value: d.reference, label: d.reference, color: 'red', icon: 'home', iconColor: 'blue' }))
+        ),
       },
       {
         columnDef: 'description',

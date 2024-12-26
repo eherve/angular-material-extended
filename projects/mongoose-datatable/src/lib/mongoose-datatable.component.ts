@@ -1,13 +1,12 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { AsyncPipe, CommonModule, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -15,12 +14,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { debounceTime, Subscription } from 'rxjs';
-import {
-  DatasourceRequestColumn,
-  DatasourceRequestOrder,
-  MongooseDatatableColumn,
-  MongooseDatatableColumnSearchType,
-} from '../public-api';
+import { DatasourceRequestColumn, DatasourceRequestOrder, MongooseDatatableColumn } from '../public-api';
+import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
+import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { DatagridDataSource } from './datasource';
 import { MongooseDatatableOptions } from './types/datatable-options.type';
 
@@ -28,23 +24,21 @@ type UpdateColumn = Pick<MongooseDatatableColumn, 'columnDef' | 'header' | 'stic
 
 @Component({
   imports: [
-    AsyncPipe,
     CommonModule,
     DragDropModule,
     FormsModule,
+    HeaderSelectFilterComponent,
+    HeaderTextFilterComponent,
     IntersectionObserverModule,
     MatBadgeModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatFormFieldModule,
     MatIconModule,
-    MatInputModule,
     MatMenuModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTableModule,
     MatTooltipModule,
-    NgIf,
     ReactiveFormsModule,
   ],
   selector: 'ngx-mat-mongoose-datatable',
@@ -111,7 +105,6 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
   }
 
   loadPage() {
-    console.warn('loadPage');
     const columns = this.buildRequestColumns();
     const order: DatasourceRequestOrder[] = [];
     this.options.columns
@@ -166,23 +159,13 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
     this.options.columns.forEach((c) => {
       if (c.hidden) return;
       const column: DatasourceRequestColumn = { data: c.property, name: c.columnDef };
-      if (c.searchable) this.addRequestColumnSearch(c.searchable, column, this.searchFormGroup.controls[c.columnDef]);
+      if (c.searchable) {
+        const control = this.searchFormGroup.controls[c.columnDef];
+        if (control.value) column.search = control.value;
+      }
       columns.push(column);
     });
     return columns;
-  }
-
-  private addRequestColumnSearch(
-    type: MongooseDatatableColumnSearchType,
-    column: DatasourceRequestColumn,
-    control: AbstractControl
-  ) {
-    switch (type) {
-      default:
-        if (control.value && control.value.length) {
-          column.search = { value: control.value, regex: true };
-        }
-    }
   }
 
   private buildDisplayColumns() {
@@ -201,7 +184,6 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
         return controls;
       }, {} as any)
     );
-    console.log(this.searchFormGroup);
     this.subscriptions.add(
       this.searchFormGroup.valueChanges.pipe(debounceTime(500)).subscribe((value) => {
         this.paginator!.pageIndex = 0;
