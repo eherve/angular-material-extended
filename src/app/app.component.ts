@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { clone, map, orderBy } from 'lodash-es';
+import { clone, filter, map, orderBy, uniqBy, includes, slice } from 'lodash-es';
 import { of } from 'rxjs';
 import { MongooseDatatableOptions } from '../../projects/mongoose-datatable/src/public-api';
 
@@ -12,6 +12,10 @@ while (i++ < 100) {
     checkbox: (() => {
       const rand = Math.random();
       return rand < 0.33 ? true : rand < 0.66 ? false : undefined;
+    })(),
+    autocomplete: (() => {
+      const rand = Math.round(Math.random() * 100);
+      return `option ${rand}`;
     })(),
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
@@ -72,6 +76,46 @@ export class AppComponent {
         options: of(
           DATA.map((d) => ({ value: d.reference, label: d.reference, color: 'red', icon: 'home', iconColor: 'blue' }))
         ),
+      },
+      {
+        columnDef: 'autocomplete',
+        header: 'Autocomplete',
+        property: 'autocomplete',
+        minWidth: 400,
+        sortable: true,
+        searchable: 'autocomplete',
+        placeholder: 'Sélectionnez une option',
+        loadOnFocus: true,
+        options: async (limit, skip, search) => {
+          return new Promise((resolve) => {
+            setTimeout(
+              () =>
+                resolve(
+                  slice(
+                    orderBy(
+                      filter(
+                        uniqBy(
+                          map(DATA, (d) => ({
+                            value: d.autocomplete,
+                            label: d.autocomplete,
+                            color: 'blue',
+                            icon: 'home',
+                            iconColor: 'red',
+                          })),
+                          'value'
+                        ),
+                        (d) => includes(d.value, search)
+                      ),
+                      ['label', 'asc']
+                    ),
+                    skip,
+                    skip + limit
+                  )
+                ),
+              2000
+            );
+          });
+        },
       },
       {
         columnDef: 'checkbox',

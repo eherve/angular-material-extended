@@ -15,20 +15,25 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { debounceTime, Subscription } from 'rxjs';
 import { DatasourceRequestColumn, DatasourceRequestOrder, MongooseDatatableColumn } from '../public-api';
+import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
 import { CellSelectValueComponent } from './components/cell-select-value/cell-select-value.component';
 import { HeaderCheckboxFilterComponent } from './components/header-checkbox-filter/header-checkbox-filter.component';
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { DatagridDataSource } from './datasource';
 import { MongooseDatatableOptions } from './types/datatable-options.type';
+import { HeaderAutocompleteFilterComponent } from './components/header-autocomplete-filter/header-autocomplete-filter.component';
 
 type UpdateColumn = Pick<MongooseDatatableColumn, 'columnDef' | 'header' | 'sticky' | 'hidden'>;
 
 @Component({
   imports: [
+    CellCheckboxValueComponent,
+    CellSelectValueComponent,
     CommonModule,
     DragDropModule,
     FormsModule,
+    HeaderAutocompleteFilterComponent,
     HeaderCheckboxFilterComponent,
     HeaderSelectFilterComponent,
     HeaderTextFilterComponent,
@@ -43,7 +48,6 @@ type UpdateColumn = Pick<MongooseDatatableColumn, 'columnDef' | 'header' | 'stic
     MatTableModule,
     MatTooltipModule,
     ReactiveFormsModule,
-    CellSelectValueComponent,
   ],
   selector: 'ngx-mat-mongoose-datatable',
   templateUrl: 'mongoose-datatable.component.html',

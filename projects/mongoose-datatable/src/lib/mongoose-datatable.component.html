@@ -110,12 +110,13 @@
     @case ('select') {
     <lib-header-select-filter [column]="column" [formControlName]="column.columnDef"></lib-header-select-filter>
     }
+    @case ('autocomplete') {
+    <lib-header-autocomplete-filter [column]="column" [formControlName]="column.columnDef"></lib-header-autocomplete-filter>
+    }
     @case ('checkbox') {
     <lib-header-checkbox-filter [column]="column" [formControlName]="column.columnDef"></lib-header-checkbox-filter>
     }
-    @default {
-    <span>{{column.header}}</span>
-    }
+    @default { <span>{{column.header}}</span> }
     }
     <ng-container *ngTemplateOutlet="headerActionsTmpl; context: { column }"></ng-container>
   </div>
@@ -145,11 +146,7 @@
     <lib-cell-select-value [column]="column" [row]="row"></lib-cell-select-value>
     }
     @case ('checkbox') {
-    @if(value === true) {
-    <mat-icon>check_box_outline_blank</mat-icon>
-    } @else if (value === false) {
-    <mat-icon color="primary">check_box</mat-icon>
-    }
+    <lib-cell-checkbox-value [column]="column" [row]="row"></lib-cell-checkbox-value>
     }
     @default { {{ value }} }
     }

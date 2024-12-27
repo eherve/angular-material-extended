@@ -1,0 +1,46 @@
+@if (selectControl) {
+<mat-form-field appearance="fill">
+  <mat-label [innerHTML]="column.header"></mat-label>
+  <input #input type="text" [placeholder]="column.placeholder!" aria-label="Number" matInput
+    [formControl]="selectControl" [matAutocomplete]="auto" (input)="filter()" (focus)="focus()">
+  <mat-autocomplete #auto="matAutocomplete" requireSelection>
+
+    <ng-container *ngTemplateOutlet="optionsTmpl"></ng-container>
+
+    @if(searching) {
+    <mat-option id="searching-option" disabled>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </mat-option>
+    }
+
+    @if (hasMore && !searching) {
+    <mat-option id="load-more-options" disabled intersectionObserver (intersection)="loadMore($event.intersect)">
+    </mat-option>
+    }
+
+  </mat-autocomplete>
+</mat-form-field>
+}
+
+<ng-template #optionsTmpl>
+  @let options = options$ | async;
+  @if (options) {
+  @for (option of options; track option.value) {
+  <mat-option [value]="option.value">
+    <ng-container *ngTemplateOutlet="autocompleteOption; context: { option }"></ng-container>
+  </mat-option>
+  }
+  }
+</ng-template>
+
+
+<ng-template #autocompleteOption let-option="option">
+  <div class="option">
+    @if (option.icon) {
+    <mat-icon [style.color]="option.iconColor" [style.margin-right.px]="8">
+      {{option.icon}}
+    </mat-icon>
+    }
+    <mat-label [style.color]="option.color" [innerHTML]="option.label"></mat-label>
+  </div>
+</ng-template>

@@ -2,7 +2,7 @@
 <mat-form-field appearance="fill">
   <mat-label [innerHTML]="column.header"></mat-label>
   <mat-select [formControl]="selectControl">
-    @let options = $any(column.options | async);
+    @let options = column.options | async;
 
     <mat-select-trigger>
       @let option = selectControl.value | selectOption:options;
@@ -12,6 +12,9 @@
       <mat-label [innerHTML]="selectControl.value"></mat-label>
       }
     </mat-select-trigger>
+    <mat-option [value]="undefined" id="no-value">
+      <mat-label [innerHTML]="column.header"></mat-label>
+    </mat-option>
     @for (option of options; track option) {
     <mat-option [value]="option.value">
       <ng-container *ngTemplateOutlet="selectOption; context: { option }"></ng-container>
