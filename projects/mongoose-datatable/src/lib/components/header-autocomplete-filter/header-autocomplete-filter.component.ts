@@ -28,9 +28,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import {
+  BehaviorSubject,
   debounceTime,
   exhaustMap,
   filter,
+  map,
   Observable,
   scan,
   startWith,
@@ -72,7 +74,7 @@ export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestr
   @Input()
   column!: IMongooseDatatableSearchAutocompleteColumn;
 
-  options$!: Observable<MongooseDatatableSearchListOption[]>;
+  options: MongooseDatatableSearchListOption[] = [];
   hasMore = false;
   searching = false;
   @ViewChild('input') input!: ElementRef<HTMLInputElement>;
@@ -83,7 +85,7 @@ export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestr
 
   onTouched = () => {};
 
-  private filter$: Subject<string> = new Subject();
+  private filter$ = new BehaviorSubject<string | undefined>(undefined);
   private nextPage$ = new Subject<void>();
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);
@@ -126,7 +128,7 @@ export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestr
   focus() {
     if (this.column.loadOnFocus) {
       const search = this.input.nativeElement.value;
-      this.filter$.next(search);
+      if (this.filter$.value !== search) this.filter$.next(search);
     }
   }
 
@@ -136,23 +138,28 @@ export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestr
   }
 
   private buildOptions() {
-    this.filter$.pipe(
-      filter((value) => typeof value === 'string'),
-      debounceTime(300)
-    );
-    this.options$ = this.filter$.pipe(
-      switchMap((search: string) => {
-        let skip = 0;
-        return this.nextPage$.pipe(
-          startWith(skip),
-          tap(() => (this.searching = true)),
-          exhaustMap(async () => this.column.options(this.column.limit || 10, skip, search)),
-          tap((data) => (this.hasMore = data?.length === (this.column.limit || 10))),
-          tap(() => (skip += this.column.limit || 10)),
-          scan((data, list) => data.concat(list), [] as MongooseDatatableSearchListOption[])
-        );
-      }),
-      tap(() => (this.searching = false))
+    this.subsink.add(
+      this.filter$
+        .pipe(
+          filter((value) => typeof value === 'string'),
+          debounceTime(300),
+          switchMap((search: string) => {
+            this.options = [];
+            let skip = 0;
+            return this.nextPage$.pipe(
+              startWith(skip),
+              tap(() => (this.searching = true)),
+              switchMap(async () => this.column.options(this.column.limit || 10, skip, search)),
+              map((data) => {
+                this.options.push(...data);
+                skip += this.column.limit || 10;
+                this.hasMore = data?.length === (this.column.limit || 10);
+                this.searching = false;
+              })
+            );
+          })
+        )
+        .subscribe()
     );
   }
 }
