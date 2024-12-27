@@ -163,21 +163,21 @@
   }
 }
 
-.mat-mdc-icon-button[mat-icon-button][size="small"] {
-  --mdc-icon-button-state-layer-size: 30px;
-  --mdc-icon-button-icon-size: 18px;
+::ng-deep {
+  .mat-mdc-icon-button[mat-icon-button][size="small"] {
+    --mdc-icon-button-state-layer-size: 30px;
+    --mdc-icon-button-icon-size: 18px;
 
-  ::ng-deep {
     .mat-mdc-button-touch-target {
       height: 36px;
       width: 36px;
     }
-  }
 
-  mat-icon {
-    height: 18px;
-    width: 18px;
-    font-size: 18px;
+    mat-icon {
+      height: 18px;
+      width: 18px;
+      font-size: 18px;
+    }
   }
 }
 

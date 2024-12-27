@@ -92,7 +92,9 @@ export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestr
 
   private subsink = new Subscription();
 
-  writeValue = () => {};
+  writeValue = (value: any) => {
+    if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
+  };
 
   registerOnChange(onChange: any): void {
     this.onChange = onChange;
@@ -108,8 +110,15 @@ export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestr
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
-        if (value === undefined) this.control.setValue(undefined);
-        else this.control.setValue({ value, regex: false });
+        console.warn(
+          'value',
+          value,
+          this.options.find((o) => o.value === value)
+        );
+        // if (this.options.find((o) => o.value === value)) {
+        //   this.control.setValue({ value, regex: false });
+        // } else
+        if (this.control.value?.value !== value) this.control.setValue({ value, regex: false });
       })
     );
     this.buildOptions();

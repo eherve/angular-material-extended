@@ -112,7 +112,7 @@ export class AppComponent {
                     skip + limit
                   )
                 ),
-              2000
+              500
             );
           });
         },

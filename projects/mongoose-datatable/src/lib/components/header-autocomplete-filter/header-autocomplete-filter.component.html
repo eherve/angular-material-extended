@@ -5,7 +5,11 @@
     [formControl]="selectControl" [matAutocomplete]="auto" (input)="filter()" (focus)="focus()">
   <mat-autocomplete #auto="matAutocomplete" requireSelection>
 
-    <ng-container *ngTemplateOutlet="optionsTmpl"></ng-container>
+    @for (option of options; track option) {
+    <mat-option [value]="option.value">
+      <ng-container *ngTemplateOutlet="autocompleteOption; context: { option }"></ng-container>
+    </mat-option>
+    }
 
     <mat-option id="searching-option" disabled>
       @if(searching) {
@@ -19,17 +23,13 @@
     }
 
   </mat-autocomplete>
+
+  <button *ngIf="selectControl.value" mat-icon-button matSuffix size="small"
+    (click)="selectControl.setValue(undefined)">
+    <mat-icon>close</mat-icon>
+  </button>
 </mat-form-field>
 }
-
-<ng-template #optionsTmpl>
-  @for (option of options; track option) {
-  <mat-option [value]="option.value">
-    <ng-container *ngTemplateOutlet="autocompleteOption; context: { option }"></ng-container>
-  </mat-option>
-  }
-</ng-template>
-
 
 <ng-template #autocompleteOption let-option="option">
   <div class="option">
