@@ -1,5 +1,7 @@
+<!-- @format -->
+
 @if (selectControl) {
-<mat-checkbox [formControl]="selectControl" [indeterminate]="selectControl.value === undefined">
-  <mat-label [innerHTML]="column.header"></mat-label>
-</mat-checkbox>
+  <mat-checkbox [formControl]="selectControl" [indeterminate]="selectControl.value === undefined">
+    <mat-label [innerHTML]="column.header"></mat-label>
+  </mat-checkbox>
 }

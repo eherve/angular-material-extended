@@ -1,3 +1,5 @@
+/** @format */
+
 :host {
   display: flex;
   flex: 1 1 100%;
@@ -29,8 +31,4 @@ mat-form-field {
   place-content: center start;
   align-items: center;
   flex-direction: row;
-}
-
-#no-value {
-  --mat-option-label-text-color: #aaa;
 }

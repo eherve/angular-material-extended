@@ -1,3 +1,5 @@
+/** @format */
+
 import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,

@@ -1,3 +1,5 @@
+/** @format */
+
 import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -13,12 +15,7 @@ describe('TableComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [TableComponent],
-      imports: [
-        NoopAnimationsModule,
-        MatPaginatorModule,
-        MatSortModule,
-        MatTableModule,
-      ]
+      imports: [NoopAnimationsModule, MatPaginatorModule, MatSortModule, MatTableModule],
     }).compileComponents();
   }));
 

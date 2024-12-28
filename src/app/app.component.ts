@@ -1,7 +1,13 @@
-import { Component } from '@angular/core';
-import { clone, filter, map, orderBy, uniqBy, includes, slice } from 'lodash-es';
+/** @format */
+
+import { Component, Input } from '@angular/core';
+import { clone, filter, map, orderBy, uniqBy, includes, slice, template, trim, toLower, deburr } from 'lodash-es';
 import { of } from 'rxjs';
-import { MongooseDatatableOptions } from '../../projects/mongoose-datatable/src/public-api';
+import {
+  DatasourceService,
+  IMongooseDatatableBaseColumn,
+  MongooseDatatableOptions,
+} from '../../projects/mongoose-datatable/src/public-api';
 
 const DATA: any[] = [];
 let i = 0;
@@ -11,16 +17,48 @@ while (i++ < 100) {
     reference: `Référence ${i}`,
     checkbox: (() => {
       const rand = Math.random();
-      return rand < 0.33 ? true : rand < 0.66 ? false : undefined;
+      return (
+        rand < 0.33 ? true
+        : rand < 0.66 ? false
+        : undefined
+      );
     })(),
     autocomplete: (() => {
       const rand = Math.round(Math.random() * 100);
       return `option ${rand}`;
     })(),
+    template: `Template ${i}`,
+    templateSearch: i,
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
   });
 }
+
+const service: DatasourceService<any> = options => {
+  let data = clone(DATA).filter(d => {
+    for (let c of options.columns) {
+      if (!c.search) continue;
+      if (c.search.regex && !deburr(toLower(trim(d[c.data]))).includes(deburr(toLower(trim(c.search.value))))) {
+        return false;
+      }
+      if (!c.search.regex && d[c.data] !== c.search.value) return false;
+    }
+    return true;
+  });
+  if (options.order) {
+    data = orderBy(
+      data,
+      map(options.order, o => options.columns[o.column].data),
+      map(options.order, 'dir')
+    );
+  }
+  const recordsFiltered = data.length;
+  data = data.slice(options.start! * options.length!, (options.start! + 1) * options.length!);
+  console.log('service', options, data);
+  return new Promise(resolve => {
+    setTimeout(() => resolve({ draw: options.draw, recordsTotal: DATA.length, recordsFiltered, data }), 300);
+  });
+};
 
 @Component({
   standalone: false,
@@ -30,21 +68,7 @@ while (i++ < 100) {
 })
 export class AppComponent {
   datatableOptions: MongooseDatatableOptions<any> = {
-    service: (options) => {
-      let data = clone(DATA);
-      if (options.order) {
-        data = orderBy(
-          data,
-          map(options.order, (o) => options.columns[o.column].data),
-          map(options.order, 'dir')
-        );
-      }
-      data = data.slice(options.start! * options.length!, (options.start! + 1) * options.length!);
-      console.log('service', options, data);
-      return new Promise((resolve) => {
-        setTimeout(() => resolve({ draw: options.draw, recordsTotal: 100, recordsFiltered: 100, data }), 300);
-      });
-    },
+    service,
     pageSizeOptions: [10, 20, 50, 100],
     pageSizeOptionsIndex: 1,
     actions: {
@@ -63,7 +87,8 @@ export class AppComponent {
         property: 'label',
         sticky: true,
         sortable: true,
-        searchable: 'text',
+        type: 'text',
+        searchable: true,
         order: { index: 0, dir: 'asc' },
       },
       {
@@ -71,10 +96,11 @@ export class AppComponent {
         header: 'Référence',
         property: 'reference',
         minWidth: 400,
+        type: 'select',
+        searchable: true,
         sortable: true,
-        searchable: 'select',
         options: of(
-          DATA.map((d) => ({ value: d.reference, label: d.reference, color: 'red', icon: 'home', iconColor: 'blue' }))
+          DATA.map(d => ({ value: d.reference, label: d.reference, color: 'red', icon: 'home', iconColor: 'blue' }))
         ),
       },
       {
@@ -82,12 +108,13 @@ export class AppComponent {
         header: 'Autocomplete',
         property: 'autocomplete',
         minWidth: 400,
+        type: 'autocomplete',
+        searchable: true,
         sortable: true,
-        searchable: 'autocomplete',
         placeholder: 'Sélectionnez une option',
         loadOnFocus: true,
         options: async (limit, skip, search) => {
-          return new Promise((resolve) => {
+          return new Promise(resolve => {
             setTimeout(
               () =>
                 resolve(
@@ -95,7 +122,7 @@ export class AppComponent {
                     orderBy(
                       filter(
                         uniqBy(
-                          map(DATA, (d) => ({
+                          map(DATA, d => ({
                             value: d.autocomplete,
                             label: d.autocomplete,
                             color: 'blue',
@@ -104,7 +131,7 @@ export class AppComponent {
                           })),
                           'value'
                         ),
-                        (d) => includes(d.value, search)
+                        d => includes(d.value, search)
                       ),
                       ['label', 'asc']
                     ),
@@ -121,7 +148,19 @@ export class AppComponent {
         columnDef: 'checkbox',
         header: 'Checkbox',
         property: 'checkbox',
-        searchable: 'checkbox',
+        type: 'checkbox',
+        searchable: true,
+      },
+      {
+        columnDef: 'template',
+        header: 'Template',
+        property: 'template',
+        type: 'text',
+        searchable: true,
+        searchProperty: 'templateSearch',
+        sortable: true,
+        sortProperty: 'templateSearch',
+        cellComponent: ComponentCellComponent,
       },
       {
         columnDef: 'description',
@@ -131,4 +170,19 @@ export class AppComponent {
       },
     ],
   };
+}
+
+@Component({
+  template: '<span>Template component : {{value}}</span>',
+  standalone: true,
+})
+export class ComponentCellComponent {
+  @Input()
+  column!: IMongooseDatatableBaseColumn;
+
+  @Input()
+  row: any;
+
+  @Input()
+  value: any;
 }

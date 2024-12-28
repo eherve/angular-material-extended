@@ -1,3 +1,5 @@
+/** @format */
+
 :host {
   display: block;
 
@@ -91,10 +93,7 @@
   ::ng-deep {
     .mat-mdc-table-sticky {
       opacity: 1;
-      background: var(
-        --datatable-sticky-background,
-        var(--datatable-background, #ffffff)
-      );
+      background: var(--datatable-sticky-background, var(--datatable-background, #ffffff));
       &.mat-mdc-table-sticky-border-elem-left {
         border-right: var(--datatable-sticky-border);
       }
@@ -164,7 +163,7 @@
 }
 
 ::ng-deep {
-  .mat-mdc-icon-button[mat-icon-button][size="small"] {
+  .mat-mdc-icon-button[mat-icon-button][size='small'] {
     --mdc-icon-button-state-layer-size: 30px;
     --mdc-icon-button-icon-size: 18px;
 

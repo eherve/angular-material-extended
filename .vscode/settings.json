@@ -1,0 +1,13 @@
+{
+  "prettier.experimentalTernaries": true,
+  "prettier.documentSelectors": ["**/*.mongodb"],
+  "prettier.insertPragma": true,
+  "prettier.useEditorConfig": false,
+  "prettier.arrowParens": "avoid",
+  "prettier.bracketSameLine": true,
+  "prettier.jsxSingleQuote": true,
+  "prettier.printWidth": 120,
+  "prettier.singleQuote": true,
+  "prettier.vueIndentScriptAndStyle": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

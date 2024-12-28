@@ -1,3 +1,5 @@
+/** @format */
+
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
@@ -17,12 +19,12 @@ import { debounceTime, Subscription } from 'rxjs';
 import { DatasourceRequestColumn, DatasourceRequestOrder, MongooseDatatableColumn } from '../public-api';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
 import { CellSelectValueComponent } from './components/cell-select-value/cell-select-value.component';
+import { HeaderAutocompleteFilterComponent } from './components/header-autocomplete-filter/header-autocomplete-filter.component';
 import { HeaderCheckboxFilterComponent } from './components/header-checkbox-filter/header-checkbox-filter.component';
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { DatagridDataSource } from './datasource';
 import { MongooseDatatableOptions } from './types/datatable-options.type';
-import { HeaderAutocompleteFilterComponent } from './components/header-autocomplete-filter/header-autocomplete-filter.component';
 
 type UpdateColumn = Pick<MongooseDatatableColumn, 'columnDef' | 'header' | 'sticky' | 'hidden'>;
 
@@ -95,14 +97,14 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
   load(intersect: boolean) {
     if (!intersect || this.loaded) return;
     this.loaded = true;
-    this.subscriptions.add(this.paginator?.page.subscribe((value) => this.loadPage()));
+    this.subscriptions.add(this.paginator?.page.subscribe(value => this.loadPage()));
     // this.subscriptions.add(this.dataSource!.connect().subscribe((data) => this.loadRows(data)));
     this.loadPage();
   }
 
   sortColumn(column: MongooseDatatableColumn) {
     if (column.sortable === false) return;
-    if (!column.order) column.order = { index: this.options.columns.filter((c) => !!c.order).length, dir: 'asc' };
+    if (!column.order) column.order = { index: this.options.columns.filter(c => !!c.order).length, dir: 'asc' };
     else if (column.order.dir === 'asc') column.order.dir = 'desc';
     else {
       delete column.order;
@@ -116,10 +118,11 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
     const columns = this.buildRequestColumns();
     const order: DatasourceRequestOrder[] = [];
     this.options.columns
-      .filter((c) => !!c.order)
+      .filter(c => !!c.order)
       .sort((c1, c2) => c1.order!.index - c2.order!.index)
-      .forEach((c) => {
-        const index = columns.findIndex((column) => column.name === c.columnDef);
+      .forEach(c => {
+        const index = columns.findIndex(column => column.data === (c.sortProperty || c.property));
+        console.log('sort', c.columnDef, c.sortProperty || c.property, index);
         if (index !== -1) order.push({ column: index, dir: c.order!.dir });
       });
     this.dataSource.loadData({
@@ -133,7 +136,7 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
 
   updateColumns: UpdateColumn[] = [];
   openUpdateColumnDisplay() {
-    this.updateColumns = this.options.columns.map((column) => ({
+    this.updateColumns = this.options.columns.map(column => ({
       columnDef: column.columnDef,
       header: column.header,
       sticky: column.sticky,
@@ -148,7 +151,7 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
   closeUpdateColumnDisplay() {
     let reload = false;
     this.updateColumns.forEach((updated, index) => {
-      const columnIndex = this.options.columns.findIndex((c) => c.columnDef === updated.columnDef);
+      const columnIndex = this.options.columns.findIndex(c => c.columnDef === updated.columnDef);
       if (columnIndex == -1) return;
       if (columnIndex !== index) moveItemInArray(this.options.columns, index, columnIndex);
       const column = this.options.columns[columnIndex];
@@ -164,21 +167,34 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
 
   private buildRequestColumns(): DatasourceRequestColumn[] {
     const columns: DatasourceRequestColumn[] = [];
-    this.options.columns.forEach((c) => {
+    const additionalColumns: DatasourceRequestColumn[] = [];
+    this.options.columns.forEach(c => {
       if (c.hidden) return;
       const column: DatasourceRequestColumn = { data: c.property, name: c.columnDef };
+      if (c.sortProperty && c.order) this.addAdditionalColumn(additionalColumns, c.sortProperty);
       if (c.searchable) {
         const control = this.searchFormGroup.controls[c.columnDef];
-        if (control.value) column.search = control.value;
+        if (control.value) {
+          if (c.searchProperty) this.addAdditionalColumn(additionalColumns, c.searchProperty, control.value);
+          else column.search = control.value;
+        }
       }
       columns.push(column);
     });
+    columns.push(...additionalColumns);
     return columns;
+  }
+
+  private addAdditionalColumn(additionalColumns: DatasourceRequestColumn[], data: string, search?: any) {
+    let column = additionalColumns.find(c => c.data === data);
+    if (!column) additionalColumns.push((column = { data }));
+    if (search) column.search = search;
+    return column;
   }
 
   private buildDisplayColumns() {
     const displayedColumns: string[] = [];
-    this.options.columns.forEach((column) => {
+    this.options.columns.forEach(column => {
       if (column.hidden) return;
       displayedColumns.push(column.columnDef);
     });
@@ -188,14 +204,14 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
   private buildSearchFormGroup() {
     this.searchFormGroup = new FormGroup(
       this.options.columns.reduce((controls, column) => {
-        if (column.searchable !== undefined) {
+        if (column.searchable) {
           controls[column.columnDef] = new FormControl({ value: undefined, disabled: false });
         }
         return controls;
       }, {} as any)
     );
     this.subscriptions.add(
-      this.searchFormGroup.valueChanges.pipe(debounceTime(500)).subscribe((value) => {
+      this.searchFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(value => {
         this.paginator!.pageIndex = 0;
         this.loadPage();
       })
@@ -205,8 +221,8 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
   private consolidateOrderIndex() {
     let index = 0;
     this.options.columns
-      .filter((c) => !!c.order)
+      .filter(c => !!c.order)
       .sort((c1, c2) => c1.order!.index - c2.order!.index)
-      .forEach((c) => (c.order!.index = index++));
+      .forEach(c => (c.order!.index = index++));
   }
 }

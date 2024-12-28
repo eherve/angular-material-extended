@@ -1,3 +1,5 @@
+/** @format */
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HeaderSelectFilterComponent } from './header-select-filter.component';
@@ -8,9 +10,8 @@ describe('HeaderSelectFilterComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HeaderSelectFilterComponent]
-    })
-    .compileComponents();
+      imports: [HeaderSelectFilterComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(HeaderSelectFilterComponent);
     component = fixture.componentInstance;

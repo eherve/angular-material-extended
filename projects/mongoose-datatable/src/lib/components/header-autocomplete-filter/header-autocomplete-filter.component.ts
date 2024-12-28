@@ -1,3 +1,5 @@
+/** @format */
+
 import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
@@ -27,20 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
-import {
-  BehaviorSubject,
-  debounceTime,
-  exhaustMap,
-  filter,
-  map,
-  Observable,
-  scan,
-  startWith,
-  Subject,
-  Subscription,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { BehaviorSubject, debounceTime, filter, map, startWith, Subject, Subscription, switchMap, tap } from 'rxjs';
 import {
   IMongooseDatatableSearchAutocompleteColumn,
   MongooseDatatableSearchListOption,
@@ -110,15 +99,12 @@ export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestr
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
-        console.warn(
-          'value',
-          value,
-          this.options.find((o) => o.value === value)
-        );
-        // if (this.options.find((o) => o.value === value)) {
-        //   this.control.setValue({ value, regex: false });
-        // } else
-        if (this.control.value?.value !== value) this.control.setValue({ value, regex: false });
+        if (value === undefined) {
+          if (this.control.value !== undefined) this.control.setValue(undefined);
+        }
+        if (value === null && !this.options.find(o => o.value === null)) {
+          if (this.control.value !== undefined) this.control.setValue(undefined);
+        } else if (this.control.value?.value !== value) this.control.setValue({ value, regex: false });
       })
     );
     this.buildOptions();
@@ -150,7 +136,7 @@ export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestr
     this.subsink.add(
       this.filter$
         .pipe(
-          filter((value) => typeof value === 'string'),
+          filter(value => typeof value === 'string'),
           debounceTime(300),
           switchMap((search: string) => {
             this.options = [];
@@ -159,7 +145,7 @@ export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestr
               startWith(skip),
               tap(() => (this.searching = true)),
               switchMap(async () => this.column.options(this.column.limit || 10, skip, search)),
-              map((data) => {
+              map(data => {
                 this.options.push(...data);
                 skip += this.column.limit || 10;
                 this.hasMore = data?.length === (this.column.limit || 10);

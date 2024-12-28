@@ -1,16 +1,18 @@
+<!-- @format -->
+
 @let options = $any(column.options | async);
-@let value = row | get:column.property;
-@let option = row | get:column.property | selectOption:options;
+@let value = row | get: column.property;
+@let option = row | get: column.property | selectOption: options;
 
 @if (option) {
-<div class="option">
-  @if (option.icon) {
-  <mat-icon [style.color]="option.iconColor" [style.margin-right.px]="8">
-    {{option.icon}}
-  </mat-icon>
-  }
-  <mat-label [style.color]="option.color" [innerHTML]="option.label"></mat-label>
-</div>
+  <div class="option">
+    @if (option.icon) {
+      <mat-icon [style.color]="option.iconColor" [style.margin-right.px]="8">
+        {{ option.icon }}
+      </mat-icon>
+    }
+    <mat-label [style.color]="option.color" [innerHTML]="option.label"></mat-label>
+  </div>
 } @else {
-{{value}}
+  {{ value }}
 }

@@ -1,32 +1,49 @@
+/** @format */
+
+import { ComponentType } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
 import { DatasourceRequestOrderDir } from './datasource-service.type';
 
-export type MongooseDatatableColumnSearchType = 'text' | 'select' | 'autocomplete' | 'checkbox';
+export type MongooseDatatableColumnType = 'text' | 'select' | 'autocomplete' | 'checkbox';
 
 export interface IMongooseDatatableBaseColumn {
   columnDef: string;
   header: string;
   property: string;
+
+  type?: MongooseDatatableColumnType;
+
   minWidth?: number;
 
   sticky?: boolean;
   hidden?: boolean;
 
-  searchable?: MongooseDatatableColumnSearchType;
+  searchable?: boolean;
+  searchProperty?: string;
 
   sortable?: boolean;
+  sortProperty?: string;
   order?: {
     index: number;
     dir: DatasourceRequestOrderDir;
   };
+
+  cellComponent?: ComponentType<any>;
 }
 
 export interface IMongooseDatatableColumn extends IMongooseDatatableBaseColumn {
-  searchable: undefined;
+  searchable?: false;
+  searchProperty?: undefined;
 }
 
-export interface IMongooseDatatableSearchTextColumn extends IMongooseDatatableBaseColumn {
-  searchable: 'text';
+export interface IMongooseDatatableSearchableColumn extends IMongooseDatatableBaseColumn {
+  type: MongooseDatatableColumnType;
+  searchable: true;
+  searchProperty?: string;
+}
+
+export interface IMongooseDatatableSearchTextColumn extends IMongooseDatatableSearchableColumn {
+  type: 'text';
 }
 
 export type MongooseDatatableSearchListOption = {
@@ -36,25 +53,25 @@ export type MongooseDatatableSearchListOption = {
   icon?: string;
   iconColor?: string;
 };
-export interface IMongooseDatatableSearchSelectColumn extends IMongooseDatatableBaseColumn {
-  searchable: 'select';
+export interface IMongooseDatatableSearchSelectColumn extends IMongooseDatatableSearchableColumn {
+  type: 'select';
   options: Observable<MongooseDatatableSearchListOption[]>;
 }
 
-export interface IMongooseDatatableSearchAutocompleteColumn extends IMongooseDatatableBaseColumn {
-  searchable: 'autocomplete';
+export interface IMongooseDatatableSearchAutocompleteColumn extends IMongooseDatatableSearchableColumn {
+  type: 'autocomplete';
   placeholder?: string;
   limit?: number;
-  loadOnFocus?:boolean;
+  loadOnFocus?: boolean;
   options: (limit: number, skip: number, search: string) => Promise<MongooseDatatableSearchListOption[]>;
 }
 
-export interface IMongooseDatatableSearchCheckboxColumn extends IMongooseDatatableBaseColumn {
-  searchable: 'checkbox';
+export interface IMongooseDatatableSearchCheckboxColumn extends IMongooseDatatableSearchableColumn {
+  type: 'checkbox';
 }
 
 export type MongooseDatatableColumn =
-  | IMongooseDatatableBaseColumn
+  | IMongooseDatatableColumn
   | IMongooseDatatableSearchTextColumn
   | IMongooseDatatableSearchSelectColumn
   | IMongooseDatatableSearchAutocompleteColumn
