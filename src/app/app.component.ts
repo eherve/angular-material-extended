@@ -1,11 +1,11 @@
 /** @format */
 
 import { Component, Input } from '@angular/core';
-import { clone, filter, map, orderBy, uniqBy, includes, slice, template, trim, toLower, deburr } from 'lodash-es';
+import { clone, deburr, filter, includes, map, orderBy, slice, toLower, trim, uniqBy } from 'lodash-es';
 import { of } from 'rxjs';
 import {
   DatasourceService,
-  IMongooseDatatableBaseColumn,
+  MongooseDatatableColumn,
   MongooseDatatableOptions,
 } from '../../projects/mongoose-datatable/src/public-api';
 
@@ -82,21 +82,21 @@ export class AppComponent {
     columnMinWith: 120,
     columns: [
       {
+        type: 'text',
         columnDef: 'label',
         header: 'Label',
         property: 'label',
         sticky: true,
         sortable: true,
-        type: 'text',
         searchable: true,
         order: { index: 0, dir: 'asc' },
       },
       {
+        type: 'select',
         columnDef: 'reference',
         header: 'Référence',
         property: 'reference',
         minWidth: 400,
-        type: 'select',
         searchable: true,
         sortable: true,
         options: of(
@@ -104,11 +104,11 @@ export class AppComponent {
         ),
       },
       {
+        type: 'autocomplete',
         columnDef: 'autocomplete',
         header: 'Autocomplete',
         property: 'autocomplete',
         minWidth: 400,
-        type: 'autocomplete',
         searchable: true,
         sortable: true,
         placeholder: 'Sélectionnez une option',
@@ -145,17 +145,17 @@ export class AppComponent {
         },
       },
       {
+        type: 'checkbox',
         columnDef: 'checkbox',
         header: 'Checkbox',
         property: 'checkbox',
-        type: 'checkbox',
         searchable: true,
       },
       {
+        type: 'text',
         columnDef: 'template',
         header: 'Template',
         property: 'template',
-        type: 'text',
         searchable: true,
         searchProperty: 'templateSearch',
         sortable: true,
@@ -163,6 +163,7 @@ export class AppComponent {
         cellComponent: ComponentCellComponent,
       },
       {
+        type: 'text',
         columnDef: 'description',
         header: 'Description',
         property: 'description',
@@ -178,7 +179,7 @@ export class AppComponent {
 })
 export class ComponentCellComponent {
   @Input()
-  column!: IMongooseDatatableBaseColumn;
+  column!: MongooseDatatableColumn;
 
   @Input()
   row: any;

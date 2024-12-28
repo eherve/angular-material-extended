@@ -31,7 +31,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { BehaviorSubject, debounceTime, filter, map, startWith, Subject, Subscription, switchMap, tap } from 'rxjs';
 import {
-  IMongooseDatatableSearchAutocompleteColumn,
+  MongooseDatatableSearchAutocompleteColumn,
   MongooseDatatableSearchListOption,
 } from '../../types/datatable-column.type';
 
@@ -61,7 +61,7 @@ import {
 })
 export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: IMongooseDatatableSearchAutocompleteColumn;
+  column!: MongooseDatatableSearchAutocompleteColumn;
 
   options: MongooseDatatableSearchListOption[] = [];
   hasMore = false;

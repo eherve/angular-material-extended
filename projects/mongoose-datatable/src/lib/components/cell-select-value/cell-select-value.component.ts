@@ -4,7 +4,7 @@ import { MatLabel } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { GetPipe } from '../../pipes/get.pipe';
 import { SelectOptionPipe } from '../../pipes/select-option.pipe';
-import { IMongooseDatatableSearchSelectColumn } from '../../types/datatable-column.type';
+import { MongooseDatatableSearchSelectColumn } from '../../types/datatable-column.type';
 
 @Component({
   selector: 'lib-cell-select-value',
@@ -14,7 +14,7 @@ import { IMongooseDatatableSearchSelectColumn } from '../../types/datatable-colu
 })
 export class CellSelectValueComponent {
   @Input()
-  column!: IMongooseDatatableSearchSelectColumn;
+  column!: MongooseDatatableSearchSelectColumn;
 
   @Input()
   row: any;

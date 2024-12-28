@@ -16,7 +16,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { debounceTime, Subscription } from 'rxjs';
-import { DatasourceRequestColumn, DatasourceRequestOrder, MongooseDatatableColumn } from '../public-api';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
 import { CellSelectValueComponent } from './components/cell-select-value/cell-select-value.component';
 import { HeaderAutocompleteFilterComponent } from './components/header-autocomplete-filter/header-autocomplete-filter.component';
@@ -24,6 +23,8 @@ import { HeaderCheckboxFilterComponent } from './components/header-checkbox-filt
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { DatagridDataSource } from './datasource';
+import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
+import { MongooseDatatableColumn } from './types/datatable-column.type';
 import { MongooseDatatableOptions } from './types/datatable-options.type';
 
 type UpdateColumn = Pick<MongooseDatatableColumn, 'columnDef' | 'header' | 'sticky' | 'hidden'>;
@@ -122,7 +123,6 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
       .sort((c1, c2) => c1.order!.index - c2.order!.index)
       .forEach(c => {
         const index = columns.findIndex(column => column.data === (c.sortProperty || c.property));
-        console.log('sort', c.columnDef, c.sortProperty || c.property, index);
         if (index !== -1) order.push({ column: index, dir: c.order!.dir });
       });
     this.dataSource.loadData({

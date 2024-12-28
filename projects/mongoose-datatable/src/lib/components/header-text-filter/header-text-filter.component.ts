@@ -23,7 +23,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Subscription } from 'rxjs';
-import { IMongooseDatatableSearchTextColumn } from '../../types/datatable-column.type';
+import { MongooseDatatableSearchTextColumn } from '../../types/datatable-column.type';
 
 @Component({
   selector: 'lib-header-text-filter',
@@ -48,7 +48,7 @@ import { IMongooseDatatableSearchTextColumn } from '../../types/datatable-column
 })
 export class HeaderTextFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: IMongooseDatatableSearchTextColumn;
+  column!: MongooseDatatableSearchTextColumn;
 
   control!: FormControl<any>;
   selectControl = new FormControl();

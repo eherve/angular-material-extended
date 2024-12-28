@@ -1,8 +1,8 @@
 <!-- @format -->
 
 @let value = row | get: column.property;
-@if (value === true) {
+@if (value === false) {
   <mat-icon>check_box_outline_blank</mat-icon>
-} @else if (value === false) {
+} @else if (value === true) {
   <mat-icon color="primary">check_box</mat-icon>
 }

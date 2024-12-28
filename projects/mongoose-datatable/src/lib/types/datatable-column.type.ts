@@ -6,12 +6,11 @@ import { DatasourceRequestOrderDir } from './datasource-service.type';
 
 export type MongooseDatatableColumnType = 'text' | 'select' | 'autocomplete' | 'checkbox';
 
-export interface IMongooseDatatableBaseColumn {
+type BaseColumn = {
+  type: MongooseDatatableColumnType;
   columnDef: string;
   header: string;
   property: string;
-
-  type?: MongooseDatatableColumnType;
 
   minWidth?: number;
 
@@ -27,25 +26,38 @@ export interface IMongooseDatatableBaseColumn {
     index: number;
     dir: DatasourceRequestOrderDir;
   };
+};
 
-  cellComponent?: ComponentType<any>;
-}
+type ComponentColumn = BaseColumn & {
+  cellComponent: ComponentType<any>;
+  cellContent?: undefined;
+};
 
-export interface IMongooseDatatableColumn extends IMongooseDatatableBaseColumn {
-  searchable?: false;
-  searchProperty?: undefined;
-}
+type ContentColumn = BaseColumn & {
+  cellComponent?: undefined;
+  cellContent: string;
+};
 
-export interface IMongooseDatatableSearchableColumn extends IMongooseDatatableBaseColumn {
+type Column = BaseColumn | ComponentColumn | ContentColumn;
+
+type SearchableColumn = Column & {
   type: MongooseDatatableColumnType;
   searchable: true;
   searchProperty?: string;
-}
+};
 
-export interface IMongooseDatatableSearchTextColumn extends IMongooseDatatableSearchableColumn {
+// TEXT COLUMN
+export type MongooseDatatableTextColumn = Column & {
   type: 'text';
-}
+};
+export type MongooseDatatableSearchTextColumn = SearchableColumn & {
+  type: 'text';
+};
 
+// SELECT COLUMN
+export type MongooseDatatableSelectColumn = Column & {
+  type: 'select';
+};
 export type MongooseDatatableSearchListOption = {
   value: any;
   label: string;
@@ -53,26 +65,37 @@ export type MongooseDatatableSearchListOption = {
   icon?: string;
   iconColor?: string;
 };
-export interface IMongooseDatatableSearchSelectColumn extends IMongooseDatatableSearchableColumn {
+export type MongooseDatatableSearchSelectColumn = SearchableColumn & {
   type: 'select';
   options: Observable<MongooseDatatableSearchListOption[]>;
-}
+};
 
-export interface IMongooseDatatableSearchAutocompleteColumn extends IMongooseDatatableSearchableColumn {
+// AUTOCOMPLETE COLUMN
+export type MongooseDatatableAutocompleteColumn = Column & {
+  type: 'autocomplete';
+};
+export type MongooseDatatableSearchAutocompleteColumn = SearchableColumn & {
   type: 'autocomplete';
   placeholder?: string;
   limit?: number;
   loadOnFocus?: boolean;
   options: (limit: number, skip: number, search: string) => Promise<MongooseDatatableSearchListOption[]>;
-}
+};
 
-export interface IMongooseDatatableSearchCheckboxColumn extends IMongooseDatatableSearchableColumn {
+// CHECKBOX COLUMN
+export type MongooseDatatableCheckboxColumn = Column & {
   type: 'checkbox';
-}
+};
+export type MongooseDatatableSearchCheckboxColumn = SearchableColumn & {
+  type: 'checkbox';
+};
 
 export type MongooseDatatableColumn =
-  | IMongooseDatatableColumn
-  | IMongooseDatatableSearchTextColumn
-  | IMongooseDatatableSearchSelectColumn
-  | IMongooseDatatableSearchAutocompleteColumn
-  | IMongooseDatatableSearchCheckboxColumn;
+  | MongooseDatatableTextColumn
+  | MongooseDatatableSearchTextColumn
+  | MongooseDatatableSelectColumn
+  | MongooseDatatableSearchSelectColumn
+  | MongooseDatatableAutocompleteColumn
+  | MongooseDatatableSearchAutocompleteColumn
+  | MongooseDatatableCheckboxColumn
+  | MongooseDatatableSearchCheckboxColumn;

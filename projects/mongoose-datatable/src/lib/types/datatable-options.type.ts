@@ -1,5 +1,7 @@
-import { MongooseDatatableColumn } from './datatable-column.type';
+/** @format */
+
 import { DatasourceService } from './datasource-service.type';
+import { MongooseDatatableColumn } from './datatable-column.type';
 
 export type MongooseDatatableOptions<Record> = {
   service: DatasourceService<Record>;

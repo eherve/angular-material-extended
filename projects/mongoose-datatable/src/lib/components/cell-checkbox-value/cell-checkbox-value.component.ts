@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { GetPipe } from '../../pipes/get.pipe';
-import { IMongooseDatatableSearchCheckboxColumn } from '../../types/datatable-column.type';
+import { MongooseDatatableSearchCheckboxColumn } from '../../types/datatable-column.type';
 
 @Component({
   selector: 'lib-cell-checkbox-value',
@@ -14,7 +14,7 @@ import { IMongooseDatatableSearchCheckboxColumn } from '../../types/datatable-co
 })
 export class CellCheckboxValueComponent {
   @Input()
-  column!: IMongooseDatatableSearchCheckboxColumn;
+  column!: MongooseDatatableSearchCheckboxColumn;
 
   @Input()
   row: any;

@@ -23,7 +23,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { filter, Subscription, tap } from 'rxjs';
-import { IMongooseDatatableSearchCheckboxColumn } from '../../types/datatable-column.type';
+import { MongooseDatatableSearchCheckboxColumn } from '../../types/datatable-column.type';
 
 @Component({
   selector: 'lib-header-checkbox-filter',
@@ -48,7 +48,7 @@ import { IMongooseDatatableSearchCheckboxColumn } from '../../types/datatable-co
 })
 export class HeaderCheckboxFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: IMongooseDatatableSearchCheckboxColumn;
+  column!: MongooseDatatableSearchCheckboxColumn;
 
   control!: FormControl<any>;
   selectControl = new FormControl();

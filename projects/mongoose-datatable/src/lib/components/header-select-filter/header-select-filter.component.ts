@@ -25,7 +25,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { Subscription } from 'rxjs';
-import { IMongooseDatatableSearchSelectColumn } from '../../types/datatable-column.type';
+import { MongooseDatatableSearchSelectColumn } from '../../types/datatable-column.type';
 import { SelectOptionPipe } from '../../pipes/select-option.pipe';
 
 @Component({
@@ -52,7 +52,7 @@ import { SelectOptionPipe } from '../../pipes/select-option.pipe';
 })
 export class HeaderSelectFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: IMongooseDatatableSearchSelectColumn;
+  column!: MongooseDatatableSearchSelectColumn;
 
   control!: FormControl<any>;
   selectControl = new FormControl();
