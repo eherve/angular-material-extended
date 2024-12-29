@@ -4,10 +4,10 @@ import { ComponentType } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
 import { DatasourceRequestOrderDir } from './datasource-service.type';
 
-export type MongooseDatatableColumnType = 'text' | 'select' | 'autocomplete' | 'checkbox';
+// export type MongooseDatatableColumnType = 'text' | 'select' | 'autocomplete' | 'checkbox';
 
 type BaseColumn = {
-  type: MongooseDatatableColumnType;
+  type: string;
   columnDef: string;
   header: string;
   property: string;
@@ -41,7 +41,7 @@ type ContentColumn = BaseColumn & {
 type Column = BaseColumn | ComponentColumn | ContentColumn;
 
 type SearchableColumn = Column & {
-  type: MongooseDatatableColumnType;
+  type: string;
   searchable: true;
   searchProperty?: string;
 };
@@ -52,6 +52,14 @@ export type MongooseDatatableTextColumn = Column & {
 };
 export type MongooseDatatableSearchTextColumn = SearchableColumn & {
   type: 'text';
+};
+
+// NUMBER COLUMN
+export type MongooseDatatableNumberColumn = Column & {
+  type: 'number';
+};
+export type MongooseDatatableSearchNumberColumn = SearchableColumn & {
+  type: 'number';
 };
 
 // SELECT COLUMN
@@ -93,6 +101,8 @@ export type MongooseDatatableSearchCheckboxColumn = SearchableColumn & {
 export type MongooseDatatableColumn =
   | MongooseDatatableTextColumn
   | MongooseDatatableSearchTextColumn
+  | MongooseDatatableNumberColumn
+  | MongooseDatatableSearchNumberColumn
   | MongooseDatatableSelectColumn
   | MongooseDatatableSearchSelectColumn
   | MongooseDatatableAutocompleteColumn

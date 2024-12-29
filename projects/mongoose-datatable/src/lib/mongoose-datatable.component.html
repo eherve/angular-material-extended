@@ -145,6 +145,9 @@
         @case ('text') {
           <lib-header-text-filter [column]="column" [formControlName]="column.columnDef"></lib-header-text-filter>
         }
+        @case ('number') {
+          <lib-header-number-filter [column]="column" [formControlName]="column.columnDef"></lib-header-number-filter>
+        }
         @case ('select') {
           <lib-header-select-filter [column]="column" [formControlName]="column.columnDef"></lib-header-select-filter>
         }

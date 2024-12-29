@@ -1,0 +1,31 @@
+<!-- @format -->
+
+@if (selectControl) {
+  <mat-form-field class="ngx-datatable-number-filter" appearance="fill" [class.has-value]="selectControl.value">
+    <mat-label [innerHTML]="column.header"></mat-label>
+
+    <lib-operator-select matPrefix [formControl]="operatorControl"></lib-operator-select>
+
+    <input matInput [formControl]="selectControl" type="number" />
+
+    <button
+      *ngIf="selectControl.value"
+      mat-icon-button
+      matSuffix
+      size="small"
+      (click)="selectControl.setValue(undefined)">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+}
+
+<ng-template #operatorTmpl let-operator="operator">
+  @switch (operator) {
+    @case ('=') {
+      <mat-icon>equal</mat-icon>
+    }
+    @case ('>') {
+      <mat-icon>equal</mat-icon>
+    }
+  }
+</ng-template>

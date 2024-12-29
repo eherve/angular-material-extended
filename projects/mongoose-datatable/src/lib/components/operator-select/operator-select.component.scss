@@ -1,0 +1,32 @@
+/** @format */
+
+.operator-button {
+  --mdc-fab-small-container-elevation-shadow: none;
+  --mdc-fab-small-hover-container-elevation-shadow: none;
+  --mdc-fab-small-focus-container-elevation-shadow: none;
+  --mdc-fab-small-container-shape: 50%;
+  font-size: 18px;
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  ::ng-deep {
+    .mat-mdc-button-touch-target {
+      height: 36px;
+      width: 36px;
+    }
+  }
+}
+
+.operator-button-value {
+  --mdc-fab-small-container-color: transparent;
+}
+
+.operator-column {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+
+  .operator-button {
+    margin-top: 8px;
+  }
+}

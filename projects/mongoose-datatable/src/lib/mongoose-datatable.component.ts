@@ -20,6 +20,7 @@ import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cel
 import { CellSelectValueComponent } from './components/cell-select-value/cell-select-value.component';
 import { HeaderAutocompleteFilterComponent } from './components/header-autocomplete-filter/header-autocomplete-filter.component';
 import { HeaderCheckboxFilterComponent } from './components/header-checkbox-filter/header-checkbox-filter.component';
+import { HeaderNumberFilterComponent } from './components/header-number-filter/header-number-filter.component';
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { DatagridDataSource } from './datasource';
@@ -38,6 +39,7 @@ type UpdateColumn = Pick<MongooseDatatableColumn, 'columnDef' | 'header' | 'stic
     FormsModule,
     HeaderAutocompleteFilterComponent,
     HeaderCheckboxFilterComponent,
+    HeaderNumberFilterComponent,
     HeaderSelectFilterComponent,
     HeaderTextFilterComponent,
     IntersectionObserverModule,

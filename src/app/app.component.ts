@@ -14,6 +14,7 @@ let i = 0;
 while (i++ < 100) {
   DATA.push({
     label: `Label ${i}`,
+    number: i,
     reference: `Référence ${i}`,
     checkbox: (() => {
       const rand = Math.random();
@@ -90,6 +91,15 @@ export class AppComponent {
         sortable: true,
         searchable: true,
         order: { index: 0, dir: 'asc' },
+      },
+      {
+        type: 'number',
+        columnDef: 'number',
+        header: 'Number',
+        property: 'number',
+        sticky: true,
+        sortable: true,
+        searchable: true,
       },
       {
         type: 'select',
