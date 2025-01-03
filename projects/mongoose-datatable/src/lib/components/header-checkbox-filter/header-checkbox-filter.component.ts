@@ -1,3 +1,5 @@
+/** @format */
+
 import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
@@ -77,20 +79,19 @@ export class HeaderCheckboxFilterComponent implements AfterViewInit, OnDestroy, 
   async ngAfterViewInit(): Promise<void> {
     const ngControl: NgControl | null = this.injector.get(NgControl, null);
     if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
-    console.log(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
     this.control = ngControl.control as UntypedFormControl;
     let previousValue = this.control.value;
     this.subsink.add(
       this.selectControl.valueChanges
         .pipe(
-          filter((value) => {
+          filter(value => {
             if (value === true && previousValue === false) {
               this.selectControl.setValue(undefined);
               return false;
             }
             return true;
           }),
-          tap((value) => (previousValue = value))
+          tap(value => (previousValue = value))
         )
         .subscribe((value: any) => {
           if (value === undefined) this.control.setValue(undefined);

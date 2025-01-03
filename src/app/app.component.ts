@@ -24,6 +24,7 @@ while (i++ < 100) {
         : undefined
       );
     })(),
+    date: new Date(Date.now() + (Math.random() - 0.5) * 1000 * 60 * 60 * 24 * 30),
     autocomplete: (() => {
       const rand = Math.round(Math.random() * 100);
       return `option ${rand}`;
@@ -91,6 +92,9 @@ export class AppComponent {
         sortable: true,
         searchable: true,
         order: { index: 0, dir: 'asc' },
+        prefix: 'Prefix ',
+        suffix: ' Suffix',
+        suffixContent: 'test',
       },
       {
         type: 'number',
@@ -102,10 +106,20 @@ export class AppComponent {
         searchable: true,
       },
       {
+        type: 'date',
+        columnDef: 'date',
+        header: 'Date',
+        property: 'date',
+        searchable: true,
+        locale: 'fr',
+        placeholder: 'DD/MM/YYYY',
+      },
+      {
         type: 'select',
         columnDef: 'reference',
         header: 'Référence',
         property: 'reference',
+        placeholder: 'Sélectionnez une référence',
         minWidth: 400,
         searchable: true,
         sortable: true,
@@ -161,6 +175,7 @@ export class AppComponent {
         property: 'checkbox',
         searchable: true,
       },
+
       {
         type: 'text',
         columnDef: 'template',
@@ -170,6 +185,7 @@ export class AppComponent {
         searchProperty: 'templateSearch',
         sortable: true,
         sortProperty: 'templateSearch',
+        cellContent: 'test',
         cellComponent: ComponentCellComponent,
       },
       {
@@ -178,6 +194,7 @@ export class AppComponent {
         header: 'Description',
         property: 'description',
         minWidth: 400,
+        cellContent: 'description',
       },
     ],
   };

@@ -3,7 +3,19 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ContentChildren,
+  EventEmitter,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  QueryList,
+  ViewChild,
+} from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,13 +29,17 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { debounceTime, Subscription } from 'rxjs';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
+import { CellDateValueComponent } from './components/cell-date-value/cell-date-value.component';
 import { CellSelectValueComponent } from './components/cell-select-value/cell-select-value.component';
 import { HeaderAutocompleteFilterComponent } from './components/header-autocomplete-filter/header-autocomplete-filter.component';
 import { HeaderCheckboxFilterComponent } from './components/header-checkbox-filter/header-checkbox-filter.component';
+import { HeaderDateFilterComponent } from './components/header-date-filter/header-date-filter.component';
 import { HeaderNumberFilterComponent } from './components/header-number-filter/header-number-filter.component';
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { DatagridDataSource } from './datasource';
+import { DatatableCellDirective } from './directives/datatable-cell.directive';
+import { FindCellContentPipe } from './pipes/find-cell-content.pipe';
 import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
 import { MongooseDatatableColumn } from './types/datatable-column.type';
 import { MongooseDatatableOptions } from './types/datatable-options.type';
@@ -33,12 +49,15 @@ type UpdateColumn = Pick<MongooseDatatableColumn, 'columnDef' | 'header' | 'stic
 @Component({
   imports: [
     CellCheckboxValueComponent,
+    CellDateValueComponent,
     CellSelectValueComponent,
     CommonModule,
     DragDropModule,
+    FindCellContentPipe,
     FormsModule,
     HeaderAutocompleteFilterComponent,
     HeaderCheckboxFilterComponent,
+    HeaderDateFilterComponent,
     HeaderNumberFilterComponent,
     HeaderSelectFilterComponent,
     HeaderTextFilterComponent,
@@ -74,7 +93,13 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
   @Input('options')
   options!: MongooseDatatableOptions<Record>;
 
+  @Output()
+  onDisplayChanged = new EventEmitter<MongooseDatatableColumn[]>();
+
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
+
+  @ContentChildren(DatatableCellDirective)
+  cellRefs?: QueryList<DatatableCellDirective>;
 
   displayedColumns: string[] = [];
   dataSource!: DatagridDataSource<Record>;
@@ -87,6 +112,7 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
 
   ngOnInit(): void {
     if (!this.options?.service) throw new Error(`missing mongoose datatable component service`);
+    if (!this.options?.columns) throw new Error(`missing mongoose datatable component columns`);
     this.buildDisplayColumns();
     this.buildSearchFormGroup();
     this.dataSource = new DatagridDataSource<Record>(this.options.service);
@@ -100,8 +126,7 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
   load(intersect: boolean) {
     if (!intersect || this.loaded) return;
     this.loaded = true;
-    this.subscriptions.add(this.paginator?.page.subscribe(value => this.loadPage()));
-    // this.subscriptions.add(this.dataSource!.connect().subscribe((data) => this.loadRows(data)));
+    this.subscriptions.add(this.paginator?.page.subscribe(() => this.loadPage()));
     this.loadPage();
   }
 
@@ -164,6 +189,7 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
       }
     });
     this.buildDisplayColumns();
+    this.onDisplayChanged.emit(this.options.columns);
     if (reload) this.loadPage();
   }
 

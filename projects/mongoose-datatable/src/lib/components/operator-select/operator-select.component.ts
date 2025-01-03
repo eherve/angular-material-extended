@@ -34,7 +34,7 @@ import { MatIconModule } from '@angular/material/icon';
   ],
 })
 export class OperatorSelectComponent implements AfterViewInit, ControlValueAccessor {
-  operators = ['=', '>', '≥', '<', '≤'];
+  operators = ['=', '>', '≥', '<', '≤', '<>', '≤≥'];
   isOpen: boolean = false;
 
   control?: FormControl<any>;

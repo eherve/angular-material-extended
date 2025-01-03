@@ -3,30 +3,31 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { MongooseDatatableComponent } from '../../projects/mongoose-datatable/src/public-api';
+import 'moment/locale/fr';
+import { MongooseDatatableModule } from '../../projects/mongoose-datatable/src/public-api';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TableComponent } from './table/table.component';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [AppComponent, TableComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    MongooseDatatableComponent,
     MatCardModule,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
     MatButtonModule,
     MatIconModule,
+    MongooseDatatableModule,
   ],
   providers: [provideAnimationsAsync()],
   bootstrap: [AppComponent],

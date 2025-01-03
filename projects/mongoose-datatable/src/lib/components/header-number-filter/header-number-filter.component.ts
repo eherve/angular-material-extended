@@ -9,8 +9,7 @@ import {
   inject,
   Injector,
   Input,
-  OnDestroy,
-  ViewEncapsulation,
+  OnDestroy
 } from '@angular/core';
 import {
   ControlValueAccessor,

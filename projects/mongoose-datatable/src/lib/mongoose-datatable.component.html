@@ -161,6 +161,9 @@
             [column]="column"
             [formControlName]="column.columnDef"></lib-header-checkbox-filter>
         }
+        @case ('date') {
+          <lib-header-date-filter [column]="column" [formControlName]="column.columnDef"></lib-header-date-filter>
+        }
         @default {
           <span>{{ column.header }}</span>
         }
@@ -203,7 +206,15 @@
     @let value = row[column.property];
     @if (column.cellComponent) {
       <ng-container *ngComponentOutlet="column.cellComponent; inputs: { column, row, value }" />
+    } @else if (column.cellContent) {
+      @let cell = cellRefs | findCellContent: column;
+      @if (cell) {
+        <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
+      }
     } @else {
+      @if (column.prefix) {
+        {{ column.prefix }}
+      }
       @switch (column.type) {
         @case ('select') {
           <lib-cell-select-value [column]="column" [row]="row"></lib-cell-select-value>
@@ -211,9 +222,15 @@
         @case ('checkbox') {
           <lib-cell-checkbox-value [column]="column" [row]="row"></lib-cell-checkbox-value>
         }
+        @case ('date') {
+          <lib-cell-date-value [column]="column" [row]="row"></lib-cell-date-value>
+        }
         @default {
           {{ value }}
         }
+      }
+      @if (column.suffix) {
+        {{ column.suffix }}
       }
     }
   </div>

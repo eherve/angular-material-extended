@@ -137,6 +137,11 @@
   }
 
   .cell {
+    display: flex;
+    box-sizing: border-box;
+    place-content: center start;
+    align-items: center;
+    flex-direction: row;
     width: 100%;
   }
 }

@@ -4,17 +4,17 @@ import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { GetPipe } from '../../pipes/get.pipe';
-import { MongooseDatatableCheckboxColumn } from '../../types/datatable-column.type';
+import { MongooseDatatableDateColumn } from '../../types/datatable-column.type';
 
 @Component({
-  selector: 'lib-cell-checkbox-value',
+  selector: 'lib-cell-date-value',
   imports: [CommonModule, GetPipe, MatIconModule],
-  templateUrl: './cell-checkbox-value.component.html',
-  styleUrl: './cell-checkbox-value.component.scss',
+  templateUrl: './cell-date-value.component.html',
+  styleUrl: './cell-date-value.component.scss',
 })
-export class CellCheckboxValueComponent {
+export class CellDateValueComponent {
   @Input()
-  column!: MongooseDatatableCheckboxColumn;
+  column!: MongooseDatatableDateColumn;
 
   @Input()
   row: any;

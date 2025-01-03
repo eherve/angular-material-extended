@@ -1,0 +1,52 @@
+<!-- @format -->
+
+@if (selectControl) {
+  @if (['<>', '≤≥'].includes(operatorControl.value!)) {
+    <mat-form-field class="ngx-datatable-number-filter" appearance="fill" [class.has-value]="selectControl.value">
+      <mat-label [innerHTML]="column.header"></mat-label>
+
+      <lib-operator-select matPrefix [formControl]="operatorControl"></lib-operator-select>
+
+      <mat-date-range-input [formGroup]="rangeGroup" [rangePicker]="rangePicker">
+        <input matStartDate formControlName="start" [placeholder]="column.placeholder!" />
+        <input matEndDate formControlName="end" [placeholder]="column.placeholder!" />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+      <mat-date-range-picker #rangePicker></mat-date-range-picker>
+
+      <button *ngIf="selectControl.value" mat-icon-button matSuffix size="small" (click)="rangeGroup.reset()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+  } @else {
+    <mat-form-field class="ngx-datatable-number-filter" appearance="fill" [class.has-value]="selectControl.value">
+      <mat-label [innerHTML]="column.header"></mat-label>
+
+      <lib-operator-select matPrefix [formControl]="operatorControl"></lib-operator-select>
+
+      <input matInput [matDatepicker]="datePicker" [formControl]="selectControl" [placeholder]="column.placeholder!" />
+      <mat-datepicker-toggle matIconSuffix [for]="datePicker"></mat-datepicker-toggle>
+      <mat-datepicker #datePicker></mat-datepicker>
+
+      <button
+        *ngIf="selectControl.value"
+        mat-icon-button
+        matSuffix
+        size="small"
+        (click)="selectControl.setValue(undefined)">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+  }
+}
+
+<ng-template #operatorTmpl let-operator="operator">
+  @switch (operator) {
+    @case ('=') {
+      <mat-icon>equal</mat-icon>
+    }
+    @case ('>') {
+      <mat-icon>equal</mat-icon>
+    }
+  }
+</ng-template>
