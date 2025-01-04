@@ -85,28 +85,28 @@
         }
       }
     },
-    "mongoose-datatable": {
+    "datatable": {
       "projectType": "library",
       "schematics": {
         "@schematics/angular:component": {
           "style": "scss"
         }
       },
-      "root": "projects/mongoose-datatable",
-      "sourceRoot": "projects/mongoose-datatable/src",
+      "root": "projects/datatable",
+      "sourceRoot": "projects/datatable/src",
       "prefix": "lib",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/mongoose-datatable/ng-package.json"
+            "project": "projects/datatable/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/mongoose-datatable/tsconfig.lib.prod.json"
+              "tsConfig": "projects/datatable/tsconfig.lib.prod.json"
             },
             "development": {
-              "tsConfig": "projects/mongoose-datatable/tsconfig.lib.json"
+              "tsConfig": "projects/datatable/tsconfig.lib.json"
             }
           },
           "defaultConfiguration": "production"
@@ -114,7 +114,7 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "tsConfig": "projects/mongoose-datatable/tsconfig.spec.json",
+            "tsConfig": "projects/datatable/tsconfig.spec.json",
             "polyfills": ["zone.js", "zone.js/testing"]
           }
         }

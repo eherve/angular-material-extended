@@ -4,8 +4,8 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "mongoose-datatable": [
-        "./dist/mongoose-datatable"
+      "datatable": [
+        "./dist/datatable"
       ]
     },
     "outDir": "./dist/out-tsc",

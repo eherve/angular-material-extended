@@ -5,14 +5,14 @@
     <mat-card-title>Datatable</mat-card-title>
   </mat-card-header>
   <mat-card-content [style.position]="'relative'" [style.overflow]="'hidden'">
-    <ngx-mat-mongoose-datatable [style.height.%]="100" [style.width.%]="100" [options]="datatableOptions">
+    <ngx-mat-datatable [style.height.%]="100" [style.width.%]="100" [options]="datatableOptions">
       <ng-template ngxMatDatatableCell="description" let-value="value">
         <div>
           <div>Desc.</div>
           <div [style.height.px]="50">{{ value }}</div>
         </div>
       </ng-template>
-    </ngx-mat-mongoose-datatable>
+    </ngx-mat-datatable>
   </mat-card-content>
 </mat-card>
 

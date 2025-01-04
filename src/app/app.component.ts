@@ -5,9 +5,9 @@ import { clone, deburr, filter, includes, map, orderBy, slice, toLower, trim, un
 import { of } from 'rxjs';
 import {
   DatasourceService,
-  MongooseDatatableColumn,
-  MongooseDatatableOptions,
-} from '../../projects/mongoose-datatable/src/public-api';
+  DatatableColumn,
+  DatatableOptions,
+} from '../../projects/datatable/src/public-api';
 
 const DATA: any[] = [];
 let i = 0;
@@ -69,7 +69,7 @@ const service: DatasourceService<any> = options => {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  datatableOptions: MongooseDatatableOptions<any> = {
+  datatableOptions: DatatableOptions<any> = {
     service,
     pageSizeOptions: [10, 20, 50, 100],
     pageSizeOptionsIndex: 1,
@@ -206,7 +206,7 @@ export class AppComponent {
 })
 export class ComponentCellComponent {
   @Input()
-  column!: MongooseDatatableColumn;
+  column!: DatatableColumn;
 
   @Input()
   row: any;
