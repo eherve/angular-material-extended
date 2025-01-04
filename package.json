@@ -1,5 +1,5 @@
 {
-  "name": "@angular-material-extended",
+  "name": "angular-material-extended",
   "version": "19.0.0",
   "scripts": {
     "ng": "ng",
