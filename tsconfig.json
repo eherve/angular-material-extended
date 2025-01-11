@@ -4,10 +4,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "datatable": [
-        "./dist/datatable"
-      ]
+      "@angular-material-extended/datatable": ["dist/@angular-material-material-extended/datatable"]
     },
+    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,

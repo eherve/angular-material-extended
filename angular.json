@@ -85,7 +85,7 @@
         }
       }
     },
-    "datatable": {
+    "NgxMatDatatable": {
       "projectType": "library",
       "schematics": {
         "@schematics/angular:component": {
@@ -94,7 +94,7 @@
       },
       "root": "projects/datatable",
       "sourceRoot": "projects/datatable/src",
-      "prefix": "lib",
+      "prefix": "NgxMat",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",

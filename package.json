@@ -1,6 +1,7 @@
 {
   "name": "angular-material-extended",
   "version": "19.0.4",
+  "author": "Eric Herve <eric.herve.95@gmail.com>",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -8,7 +9,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
-  "private": true,
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@angular/animations": "^19.0.4",
     "@angular/cdk": "^19.0.4",
