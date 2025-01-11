@@ -9,5 +9,6 @@
   "prettier.printWidth": 120,
   "prettier.singleQuote": true,
   "prettier.vueIndentScriptAndStyle": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.resolveGlobalModules": true
 }

@@ -1,6 +1,6 @@
 {
   "name": "angular-material-extended",
-  "version": "19.0.0",
+  "version": "19.0.4",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
