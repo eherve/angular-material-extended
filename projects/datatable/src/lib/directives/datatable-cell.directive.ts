@@ -8,7 +8,7 @@ import {
 @Directive({
   selector: '[ngxMatDatatableCell]',
 })
-export class DatatableCellDirective {
+export class NgxMatDatatableCellDirective {
   @Input('ngxMatDatatableCell')
   columnDef!: string;
 

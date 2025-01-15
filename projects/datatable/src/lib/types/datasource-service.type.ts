@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 
 export type DatasourceRequestSearch = {
   value: any;

@@ -2,11 +2,11 @@
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { DatatableCellDirective } from './directives/datatable-cell.directive';
-import { MongooseDatatableComponent } from './datatable.component';
+import { NgxMatDatatableCellDirective } from './directives/datatable-cell.directive';
+import { NgxMatDatatableComponent } from './datatable.component';
 
 @NgModule({
-  imports: [CommonModule, MongooseDatatableComponent, DatatableCellDirective],
-  exports: [MongooseDatatableComponent, DatatableCellDirective],
+  imports: [CommonModule, NgxMatDatatableComponent, NgxMatDatatableCellDirective],
+  exports: [NgxMatDatatableComponent, NgxMatDatatableCellDirective],
 })
-export class DatatableModule {}
+export class NgxMatDatatableModule {}

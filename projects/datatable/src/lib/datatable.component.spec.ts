@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MongooseDatatableComponent } from './datatable.component';
+import { NgxMatDatatableComponent } from './datatable.component';
 
 describe('MongooseDatatableComponent', () => {
-  let component: MongooseDatatableComponent;
-  let fixture: ComponentFixture<MongooseDatatableComponent>;
+  let component: NgxMatDatatableComponent;
+  let fixture: ComponentFixture<NgxMatDatatableComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MongooseDatatableComponent]
+      imports: [NgxMatDatatableComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(MongooseDatatableComponent);
+    fixture = TestBed.createComponent(NgxMatDatatableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

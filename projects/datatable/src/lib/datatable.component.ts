@@ -38,7 +38,7 @@ import { HeaderNumberFilterComponent } from './components/header-number-filter/h
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { DatagridDataSource } from './datasource';
-import { DatatableCellDirective } from './directives/datatable-cell.directive';
+import { NgxMatDatatableCellDirective } from './directives/datatable-cell.directive';
 import { FindCellContentPipe } from './pipes/find-cell-content.pipe';
 import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
 import { DatatableColumn } from './types/datatable-column.type';
@@ -89,7 +89,7 @@ type UpdateColumn = Pick<DatatableColumn, 'columnDef' | 'header' | 'sticky' | 'h
     ]),
   ],
 })
-export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestroy {
+export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy {
   @Input('options')
   options!: DatatableOptions<Record>;
 
@@ -98,8 +98,8 @@ export class MongooseDatatableComponent<Record = any> implements OnInit, OnDestr
 
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
-  @ContentChildren(DatatableCellDirective)
-  cellRefs?: QueryList<DatatableCellDirective>;
+  @ContentChildren(NgxMatDatatableCellDirective)
+  cellRefs?: QueryList<NgxMatDatatableCellDirective>;
 
   displayedColumns: string[] = [];
   dataSource!: DatagridDataSource<Record>;
