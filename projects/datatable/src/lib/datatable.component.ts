@@ -40,6 +40,7 @@ import { HeaderTextFilterComponent } from './components/header-text-filter/heade
 import { DatagridDataSource } from './datasource';
 import { NgxMatDatatableCellDirective } from './directives/datatable-cell.directive';
 import { FindCellContentPipe } from './pipes/find-cell-content.pipe';
+import { GetPipe } from './pipes/get.pipe';
 import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
 import { DatatableColumn } from './types/datatable-column.type';
 import { DatatableOptions } from './types/datatable-options.type';
@@ -55,6 +56,7 @@ type UpdateColumn = Pick<DatatableColumn, 'columnDef' | 'header' | 'sticky' | 'h
     DragDropModule,
     FindCellContentPipe,
     FormsModule,
+    GetPipe,
     HeaderAutocompleteFilterComponent,
     HeaderCheckboxFilterComponent,
     HeaderDateFilterComponent,
@@ -207,9 +209,16 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
           else column.search = control.value;
         }
       }
+      if (c.additionalProperties) {
+        c.additionalProperties.forEach(property => this.addAdditionalColumn(additionalColumns, property));
+      }
       columns.push(column);
     });
-    columns.push(...additionalColumns);
+    for (let additionalColumn of additionalColumns) {
+      const c = columns.find(c => c.data === additionalColumn.data);
+      if (!c) columns.push(additionalColumn);
+      else if (additionalColumn.search && !c.search) c.search = additionalColumn.search;
+    }
     return columns;
   }
 

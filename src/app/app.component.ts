@@ -3,17 +3,16 @@
 import { Component, Input } from '@angular/core';
 import { clone, deburr, filter, includes, map, orderBy, slice, toLower, trim, uniqBy } from 'lodash-es';
 import { of } from 'rxjs';
-import {
-  DatasourceService,
-  DatatableColumn,
-  DatatableOptions,
-} from '../../projects/datatable/src/public-api';
+import { DatasourceService, DatatableColumn, DatatableOptions } from '../../projects/datatable/src/public-api';
 
 const DATA: any[] = [];
 let i = 0;
 while (i++ < 100) {
   DATA.push({
     label: `Label ${i}`,
+    embedded: {
+      label: `Embedded label ${i}`,
+    },
     number: i,
     reference: `Référence ${i}`,
     checkbox: (() => {
@@ -74,11 +73,11 @@ export class AppComponent {
     pageSizeOptions: [10, 20, 50, 100],
     pageSizeOptionsIndex: 1,
     actions: {
-      columns: {
-        hideAndShow: true,
-        sticky: true,
-        reorder: true,
-      },
+      // columns: {
+      //   hideAndShow: true,
+      //   sticky: true,
+      //   reorder: true,
+      // },
       refresh: true,
     },
     columnMinWith: 120,
@@ -106,6 +105,14 @@ export class AppComponent {
         searchable: true,
       },
       {
+        type: 'text',
+        columnDef: 'embedded-label',
+        header: 'Embedded label',
+        property: 'embedded.label',
+        sortable: true,
+        searchable: true,
+      },
+      {
         type: 'date',
         columnDef: 'date',
         header: 'Date',
@@ -124,7 +131,7 @@ export class AppComponent {
         searchable: true,
         sortable: true,
         options: of(
-          DATA.map(d => ({ value: d.reference, label: d.reference, color: 'red', icon: 'home', iconColor: 'blue' }))
+          DATA.map(d => ({ value: d.reference, name: d.reference, color: 'red', icon: 'home', iconColor: 'blue' }))
         ),
       },
       {
@@ -148,7 +155,7 @@ export class AppComponent {
                         uniqBy(
                           map(DATA, d => ({
                             value: d.autocomplete,
-                            label: d.autocomplete,
+                            name: d.autocomplete,
                             color: 'blue',
                             icon: 'home',
                             iconColor: 'red',
@@ -195,6 +202,12 @@ export class AppComponent {
         property: 'description',
         minWidth: 400,
         cellContent: 'description',
+      },
+      {
+        columnDef: 'default',
+        header: 'Default',
+        property: 'label',
+        minWidth: 400,
       },
     ],
   };

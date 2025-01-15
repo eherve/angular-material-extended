@@ -60,7 +60,7 @@
           mat-icon-button
           color="primary"
           class="icon-only action"
-          [matTooltip]="options.actions!.columns!.tooltip || 'Afficher / masquer des colonnes'"
+          [matTooltip]="options.actions?.columns?.tooltip || 'Afficher / masquer des colonnes'"
           [matMenuTriggerFor]="columnsMenu"
           (menuOpened)="openUpdateColumnDisplay()"
           (menuClosed)="closeUpdateColumnDisplay()">
@@ -90,7 +90,7 @@
     id="column-options"
     cdkDropList
     has-handle
-    [cdkDropListDisabled]="!options.actions!.columns!.reorder"
+    [cdkDropListDisabled]="!options.actions?.columns?.reorder"
     (cdkDropListDropped)="reorderColumns($event)">
     @for (column of updateColumns; track column) {
       @if (['_select', '_rownumber'].includes(column.header)) {
@@ -98,7 +98,7 @@
       } @else {
         <div class="column-options-item" mat-list-item cdkDrag (click)="$event.stopPropagation()">
           <button
-            *ngIf="options.actions!.columns!.hideAndShow"
+            *ngIf="options.actions?.columns?.hideAndShow"
             mat-icon-button
             size="small"
             color="primary"
@@ -114,7 +114,7 @@
             </mat-icon>
           </button>
           <button
-            *ngIf="options.actions!.columns!.sticky"
+            *ngIf="options.actions?.columns?.sticky"
             mat-icon-button
             size="small"
             color="primary"
@@ -125,7 +125,7 @@
           </button>
           <span [style.margin-right.px]="8">{{ column.header }}</span>
           <mat-icon
-            *ngIf="options.actions!.columns!.reorder"
+            *ngIf="options.actions?.columns?.reorder"
             size="small"
             class="handle"
             cdkDragHandle
@@ -202,36 +202,40 @@
 </ng-template>
 
 <ng-template #cellTmpl let-column="column" let-row="row">
-  <div class="cell">
-    @let value = row[column.property];
-    @if (column.cellComponent) {
-      <ng-container *ngComponentOutlet="column.cellComponent; inputs: { column, row, value }" />
-    } @else if (column.cellContent) {
-      @let cell = cellRefs | findCellContent: column;
-      @if (cell) {
-        <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
-      }
-    } @else {
-      @if (column.prefix) {
-        {{ column.prefix }}
-      }
-      @switch (column.type) {
-        @case ('select') {
-          <lib-cell-select-value [column]="column" [row]="row"></lib-cell-select-value>
+  @defer (on viewport) {
+    <div class="cell">
+      @let value = row | get: column.property;
+      @if (column.cellComponent) {
+        <ng-container *ngComponentOutlet="column.cellComponent; inputs: { column, row, value }" />
+      } @else if (column.cellContent) {
+        @let cell = cellRefs | findCellContent: column;
+        @if (cell) {
+          <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
         }
-        @case ('checkbox') {
-          <lib-cell-checkbox-value [column]="column" [row]="row"></lib-cell-checkbox-value>
+      } @else {
+        @if (column.prefix) {
+          {{ column.prefix }}
         }
-        @case ('date') {
-          <lib-cell-date-value [column]="column" [row]="row"></lib-cell-date-value>
+        @switch (column.type) {
+          @case ('select') {
+            <lib-cell-select-value [column]="column" [row]="row"></lib-cell-select-value>
+          }
+          @case ('checkbox') {
+            <lib-cell-checkbox-value [column]="column" [row]="row"></lib-cell-checkbox-value>
+          }
+          @case ('date') {
+            <lib-cell-date-value [column]="column" [row]="row"></lib-cell-date-value>
+          }
+          @default {
+            {{ value }}
+          }
         }
-        @default {
-          {{ value }}
+        @if (column.suffix) {
+          {{ column.suffix }}
         }
       }
-      @if (column.suffix) {
-        {{ column.suffix }}
-      }
-    }
-  </div>
+    </div>
+  } @placeholder {
+    <div class="cell"></div>
+  }
 </ng-template>

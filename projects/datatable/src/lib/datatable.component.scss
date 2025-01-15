@@ -28,7 +28,7 @@
   place-content: center space-between;
   align-items: center;
   flex-direction: row;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--datatable-border-color);
 
   #actions-start,
   #actions-center,
@@ -148,6 +148,7 @@
 
 #paginator {
   --mat-paginator-container-background-color: var(--datatable-background);
+  border-top: 1px solid var(--datatable-border-color);
 }
 
 #loading {

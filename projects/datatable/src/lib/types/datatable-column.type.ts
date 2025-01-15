@@ -5,10 +5,12 @@ import { Observable } from 'rxjs';
 import { DatasourceRequestOrderDir } from './datasource-service.type';
 
 type BaseColumn = {
-  type: string;
+  type?: string;
   columnDef: string;
   header: string;
   property: string;
+
+  additionalProperties?: string[];
 
   minWidth?: number;
 
@@ -58,7 +60,7 @@ export type DatatableSearchNumberColumn = DatatableNumberColumn & SearchableColu
 // SELECT
 export type DatatableSearchListOption = {
   value: any;
-  label: string;
+  name: string;
   color?: string;
   icon?: string;
   iconColor?: string;
@@ -100,7 +102,13 @@ export type DatatableSearchDateColumn = DatatableDateColumn &
     placeholder?: string;
   };
 
+// DEFAULT
+export type DatatableDefaultColumn = Column & {
+  searchable?: false;
+};
+
 export type DatatableColumn =
+  | DatatableDefaultColumn
   | DatatableTextColumn
   | DatatableSearchTextColumn
   | DatatableNumberColumn
