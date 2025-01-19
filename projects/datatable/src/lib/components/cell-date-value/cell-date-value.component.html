@@ -2,5 +2,5 @@
 
 @let value = row | get: column.property;
 @if (value) {
-  {{ value.toLocaleDateString(column.locale) }}
+  {{ value | date: (column.format || 'short') : column.timezone : column.locale }}
 }

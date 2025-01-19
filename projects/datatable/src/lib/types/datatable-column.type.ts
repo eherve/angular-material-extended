@@ -95,6 +95,8 @@ export type DatatableSearchCheckboxColumn = DatatableCheckboxColumn & Searchable
 // DATE
 export type DatatableDateColumn = Column & {
   type: 'date';
+  format?:string;
+  timezone?:string;
   locale?: string;
 };
 export type DatatableSearchDateColumn = DatatableDateColumn &

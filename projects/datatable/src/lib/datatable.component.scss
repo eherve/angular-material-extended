@@ -134,6 +134,15 @@
     place-content: center space-between;
     align-items: center;
     flex-direction: row;
+
+    .header-actions {
+      .sort-btn {
+        --mat-badge-container-size: 12px;
+        --mat-badge-line-height: 16px;
+        --mat-badge-text-size: 10px;
+        --mat-badge-legacy-container-size: 18px;
+      }
+    }
   }
 
   .cell {
