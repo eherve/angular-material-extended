@@ -226,6 +226,9 @@
           @case ('date') {
             <lib-cell-date-value [column]="column" [row]="row"></lib-cell-date-value>
           }
+          @case ('duration') {
+            <lib-cell-duration-value [column]="column" [row]="row"></lib-cell-duration-value>
+          }
           @default {
             {{ value }}
           }

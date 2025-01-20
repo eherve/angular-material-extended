@@ -4,7 +4,7 @@
   <button
     mat-mini-fab
     color="primary"
-    class="operator-button operator-button-value"
+    class="operator-button"
     cdkOverlayOrigin
     #trigger="cdkOverlayOrigin"
     (click)="$event.stopPropagation(); isOpen = !isOpen">
@@ -15,7 +15,11 @@
     <div class="operator-column" @fade>
       @for (operator of operators; track operator) {
         @if (operator !== control.value) {
-          <button mat-mini-fab color="primary" class="operator-button" (click)="control.setValue(operator); isOpen = !isOpen">
+          <button
+            mat-mini-fab
+            color="primary"
+            class="operator-button"
+            (click)="control.setValue(operator); isOpen = !isOpen">
             {{ operator }}
           </button>
         }

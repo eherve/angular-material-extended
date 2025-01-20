@@ -95,11 +95,21 @@ export type DatatableSearchCheckboxColumn = DatatableCheckboxColumn & Searchable
 // DATE
 export type DatatableDateColumn = Column & {
   type: 'date';
-  format?:string;
-  timezone?:string;
+  format?: string;
+  timezone?: string;
   locale?: string;
 };
 export type DatatableSearchDateColumn = DatatableDateColumn &
+  SearchableColumn & {
+    placeholder?: string;
+  };
+
+// DURATION
+export type DatatableDurationColumn = Column & {
+  type: 'duration';
+  locale?: string;
+};
+export type DatatableSearchDurationColumn = DatatableDurationColumn &
   SearchableColumn & {
     placeholder?: string;
   };
@@ -122,4 +132,5 @@ export type DatatableColumn =
   | DatatableCheckboxColumn
   | DatatableSearchCheckboxColumn
   | DatatableDateColumn
-  | DatatableSearchDateColumn;
+  | DatatableSearchDateColumn
+  | DatatableDurationColumn;

@@ -30,6 +30,7 @@ import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { debounceTime, Subscription } from 'rxjs';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
 import { CellDateValueComponent } from './components/cell-date-value/cell-date-value.component';
+import { CellDurationValueComponent } from './components/cell-duration-value/cell-duration-value.component';
 import { CellSelectValueComponent } from './components/cell-select-value/cell-select-value.component';
 import { HeaderAutocompleteFilterComponent } from './components/header-autocomplete-filter/header-autocomplete-filter.component';
 import { HeaderCheckboxFilterComponent } from './components/header-checkbox-filter/header-checkbox-filter.component';
@@ -51,6 +52,7 @@ type UpdateColumn = Pick<DatatableColumn, 'columnDef' | 'header' | 'sticky' | 'h
   imports: [
     CellCheckboxValueComponent,
     CellDateValueComponent,
+    CellDurationValueComponent,
     CellSelectValueComponent,
     CommonModule,
     DragDropModule,

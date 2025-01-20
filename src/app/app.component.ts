@@ -4,6 +4,7 @@ import { Component, Input } from '@angular/core';
 import { clone, deburr, filter, includes, map, orderBy, slice, toLower, trim, uniqBy } from 'lodash-es';
 import { of } from 'rxjs';
 import { DatasourceService, DatatableColumn, DatatableOptions } from '../../projects/datatable/src/public-api';
+import moment from 'moment';
 
 const DATA: any[] = [];
 let i = 0;
@@ -24,6 +25,7 @@ while (i++ < 100) {
       );
     })(),
     date: new Date(Date.now() + (Math.random() - 0.5) * 1000 * 60 * 60 * 24 * 30),
+    duration: moment.duration(moment().diff(moment().subtract(Math.random() * 1000 * 60 * 60, 'seconds'))),
     autocomplete: (() => {
       const rand = Math.round(Math.random() * 100);
       return `option ${rand}`;
@@ -118,8 +120,14 @@ export class AppComponent {
         header: 'Date',
         property: 'date',
         searchable: true,
-        locale: 'fr',
+        format: 'L LT',
         placeholder: 'DD/MM/YYYY',
+      },
+      {
+        type: 'duration',
+        columnDef: 'duration',
+        header: 'Durée',
+        property: 'duration',
       },
       {
         type: 'select',

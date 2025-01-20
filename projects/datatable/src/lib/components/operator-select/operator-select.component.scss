@@ -5,9 +5,6 @@
   --mdc-fab-small-hover-container-elevation-shadow: none;
   --mdc-fab-small-focus-container-elevation-shadow: none;
   --mdc-fab-small-container-shape: 50%;
-  // --mdc-fab-small-container-color: var(--mat-fab-small-foreground-color, var(--mat-sys-on-primary-container, inherit));
-  // --mat-fab-small-foreground-color: var(--mdc-fab-small-container-color, var(--mat-sys-primary-container));
-  // border: 1px solid var(--mdc-fab-small-container-color, var(--mat-sys-primary-container));
   font-size: 18px;
   width: 30px;
   height: 30px;
@@ -18,10 +15,6 @@
       width: 36px;
     }
   }
-}
-
-.operator-button-value {
-  --mdc-fab-small-container-color: transparent;
 }
 
 .operator-column {
