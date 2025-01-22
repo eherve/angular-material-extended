@@ -34,7 +34,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { debounceTime, Subscription } from 'rxjs';
 import { DatatableSearchDateColumn } from '../../types/datatable-column.type';
-import { OperatorSelectComponent } from '../operator-select/operator-select.component';
+import { OPERATOR, OperatorSelectComponent } from '../operator-select/operator-select.component';
+import moment, { Moment } from 'moment';
 
 @Component({
   selector: 'lib-header-date-filter',
@@ -68,10 +69,10 @@ export class HeaderDateFilterComponent implements OnInit, AfterViewInit, OnDestr
   control!: FormControl<any>;
   selectControl = new FormControl<Date | undefined>(undefined);
   rangeGroup = new FormGroup({
-    start: new FormControl<Date | undefined>(undefined, Validators.required),
-    end: new FormControl<Date | undefined>(undefined, Validators.required),
+    from: new FormControl<Date | undefined>(undefined, Validators.required),
+    to: new FormControl<Date | undefined>(undefined, Validators.required),
   });
-  operatorControl = new FormControl('=');
+  operatorControl = new FormControl<OPERATOR>('=');
 
   onChange = () => {};
 
@@ -86,7 +87,12 @@ export class HeaderDateFilterComponent implements OnInit, AfterViewInit, OnDestr
   private subsink = new Subscription();
 
   writeValue = (value: any) => {
-    if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
+    // if (value?.operator && this.operatorControl.value !== value.operator) this.operatorControl.setValue(value.operator);
+    // if (['<>', '≤≥'].includes(this.operatorControl.value!)) {
+    //   if (value?.value?.from !== this.rangeGroup.value.from && value?.value?.to !== this.rangeGroup.value.to) {
+    //     this.rangeGroup.setValue({ from: value.value.from, to: value.value.to });
+    //   }
+    // } else if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
   };
 
   registerOnChange(onChange: any): void {
@@ -113,33 +119,24 @@ export class HeaderDateFilterComponent implements OnInit, AfterViewInit, OnDestr
       this.selectControl.valueChanges.pipe(debounceTime(500)).subscribe(value => {
         if (this.control.invalid) return;
         else if (!value) this.control.setValue(undefined);
-        else this.control.setValue({ value, regex: false, operator: this.operatorControl.value });
+        else this.control.setValue(this.buildValue(this.operatorControl.value!, value));
       })
     );
     this.subsink.add(
       this.rangeGroup.valueChanges.pipe(debounceTime(500)).subscribe(value => {
         if (this.rangeGroup.invalid) return;
-        else if (!value) this.control.setValue(undefined);
-        else
-          this.control.setValue({
-            value: [value.start, value.end],
-            regex: false,
-            operator: this.operatorControl.value,
-          });
+        if (!value) this.control.setValue(undefined);
+        else this.control.setValue(this.buildValue(this.operatorControl.value!, value));
       })
     );
     this.subsink.add(
       this.operatorControl.valueChanges.subscribe((value: any) => {
-        if (['<>', '≤≥'].includes(this.operatorControl.value!)) {
+        if (['<>', '≤≥'].includes(value!)) {
           if (!this.rangeGroup.value || this.rangeGroup.invalid) return;
-          this.control.setValue({
-            value: [this.rangeGroup.value.start, this.rangeGroup.value.end],
-            regex: false,
-            operator: value,
-          });
+          this.control.setValue(this.buildValue(value, this.rangeGroup.value));
         } else {
           if (!this.selectControl.value) return;
-          this.control.setValue({ value: this.selectControl.value, regex: false, operator: value });
+          this.control.setValue(this.buildValue(value, this.selectControl.value));
         }
       })
     );
@@ -148,5 +145,27 @@ export class HeaderDateFilterComponent implements OnInit, AfterViewInit, OnDestr
 
   ngOnDestroy(): void {
     this.subsink.unsubscribe();
+  }
+
+  private buildValue(operator: OPERATOR, value: any) {
+    switch (operator) {
+      case '=':
+        return {
+          operator: '≤≥',
+          value: { from: moment(value).startOf('day'), to: moment(value).endOf('day') },
+        };
+      case '>':
+        return { operator, value: moment(value).endOf('day') };
+      case '≥':
+        return { operator, value: moment(value).startOf('day') };
+      case '<':
+        return { operator, value: moment(value).startOf('day') };
+      case '≤':
+        return { operator, value: moment(value).endOf('day') };
+      case '<>':
+        return { operator, value: { from: moment(value.from).endOf('day'), to: moment(value.to).startOf('day') } };
+      case '≤≥':
+        return { operator, value: { from: moment(value.from).startOf('day'), to: moment(value.to).endOf('day') } };
+    }
   }
 }

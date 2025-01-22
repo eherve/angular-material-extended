@@ -8,8 +8,8 @@
       <lib-operator-select matPrefix [formControl]="operatorControl"></lib-operator-select>
 
       <mat-date-range-input [formGroup]="rangeGroup" [rangePicker]="rangePicker">
-        <input matStartDate formControlName="start" [placeholder]="column.placeholder!" />
-        <input matEndDate formControlName="end" [placeholder]="column.placeholder!" />
+        <input matStartDate formControlName="from" [placeholder]="column.placeholder!" />
+        <input matEndDate formControlName="to" [placeholder]="column.placeholder!" />
       </mat-date-range-input>
       <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
       <mat-date-range-picker #rangePicker></mat-date-range-picker>
