@@ -164,6 +164,11 @@
         @case ('date') {
           <lib-header-date-filter [column]="column" [formControlName]="column.columnDef"></lib-header-date-filter>
         }
+        @case ('duration') {
+          <lib-header-duration-filter
+            [column]="column"
+            [formControlName]="column.columnDef"></lib-header-duration-filter>
+        }
         @default {
           <span>{{ column.header }}</span>
         }

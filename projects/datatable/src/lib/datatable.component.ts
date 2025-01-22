@@ -35,6 +35,7 @@ import { CellSelectValueComponent } from './components/cell-select-value/cell-se
 import { HeaderAutocompleteFilterComponent } from './components/header-autocomplete-filter/header-autocomplete-filter.component';
 import { HeaderCheckboxFilterComponent } from './components/header-checkbox-filter/header-checkbox-filter.component';
 import { HeaderDateFilterComponent } from './components/header-date-filter/header-date-filter.component';
+import { HeaderDurationFilterComponent } from './components/header-duration-filter/header-duration-filter.component';
 import { HeaderNumberFilterComponent } from './components/header-number-filter/header-number-filter.component';
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
@@ -62,6 +63,7 @@ type UpdateColumn = Pick<DatatableColumn, 'columnDef' | 'header' | 'sticky' | 'h
     HeaderAutocompleteFilterComponent,
     HeaderCheckboxFilterComponent,
     HeaderDateFilterComponent,
+    HeaderDurationFilterComponent,
     HeaderNumberFilterComponent,
     HeaderSelectFilterComponent,
     HeaderTextFilterComponent,
@@ -202,7 +204,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     const additionalColumns: DatasourceRequestColumn[] = [];
     this.options.columns.forEach(c => {
       if (c.hidden) return;
-      const column: DatasourceRequestColumn = { data: c.property, name: c.columnDef };
+      const column: DatasourceRequestColumn = { data: c.property, name: c.columnDef, searchable: c.searchable };
       if (c.sortProperty && c.order) this.addAdditionalColumn(additionalColumns, c.sortProperty);
       if (c.searchable) {
         const control = this.searchFormGroup.controls[c.columnDef];
@@ -255,6 +257,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
         this.loadPage();
       })
     );
+    console.warn(this.searchFormGroup);
   }
 
   private consolidateOrderIndex() {

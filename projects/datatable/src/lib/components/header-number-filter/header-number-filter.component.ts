@@ -87,7 +87,8 @@ export class HeaderNumberFilterComponent implements AfterViewInit, OnDestroy, Co
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
-        if (!value) this.control.setValue(undefined);
+        if (this.control.invalid) return;
+        else if (!value) this.control.setValue(undefined);
         else this.control.setValue({ value, regex: false, operator: this.operatorControl.value });
       })
     );

@@ -32,7 +32,6 @@ import { MatDatepickerIntl, MatDatepickerModule } from '@angular/material/datepi
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
 import { debounceTime, Subscription } from 'rxjs';
 import { DatatableSearchDateColumn } from '../../types/datatable-column.type';
 import { OperatorSelectComponent } from '../operator-select/operator-select.component';
@@ -47,7 +46,6 @@ import { OperatorSelectComponent } from '../operator-select/operator-select.comp
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatMenuModule,
     ReactiveFormsModule,
     OperatorSelectComponent,
   ],
@@ -124,8 +122,7 @@ export class HeaderDateFilterComponent implements OnInit, AfterViewInit, OnDestr
         else if (!value) this.control.setValue(undefined);
         else
           this.control.setValue({
-            start: value.start,
-            end: value.end,
+            value: [value.start, value.end],
             regex: false,
             operator: this.operatorControl.value,
           });
@@ -136,8 +133,7 @@ export class HeaderDateFilterComponent implements OnInit, AfterViewInit, OnDestr
         if (['<>', '≤≥'].includes(this.operatorControl.value!)) {
           if (!this.rangeGroup.value || this.rangeGroup.invalid) return;
           this.control.setValue({
-            start: this.rangeGroup.value.start,
-            end: this.rangeGroup.value.end,
+            value: [this.rangeGroup.value.start, this.rangeGroup.value.end],
             regex: false,
             operator: value,
           });

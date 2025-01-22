@@ -1,0 +1,23 @@
+/** @format */
+
+.operator-button {
+  font-size: 12px;
+  height: 26px;
+  padding: 6px;
+  ::ng-deep {
+    .mat-mdc-button-touch-target {
+      height: 36px;
+      width: 36px;
+    }
+  }
+}
+
+.operator-column {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+
+  .operator-button {
+    margin-top: 8px;
+  }
+}

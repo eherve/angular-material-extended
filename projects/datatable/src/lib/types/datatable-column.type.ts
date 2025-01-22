@@ -133,4 +133,5 @@ export type DatatableColumn =
   | DatatableSearchCheckboxColumn
   | DatatableDateColumn
   | DatatableSearchDateColumn
-  | DatatableDurationColumn;
+  | DatatableDurationColumn
+  | DatatableSearchDurationColumn;

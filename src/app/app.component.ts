@@ -25,7 +25,9 @@ while (i++ < 100) {
       );
     })(),
     date: new Date(Date.now() + (Math.random() - 0.5) * 1000 * 60 * 60 * 24 * 30),
-    duration: moment.duration(moment().diff(moment().subtract(Math.random() * 1000 * 60 * 60, 'seconds'))),
+    duration: moment
+      .duration(moment().diff(moment().subtract(Math.random() * 1000 * 60 * 60, 'seconds')))
+      .valueOf() as number,
     autocomplete: (() => {
       const rand = Math.round(Math.random() * 100);
       return `option ${rand}`;
@@ -128,6 +130,7 @@ export class AppComponent {
         columnDef: 'duration',
         header: 'Durée',
         property: 'duration',
+        searchable: true,
       },
       {
         type: 'select',

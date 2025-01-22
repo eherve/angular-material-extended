@@ -3,10 +3,13 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, forwardRef, inject, Injector } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, forwardRef, inject, Injector, Input } from '@angular/core';
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl, UntypedFormControl } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+
+export type OPERATOR = '=' | '>' | '≥' | '<' | '≤' | '<>' | '≤≥';
+const OPERATORS: OPERATOR[] = ['=', '>', '≥', '<', '≤', '<>', '≤≥'];
 
 @Component({
   selector: 'lib-operator-select',
@@ -34,7 +37,15 @@ import { MatIconModule } from '@angular/material/icon';
   ],
 })
 export class OperatorSelectComponent implements AfterViewInit, ControlValueAccessor {
-  operators = ['=', '>', '≥', '<', '≤', '<>', '≤≥'];
+  @Input('disableRange')
+  set setDisableRange(disableRange: any) {
+    this.disableRange = disableRange !== false;
+    if (this.disableRange) this.operators = OPERATORS.slice(0, 5);
+    else this.operators = OPERATORS;
+  }
+  disableRange = false;
+
+  operators = OPERATORS;
   isOpen: boolean = false;
 
   control?: FormControl<any>;
