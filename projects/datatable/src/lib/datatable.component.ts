@@ -229,7 +229,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private addAdditionalColumn(additionalColumns: DatasourceRequestColumn[], data: string, search?: any) {
     let column = additionalColumns.find(c => c.data === data);
     if (!column) additionalColumns.push((column = { data }));
-    if (search) column.search = search;
+    if (search) {
+      column.search = search;
+      column.searchable = true;
+    }
     return column;
   }
 
