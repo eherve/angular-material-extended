@@ -6,6 +6,8 @@ import { of } from 'rxjs';
 import { DatasourceService, DatatableColumn, DatatableOptions } from '../../projects/datatable/src/public-api';
 import moment from 'moment';
 
+moment.locale('fr');
+
 const DATA: any[] = [];
 let i = 0;
 while (i++ < 100) {
@@ -15,6 +17,7 @@ while (i++ < 100) {
       label: `Embedded label ${i}`,
     },
     number: i,
+    float: Math.random() * i * 100,
     reference: `Référence ${i}`,
     checkbox: (() => {
       const rand = Math.random();
@@ -95,9 +98,8 @@ export class AppComponent {
         sortable: true,
         searchable: true,
         order: { index: 0, dir: 'asc' },
-        prefix: 'Prefix ',
-        suffix: ' Suffix',
-        suffixContent: 'test',
+        prefix: 'Prefix&nbsp;',
+        suffixContentId: 'suffix',
       },
       {
         type: 'number',
@@ -107,6 +109,14 @@ export class AppComponent {
         sticky: true,
         sortable: true,
         searchable: true,
+      },
+      {
+        type: 'number',
+        columnDef: 'float',
+        header: 'Float',
+        property: 'float',
+        format: '0.0-2',
+        suffix: '<b>ml</b>',
       },
       {
         type: 'text',
@@ -203,7 +213,7 @@ export class AppComponent {
         searchProperty: 'templateSearch',
         sortable: true,
         sortProperty: 'templateSearch',
-        cellContent: 'test',
+        cellContentId: 'test',
         cellComponent: ComponentCellComponent,
       },
       {
@@ -212,7 +222,7 @@ export class AppComponent {
         header: 'Description',
         property: 'description',
         minWidth: 400,
-        cellContent: 'description',
+        cellContentId: 'description',
       },
       {
         columnDef: 'default',

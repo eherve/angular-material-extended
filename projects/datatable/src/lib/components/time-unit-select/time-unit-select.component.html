@@ -4,7 +4,7 @@
   <button
     mat-flat-button
     color="primary"
-    class="operator-button"
+    class="ngx-mat-datatable-time-unit-button"
     cdkOverlayOrigin
     #trigger="cdkOverlayOrigin"
     (click)="$event.stopPropagation(); isOpen = !isOpen">
@@ -14,13 +14,13 @@
   </button>
 
   <ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="trigger" [cdkConnectedOverlayOpen]="isOpen">
-    <div class="operator-column" @fade>
+    <div class="ngx-mat-datatable-time-unit-column" @fade>
       @for (unit of units; track unit) {
         @if (unit !== control.value) {
           <button
             mat-flat-button
             color="primary"
-            class="operator-button"
+            class="ngx-mat-datatable-time-unit-button"
             (click)="control.setValue(unit); isOpen = !isOpen">
             <span>
               {{ unitNames[unit] }}

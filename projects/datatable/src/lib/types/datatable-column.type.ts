@@ -32,11 +32,11 @@ export type DatatableComponentColumn = BaseColumn & {
   cellComponent: ComponentType<any>;
 };
 export type DatatableContentColumn = BaseColumn & {
-  cellContent: string;
+  cellContentId: string;
 };
 export type DatatableValueColumn = BaseColumn &
-  ({ prefix?: string } | { prefixContent?: string }) &
-  ({ suffix?: string } | { suffixContent?: string });
+  ({ prefix?: string } | { prefixContentId?: string }) &
+  ({ suffix?: string } | { suffixContentId?: string });
 
 type Column = DatatableComponentColumn | DatatableContentColumn | DatatableValueColumn;
 
@@ -54,6 +54,8 @@ export type DatatableSearchTextColumn = DatatableTextColumn & SearchableColumn &
 // NUMBER
 export type DatatableNumberColumn = Column & {
   type: 'number';
+  format?: string;
+  locale?: string;
 };
 export type DatatableSearchNumberColumn = DatatableNumberColumn & SearchableColumn & {};
 

@@ -2,11 +2,11 @@
 
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgxMatDatatableCellDirective } from './directives/datatable-cell.directive';
+import { NgxMatDatatableContentDirective } from './directives/datatable-cell.directive';
 import { NgxMatDatatableComponent } from './datatable.component';
 
 @NgModule({
-  imports: [CommonModule, NgxMatDatatableComponent, NgxMatDatatableCellDirective],
-  exports: [NgxMatDatatableComponent, NgxMatDatatableCellDirective],
+  imports: [CommonModule, NgxMatDatatableComponent, NgxMatDatatableContentDirective],
+  exports: [NgxMatDatatableComponent, NgxMatDatatableContentDirective],
 })
 export class NgxMatDatatableModule {}

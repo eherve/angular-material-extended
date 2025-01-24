@@ -31,6 +31,7 @@ import { debounceTime, Subscription } from 'rxjs';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
 import { CellDateValueComponent } from './components/cell-date-value/cell-date-value.component';
 import { CellDurationValueComponent } from './components/cell-duration-value/cell-duration-value.component';
+import { CellNumberValueComponent } from './components/cell-number-value/cell-number-value.component';
 import { CellSelectValueComponent } from './components/cell-select-value/cell-select-value.component';
 import { HeaderAutocompleteFilterComponent } from './components/header-autocomplete-filter/header-autocomplete-filter.component';
 import { HeaderCheckboxFilterComponent } from './components/header-checkbox-filter/header-checkbox-filter.component';
@@ -40,9 +41,10 @@ import { HeaderNumberFilterComponent } from './components/header-number-filter/h
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { DatagridDataSource } from './datasource';
-import { NgxMatDatatableCellDirective } from './directives/datatable-cell.directive';
-import { FindCellContentPipe } from './pipes/find-cell-content.pipe';
+import { NgxMatDatatableContentDirective } from './directives/datatable-cell.directive';
+import { FindContentPipe } from './pipes/find-cell-content.pipe';
 import { GetPipe } from './pipes/get.pipe';
+
 import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
 import { DatatableColumn } from './types/datatable-column.type';
 import { DatatableOptions } from './types/datatable-options.type';
@@ -54,10 +56,11 @@ type UpdateColumn = Pick<DatatableColumn, 'columnDef' | 'header' | 'sticky' | 'h
     CellCheckboxValueComponent,
     CellDateValueComponent,
     CellDurationValueComponent,
+    CellNumberValueComponent,
     CellSelectValueComponent,
     CommonModule,
     DragDropModule,
-    FindCellContentPipe,
+    FindContentPipe,
     FormsModule,
     GetPipe,
     HeaderAutocompleteFilterComponent,
@@ -104,8 +107,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
-  @ContentChildren(NgxMatDatatableCellDirective)
-  cellRefs?: QueryList<NgxMatDatatableCellDirective>;
+  @ContentChildren(NgxMatDatatableContentDirective)
+  contentRefs?: QueryList<NgxMatDatatableContentDirective>;
 
   displayedColumns: string[] = [];
   dataSource!: DatagridDataSource<Record>;

@@ -1,8 +1,10 @@
 /** @format */
 
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +17,8 @@ import { NgxMatDatatableModule } from '../../projects/datatable/src/public-api';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TableComponent } from './table/table.component';
+
+registerLocaleData(localeFr);
 
 @NgModule({
   declarations: [AppComponent, TableComponent],
@@ -29,7 +33,7 @@ import { TableComponent } from './table/table.component';
     MatIconModule,
     NgxMatDatatableModule,
   ],
-  providers: [provideAnimationsAsync()],
+  providers: [provideAnimationsAsync(), { provide: LOCALE_ID, useValue: 'fr' }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -1,9 +1,10 @@
 /** @format */
 
-.operator-button {
+.ngx-mat-datatable-time-unit-button {
   font-size: 12px;
   height: 26px;
   padding: 6px;
+  
   ::ng-deep {
     .mat-mdc-button-touch-target {
       height: 36px;
@@ -12,12 +13,12 @@
   }
 }
 
-.operator-column {
+.ngx-mat-datatable-time-unit-column {
   display: flex;
   box-sizing: border-box;
   flex-direction: column;
 
-  .operator-button {
+  .ngx-mat-datatable-time-unit-button {
     margin-top: 8px;
   }
 }

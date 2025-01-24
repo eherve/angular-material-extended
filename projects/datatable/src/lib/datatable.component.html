@@ -212,16 +212,24 @@
       @let value = row | get: column.property;
       @if (column.cellComponent) {
         <ng-container *ngComponentOutlet="column.cellComponent; inputs: { column, row, value }" />
-      } @else if (column.cellContent) {
-        @let cell = cellRefs | findCellContent: column;
+      } @else if (column.cellContentId) {
+        @let cell = contentRefs | findContent: column.cellContentId;
         @if (cell) {
           <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
         }
       } @else {
-        @if (column.prefix) {
-          {{ column.prefix }}
+        @if (column.prefixContentId) {
+          @let cell = contentRefs | findContent: column.prefixContentId;
+          @if (cell) {
+            <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
+          }
+        } @else if (column.prefix) {
+          <span [outerHTML]="column.prefix"></span>
         }
         @switch (column.type) {
+          @case ('number') {
+            <lib-cell-number-value [column]="column" [row]="row"></lib-cell-number-value>
+          }
           @case ('select') {
             <lib-cell-select-value [column]="column" [row]="row"></lib-cell-select-value>
           }
@@ -235,11 +243,16 @@
             <lib-cell-duration-value [column]="column" [row]="row"></lib-cell-duration-value>
           }
           @default {
-            {{ value }}
+            <span [outerHTML]="value"></span>
           }
         }
-        @if (column.suffix) {
-          {{ column.suffix }}
+        @if (column.suffixContentId) {
+          @let cell = contentRefs | findContent: column.suffixContentId;
+          @if (cell) {
+            <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
+          }
+        } @else if (column.suffix) {
+          <span [outerHTML]="column.suffix"></span>
         }
       }
     </div>

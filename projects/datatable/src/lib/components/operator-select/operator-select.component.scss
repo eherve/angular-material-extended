@@ -1,6 +1,6 @@
 /** @format */
 
-.operator-button {
+.ngx-mat-datatable-operator-button {
   --mdc-fab-small-container-elevation-shadow: none;
   --mdc-fab-small-hover-container-elevation-shadow: none;
   --mdc-fab-small-focus-container-elevation-shadow: none;
@@ -11,6 +11,7 @@
   width: 26px;
   height: 26px;
   padding: 6px;
+  
   ::ng-deep {
     .mat-mdc-button-touch-target {
       height: 36px;
@@ -19,12 +20,12 @@
   }
 }
 
-.operator-column {
+.ngx-mat-datatable-operator-column {
   display: flex;
   box-sizing: border-box;
   flex-direction: column;
 
-  .operator-button {
+  .ngx-mat-datatable-operator-button {
     margin-top: 8px;
   }
 }

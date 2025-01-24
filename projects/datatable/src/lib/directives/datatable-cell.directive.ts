@@ -1,16 +1,12 @@
 /** @format */
 
-import {
-  Directive,
-  Input,
-  TemplateRef
-} from '@angular/core';
+import { Directive, Input, TemplateRef } from '@angular/core';
 @Directive({
-  selector: '[ngxMatDatatableCell]',
+  selector: '[ngxMatDatatableContent]',
 })
-export class NgxMatDatatableCellDirective {
-  @Input('ngxMatDatatableCell')
-  columnDef!: string;
+export class NgxMatDatatableContentDirective {
+  @Input('ngxMatDatatableContent')
+  id!: string;
 
   constructor(public templateRef: TemplateRef<any>) {}
 }

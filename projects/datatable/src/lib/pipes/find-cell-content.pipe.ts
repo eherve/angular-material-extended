@@ -1,15 +1,14 @@
 /** @format */
 
 import { Pipe, PipeTransform, QueryList } from '@angular/core';
-import { NgxMatDatatableCellDirective } from '../directives/datatable-cell.directive';
-import { DatatableContentColumn } from '../types/datatable-column.type';
+import { NgxMatDatatableContentDirective } from '../directives/datatable-cell.directive';
 
-@Pipe({ name: 'findCellContent' })
-export class FindCellContentPipe implements PipeTransform {
+@Pipe({ name: 'findContent' })
+export class FindContentPipe implements PipeTransform {
   transform(
-    cellRefs: QueryList<NgxMatDatatableCellDirective> | undefined,
-    column: DatatableContentColumn
-  ): NgxMatDatatableCellDirective | undefined {
-    return cellRefs?.find(ref => ref.columnDef === column.columnDef);
+    contentRefs: QueryList<NgxMatDatatableContentDirective> | undefined,
+    id: string
+  ): NgxMatDatatableContentDirective | undefined {
+    return contentRefs?.find(ref => ref.id === id);
   }
 }
