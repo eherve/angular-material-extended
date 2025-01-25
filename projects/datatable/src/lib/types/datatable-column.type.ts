@@ -4,6 +4,8 @@ import { ComponentType } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
 import { DatasourceRequestOrderDir } from './datasource-service.type';
 
+type Color = string | ((row: any) => string);
+
 type BaseColumn = {
   type?: string;
   columnDef: string;
@@ -34,8 +36,10 @@ export type DatatableComponentColumn = BaseColumn & {
 export type DatatableContentColumn = BaseColumn & {
   cellContentId: string;
 };
-export type DatatableValueColumn = BaseColumn &
-  ({ prefix?: string } | { prefixContentId?: string }) &
+export type DatatableValueColumn = BaseColumn & { color?: Color } & (
+    | { prefix?: string }
+    | { prefixContentId?: string }
+  ) &
   ({ suffix?: string } | { suffixContentId?: string });
 
 type Column = DatatableComponentColumn | DatatableContentColumn | DatatableValueColumn;
@@ -100,6 +104,7 @@ export type DatatableDateColumn = Column & {
   format?: string;
   timezone?: string;
   locale?: string;
+  withDuration?:boolean;
 };
 export type DatatableSearchDateColumn = DatatableDateColumn &
   SearchableColumn & {

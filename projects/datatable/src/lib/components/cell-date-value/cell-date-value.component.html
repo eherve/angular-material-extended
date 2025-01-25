@@ -2,5 +2,8 @@
 
 @let value = row | get: column.property;
 @if (value) {
-  {{ value | momentFormat:column}}
+  {{ value | momentFormat: column }}
+  @if (column.withDuration) {
+    ({{ value | duration: column }})
+  }
 }

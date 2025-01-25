@@ -109,6 +109,7 @@ export class AppComponent {
         sticky: true,
         sortable: true,
         searchable: true,
+        color: row => ['blue', 'green'][row.number % 2],
       },
       {
         type: 'number',
@@ -117,6 +118,7 @@ export class AppComponent {
         property: 'float',
         format: '0.0-2',
         suffix: '<b>ml</b>',
+        color: 'red',
       },
       {
         type: 'text',
@@ -134,6 +136,7 @@ export class AppComponent {
         searchable: true,
         format: 'L LT',
         placeholder: 'DD/MM/YYYY',
+        withDuration: true,
       },
       {
         type: 'duration',

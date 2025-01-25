@@ -17,8 +17,13 @@ import { NgxMatDatatableModule } from '../../projects/datatable/src/public-api';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TableComponent } from './table/table.component';
+import { NgxMatDatatableIntl } from '../../projects/datatable/src/lib/datatable.intl';
 
 registerLocaleData(localeFr);
+
+class AppDatatableIntl extends NgxMatDatatableIntl {
+  public override noDateLabel = 'Aucune donnée pour les filtres sélectionnés';
+}
 
 @NgModule({
   declarations: [AppComponent, TableComponent],
@@ -33,7 +38,11 @@ registerLocaleData(localeFr);
     MatIconModule,
     NgxMatDatatableModule,
   ],
-  providers: [provideAnimationsAsync(), { provide: LOCALE_ID, useValue: 'fr' }],
+  providers: [
+    provideAnimationsAsync(),
+    { provide: LOCALE_ID, useValue: 'fr' },
+    { provide: NgxMatDatatableIntl, useClass: AppDatatableIntl },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

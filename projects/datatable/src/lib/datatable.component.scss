@@ -86,7 +86,7 @@
 
 #table {
   width: 100%;
-  height: 100%;
+  max-height: 100%;
   --mat-table-background-color: var(--datatable-background);
   --mat-table-row-item-outline-color: var(--datatable-border-color);
 
@@ -122,8 +122,19 @@
         }
       }
     }
+
     .mat-mdc-cell {
       padding: 0 8px;
+    }
+
+    .mat-mdc-row {
+      &:last-child {
+        .mat-mdc-cell {
+          border-bottom-color: var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));
+          border-bottom-width: var(--mat-table-row-item-outline-width, 1px);
+          border-bottom-style: solid;
+        }
+      }
     }
   }
 
@@ -201,4 +212,14 @@
   place-content: center start;
   align-items: center;
   flex-direction: row;
+}
+
+#no-data {
+  position: sticky;
+  width: fit-content;
+  left: 50%;
+  #no-data-label {
+    position: relative;
+    margin-left: -50%;
+  }
 }

@@ -3,15 +3,8 @@
 <div *ngIf="dataSource" id="container">
   <ng-container *ngTemplateOutlet="actionsTmpl"></ng-container>
 
-  <div id="table-container">
-    <table
-      id="table"
-      intersectionObserver
-      (intersection)="load($event.intersect)"
-      mat-table
-      [fixedLayout]="false"
-      [dataSource]="dataSource"
-      multiTemplateDataRows>
+  <div id="table-container" intersectionObserver (intersection)="load($event.intersect)">
+    <table id="table" mat-table [fixedLayout]="false" [dataSource]="dataSource" multiTemplateDataRows>
       @for (column of options.columns; track column) {
         <ng-container [matColumnDef]="column.columnDef" [sticky]="column.sticky">
           <th
@@ -29,6 +22,13 @@
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td [attr.colspan]="displayedColumns.length">
+          <div id="no-data">
+            <span id="no-data-label"> {{ datatableIntl.noDateLabel }}</span>
+          </div>
+        </td>
+      </tr>
     </table>
   </div>
 
@@ -208,7 +208,7 @@
 
 <ng-template #cellTmpl let-column="column" let-row="row">
   @defer (on viewport) {
-    <div class="cell">
+    <div class="cell" [style.color]="row | color: column">
       @let value = row | get: column.property;
       @if (column.cellComponent) {
         <ng-container *ngComponentOutlet="column.cellComponent; inputs: { column, row, value }" />

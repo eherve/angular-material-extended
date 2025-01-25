@@ -9,6 +9,7 @@ import {
   ContentChildren,
   EventEmitter,
   inject,
+  Injectable,
   Input,
   OnDestroy,
   OnInit,
@@ -22,7 +23,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -48,6 +49,24 @@ import { GetPipe } from './pipes/get.pipe';
 import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
 import { DatatableColumn } from './types/datatable-column.type';
 import { DatatableOptions } from './types/datatable-options.type';
+import { ColorPipe } from './pipes/color.pipe';
+import { NgxMatDatatableIntl } from './datatable.intl';
+
+@Injectable()
+class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
+  private datatableIntl = inject(NgxMatDatatableIntl);
+
+  override itemsPerPageLabel = this.datatableIntl.itemsPerPageLabel;
+  override nextPageLabel = this.datatableIntl.nextPageLabel;
+  override lastPageLabel = this.datatableIntl.lastPageLabel;
+  override previousPageLabel = this.datatableIntl.previousPageLabel;
+  override firstPageLabel = this.datatableIntl.firstPageLabel;
+  onLabel = this.datatableIntl.onLabel;
+
+  override getRangeLabel = (page: number, pageSize: number, length: number): string => {
+    return this.datatableIntl.getRangeLabel(page, pageSize, length);
+  };
+}
 
 type UpdateColumn = Pick<DatatableColumn, 'columnDef' | 'header' | 'sticky' | 'hidden'>;
 
@@ -58,6 +77,7 @@ type UpdateColumn = Pick<DatatableColumn, 'columnDef' | 'header' | 'sticky' | 'h
     CellDurationValueComponent,
     CellNumberValueComponent,
     CellSelectValueComponent,
+    ColorPipe,
     CommonModule,
     DragDropModule,
     FindContentPipe,
@@ -82,6 +102,7 @@ type UpdateColumn = Pick<DatatableColumn, 'columnDef' | 'header' | 'sticky' | 'h
     MatTooltipModule,
     ReactiveFormsModule,
   ],
+  providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }],
   selector: 'ngx-mat-datatable',
   templateUrl: 'datatable.component.html',
   styleUrl: 'datatable.component.scss',
@@ -115,6 +136,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   loaded = false;
 
   searchFormGroup!: FormGroup;
+
+  datatableIntl = inject(NgxMatDatatableIntl);
 
   private subscriptions = new Subscription();
   private changeDetectorRef = inject(ChangeDetectorRef);
@@ -263,7 +286,6 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
         this.loadPage();
       })
     );
-    console.warn(this.searchFormGroup);
   }
 
   private consolidateOrderIndex() {
