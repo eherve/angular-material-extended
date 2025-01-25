@@ -6,17 +6,18 @@ import { MatLabel } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { GetPipe } from '../../pipes/get.pipe';
 import { SelectOptionPipe } from '../../pipes/select-option.pipe';
+import { TransformPipe } from '../../pipes/transform.pipe';
 import { DatatableSelectColumn } from '../../types/datatable-column.type';
 
 @Component({
   selector: 'lib-cell-select-value',
-  imports: [CommonModule, SelectOptionPipe, GetPipe, MatIconModule, MatLabel],
+  imports: [CommonModule, SelectOptionPipe, GetPipe, MatIconModule, MatLabel, TransformPipe],
   templateUrl: './cell-select-value.component.html',
   styleUrl: './cell-select-value.component.scss',
 })
-export class CellSelectValueComponent {
+export class CellSelectValueComponent<Record> {
   @Input()
-  column!: DatatableSelectColumn;
+  column!: DatatableSelectColumn<Record>;
 
   @Input()
   row: any;

@@ -25,8 +25,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { Subscription } from 'rxjs';
-import { DatatableSearchSelectColumn } from '../../types/datatable-column.type';
 import { SelectOptionPipe } from '../../pipes/select-option.pipe';
+import { DatatableSearchSelectColumn } from '../../types/datatable-column.type';
 
 @Component({
   selector: 'lib-header-select-filter',
@@ -50,9 +50,9 @@ import { SelectOptionPipe } from '../../pipes/select-option.pipe';
     },
   ],
 })
-export class HeaderSelectFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: DatatableSearchSelectColumn;
+  column!: DatatableSearchSelectColumn<Record>;
 
   control!: FormControl<any>;
   selectControl = new FormControl();

@@ -1,7 +1,7 @@
 <!-- @format -->
 
 @let options = $any(column.options | async);
-@let value = row | get: column.property;
+@let value = row | get: column.property | transform: row : column;
 @let option = row | get: column.property | selectOption: options;
 
 @if (option) {

@@ -2,5 +2,5 @@
 
 @let value = row | get: column.property;
 @if (value) {
-  {{ value | duration: column }}
+  {{ value | transform: row : column | duration: column }}
 }

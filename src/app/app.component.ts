@@ -80,12 +80,13 @@ export class AppComponent {
     pageSizeOptions: [10, 20, 50, 100],
     pageSizeOptionsIndex: 1,
     actions: {
-      // columns: {
-      //   hideAndShow: true,
-      //   sticky: true,
-      //   reorder: true,
-      // },
+      columns: {
+        hideAndShow: true,
+        sticky: true,
+        reorder: true,
+      },
       refresh: true,
+      rowClick: row => console.log(row),
     },
     columnMinWith: 120,
     columns: [
@@ -243,7 +244,7 @@ export class AppComponent {
 })
 export class ComponentCellComponent {
   @Input()
-  column!: DatatableColumn;
+  column!: DatatableColumn<any>;
 
   @Input()
   row: any;

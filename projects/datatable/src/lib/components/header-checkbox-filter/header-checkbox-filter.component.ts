@@ -48,9 +48,9 @@ import { DatatableSearchCheckboxColumn } from '../../types/datatable-column.type
     },
   ],
 })
-export class HeaderCheckboxFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderCheckboxFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: DatatableSearchCheckboxColumn;
+  column!: DatatableSearchCheckboxColumn<Record>;
 
   control!: FormControl<any>;
   selectControl = new FormControl();

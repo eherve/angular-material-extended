@@ -6,7 +6,7 @@ import { DatatableColumn } from './datatable-column.type';
 export type DatatableOptions<Record> = {
   service: DatasourceService<Record>;
 
-  columns: DatatableColumn[];
+  columns: DatatableColumn<Record>[];
   columnMinWith?: number;
 
   pageSizeOptions?: number[];
@@ -20,5 +20,6 @@ export type DatatableOptions<Record> = {
       reorder?: boolean;
     };
     refresh?: boolean;
+    rowClick?: boolean | ((row: Record) => void);
   };
 };

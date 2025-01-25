@@ -46,11 +46,12 @@ import { NgxMatDatatableContentDirective } from './directives/datatable-cell.dir
 import { FindContentPipe } from './pipes/find-cell-content.pipe';
 import { GetPipe } from './pipes/get.pipe';
 
+import { NgxMatDatatableIntl } from './datatable.intl';
+import { ColorPipe } from './pipes/color.pipe';
 import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
 import { DatatableColumn } from './types/datatable-column.type';
 import { DatatableOptions } from './types/datatable-options.type';
-import { ColorPipe } from './pipes/color.pipe';
-import { NgxMatDatatableIntl } from './datatable.intl';
+import { TransformPipe } from './pipes/transform.pipe';
 
 @Injectable()
 class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
@@ -68,7 +69,7 @@ class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
   };
 }
 
-type UpdateColumn = Pick<DatatableColumn, 'columnDef' | 'header' | 'sticky' | 'hidden'>;
+type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header' | 'sticky' | 'hidden'>;
 
 @Component({
   imports: [
@@ -79,6 +80,7 @@ type UpdateColumn = Pick<DatatableColumn, 'columnDef' | 'header' | 'sticky' | 'h
     CellSelectValueComponent,
     ColorPipe,
     CommonModule,
+    TransformPipe,
     DragDropModule,
     FindContentPipe,
     FormsModule,
@@ -124,7 +126,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   options!: DatatableOptions<Record>;
 
   @Output()
-  onDisplayChanged = new EventEmitter<DatatableColumn[]>();
+  onDisplayChanged = new EventEmitter<DatatableColumn<Record>[]>();
+
+  @Output()
+  rowClicked = new EventEmitter<Record>();
 
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
@@ -162,7 +167,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.loadPage();
   }
 
-  sortColumn(column: DatatableColumn) {
+  sortColumn(column: DatatableColumn<Record>) {
     if (column.sortable === false) return;
     if (!column.order) column.order = { index: this.options.columns.filter(c => !!c.order).length, dir: 'asc' };
     else if (column.order.dir === 'asc') column.order.dir = 'desc';
@@ -193,7 +198,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     });
   }
 
-  updateColumns: UpdateColumn[] = [];
+  updateColumns: UpdateColumn<Record>[] = [];
   openUpdateColumnDisplay() {
     this.updateColumns = this.options.columns.map(column => ({
       columnDef: column.columnDef,
@@ -223,6 +228,15 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.buildDisplayColumns();
     this.onDisplayChanged.emit(this.options.columns);
     if (reload) this.loadPage();
+  }
+
+  rowClick(row: Record) {
+    if (typeof this.options.actions?.rowClick === 'boolean') {
+      this.rowClicked.emit(row);
+    } else if (typeof this.options.actions?.rowClick === 'function') {
+      this.options.actions.rowClick(row);
+      this.rowClicked.emit(row);
+    }
   }
 
   private buildRequestColumns(): DatasourceRequestColumn[] {

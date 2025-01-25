@@ -59,9 +59,9 @@ import {
     },
   ],
 })
-export class HeaderAutocompleteFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: DatatableSearchAutocompleteColumn;
+  column!: DatatableSearchAutocompleteColumn<Record>;
 
   options: DatatableSearchListOption[] = [];
   hasMore = false;

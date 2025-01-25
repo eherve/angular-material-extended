@@ -1,7 +1,16 @@
+/** @format */
+
 .option {
   display: flex;
   box-sizing: border-box;
   place-content: center start;
   align-items: center;
   flex-direction: row;
+}
+
+:host-context(tr.has-click:hover) {
+  mat-icon,
+  mat-label {
+    color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary)) !important;
+  }
 }

@@ -52,9 +52,9 @@ import { OperatorSelectComponent } from '../operator-select/operator-select.comp
     },
   ],
 })
-export class HeaderNumberFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderNumberFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: DatatableSearchNumberColumn;
+  column!: DatatableSearchNumberColumn<Record>;
 
   control!: FormControl<any>;
   selectControl = new FormControl();

@@ -4,7 +4,7 @@ import { ComponentType } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
 import { DatasourceRequestOrderDir } from './datasource-service.type';
 
-type Color = string | ((row: any) => string);
+type Color<Record> = string | ((row: Record) => string | undefined);
 
 type BaseColumn = {
   type?: string;
@@ -36,32 +36,32 @@ export type DatatableComponentColumn = BaseColumn & {
 export type DatatableContentColumn = BaseColumn & {
   cellContentId: string;
 };
-export type DatatableValueColumn = BaseColumn & { color?: Color } & (
+export type DatatableValueColumn<Record> = BaseColumn & { color?: Color<Record> } & (
     | { prefix?: string }
     | { prefixContentId?: string }
   ) &
-  ({ suffix?: string } | { suffixContentId?: string });
+  ({ suffix?: string } | { suffixContentId?: string }) & { transform?: (value: any, row: Record) => any };
 
-type Column = DatatableComponentColumn | DatatableContentColumn | DatatableValueColumn;
+type Column<Record> = DatatableComponentColumn | DatatableContentColumn | DatatableValueColumn<Record>;
 
-type SearchableColumn = Column & {
+type SearchableColumn<Record> = Column<Record> & {
   searchable: true;
   searchProperty?: string;
 };
 
 // TEXT
-export type DatatableTextColumn = Column & {
+export type DatatableTextColumn<Record> = Column<Record> & {
   type: 'text';
 };
-export type DatatableSearchTextColumn = DatatableTextColumn & SearchableColumn & {};
+export type DatatableSearchTextColumn<Record> = DatatableTextColumn<Record> & SearchableColumn<Record> & {};
 
 // NUMBER
-export type DatatableNumberColumn = Column & {
+export type DatatableNumberColumn<Record> = Column<Record> & {
   type: 'number';
   format?: string;
   locale?: string;
 };
-export type DatatableSearchNumberColumn = DatatableNumberColumn & SearchableColumn & {};
+export type DatatableSearchNumberColumn<Record> = DatatableNumberColumn<Record> & SearchableColumn<Record> & {};
 
 // SELECT
 export type DatatableSearchListOption = {
@@ -71,21 +71,21 @@ export type DatatableSearchListOption = {
   icon?: string;
   iconColor?: string;
 };
-export type DatatableSelectColumn = Column & {
+export type DatatableSelectColumn<Record> = Column<Record> & {
   type: 'select';
   options: Observable<DatatableSearchListOption[]>;
 };
-export type DatatableSearchSelectColumn = DatatableSelectColumn &
-  SearchableColumn & {
+export type DatatableSearchSelectColumn<Record> = DatatableSelectColumn<Record> &
+  SearchableColumn<Record> & {
     placeholder?: string;
   };
 
 // AUTOCOMPLETE
-export type DatatableAutocompleteColumn = Column & {
+export type DatatableAutocompleteColumn<Record> = Column<Record> & {
   type: 'autocomplete';
 };
-export type DatatableSearchAutocompleteColumn = DatatableAutocompleteColumn &
-  SearchableColumn & {
+export type DatatableSearchAutocompleteColumn<Record> = DatatableAutocompleteColumn<Record> &
+  SearchableColumn<Record> & {
     placeholder?: string;
     limit?: number;
     loadOnFocus?: boolean;
@@ -93,52 +93,52 @@ export type DatatableSearchAutocompleteColumn = DatatableAutocompleteColumn &
   };
 
 // CHECKBOX
-export type DatatableCheckboxColumn = Column & {
+export type DatatableCheckboxColumn<Record> = Column<Record> & {
   type: 'checkbox';
 };
-export type DatatableSearchCheckboxColumn = DatatableCheckboxColumn & SearchableColumn & {};
+export type DatatableSearchCheckboxColumn<Record> = DatatableCheckboxColumn<Record> & SearchableColumn<Record>;
 
 // DATE
-export type DatatableDateColumn = Column & {
+export type DatatableDateColumn<Record> = Column<Record> & {
   type: 'date';
   format?: string;
   timezone?: string;
   locale?: string;
-  withDuration?:boolean;
+  withDuration?: boolean;
 };
-export type DatatableSearchDateColumn = DatatableDateColumn &
-  SearchableColumn & {
+export type DatatableSearchDateColumn<Record> = DatatableDateColumn<Record> &
+  SearchableColumn<Record> & {
     placeholder?: string;
   };
 
 // DURATION
-export type DatatableDurationColumn = Column & {
+export type DatatableDurationColumn<Record> = Column<Record> & {
   type: 'duration';
   locale?: string;
 };
-export type DatatableSearchDurationColumn = DatatableDurationColumn &
-  SearchableColumn & {
+export type DatatableSearchDurationColumn<Record> = DatatableDurationColumn<Record> &
+  SearchableColumn<Record> & {
     placeholder?: string;
   };
 
 // DEFAULT
-export type DatatableDefaultColumn = Column & {
+export type DatatableDefaultColumn<Record> = Column<Record> & {
   searchable?: false;
 };
 
-export type DatatableColumn =
-  | DatatableDefaultColumn
-  | DatatableTextColumn
-  | DatatableSearchTextColumn
-  | DatatableNumberColumn
-  | DatatableSearchNumberColumn
-  | DatatableSelectColumn
-  | DatatableSearchSelectColumn
-  | DatatableAutocompleteColumn
-  | DatatableSearchAutocompleteColumn
-  | DatatableCheckboxColumn
-  | DatatableSearchCheckboxColumn
-  | DatatableDateColumn
-  | DatatableSearchDateColumn
-  | DatatableDurationColumn
-  | DatatableSearchDurationColumn;
+export type DatatableColumn<Record> =
+  | DatatableDefaultColumn<Record>
+  | DatatableTextColumn<Record>
+  | DatatableSearchTextColumn<Record>
+  | DatatableNumberColumn<Record>
+  | DatatableSearchNumberColumn<Record>
+  | DatatableSelectColumn<Record>
+  | DatatableSearchSelectColumn<Record>
+  | DatatableAutocompleteColumn<Record>
+  | DatatableSearchAutocompleteColumn<Record>
+  | DatatableCheckboxColumn<Record>
+  | DatatableSearchCheckboxColumn<Record>
+  | DatatableDateColumn<Record>
+  | DatatableSearchDateColumn<Record>
+  | DatatableDurationColumn<Record>
+  | DatatableSearchDurationColumn<Record>;

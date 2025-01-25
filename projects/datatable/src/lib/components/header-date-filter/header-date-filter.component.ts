@@ -62,9 +62,9 @@ import moment, { Moment } from 'moment';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeaderDateFilterComponent implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderDateFilterComponent<Record> implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: DatatableSearchDateColumn;
+  column!: DatatableSearchDateColumn<Record>;
 
   control!: FormControl<any>;
   selectControl = new FormControl<Date | undefined>(undefined);

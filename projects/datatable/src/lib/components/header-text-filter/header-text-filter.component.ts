@@ -46,9 +46,9 @@ import { DatatableSearchTextColumn } from '../../types/datatable-column.type';
     },
   ],
 })
-export class HeaderTextFilterComponent implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: DatatableSearchTextColumn;
+  column!: DatatableSearchTextColumn<Record>;
 
   control!: FormControl<any>;
   selectControl = new FormControl();

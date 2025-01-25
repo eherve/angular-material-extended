@@ -1,6 +1,6 @@
 <!-- @format -->
 
-@let value = row | get: column.property;
+@let value = row | get: column.property | transform: row : column;
 @if (value) {
   {{ value | momentFormat: column }}
   @if (column.withDuration) {

@@ -3,10 +3,10 @@
 :host {
   display: block;
 
-  --datatable-background: #ffffff;
-  --datatable-border-color: #ccc;
-  --datatable-sticky-background: var(--datatable-background);
-  --datatable-sticky-border: 1px dashed #e6a93a;
+  --ngx-mat-datatable-background: #ffffff;
+  --ngx-mat-datatable-border-color: #ccc;
+  --ngx-mat-datatable-sticky-background: var(--ngx-mat-datatable-background);
+  --ngx-mat-datatable-sticky-border: 1px dashed #e6a93a;
 }
 
 #container {
@@ -18,7 +18,7 @@
   height: 100%;
   width: 100%;
 
-  background-color: var(--datatable-background);
+  background-color: var(--ngx-mat-datatable-background);
 }
 
 #actions {
@@ -28,7 +28,7 @@
   place-content: center space-between;
   align-items: center;
   flex-direction: row;
-  border-bottom: 1px solid var(--datatable-border-color);
+  border-bottom: 1px solid var(--ngx-mat-datatable-border-color);
 
   #actions-start,
   #actions-center,
@@ -87,15 +87,15 @@
 #table {
   width: 100%;
   max-height: 100%;
-  --mat-table-background-color: var(--datatable-background);
-  --mat-table-row-item-outline-color: var(--datatable-border-color);
+  --mat-table-background-color: var(--ngx-mat-datatable-background);
+  --mat-table-row-item-outline-color: var(--ngx-mat-datatable-border-color);
 
   ::ng-deep {
     .mat-mdc-table-sticky {
       opacity: 1;
-      background: var(--datatable-sticky-background, var(--datatable-background, #ffffff));
+      background: var(--ngx-mat-datatable-sticky-background, var(--ngx-mat-datatable-background, #ffffff));
       &.mat-mdc-table-sticky-border-elem-left {
-        border-right: var(--datatable-sticky-border);
+        border-right: var(--ngx-mat-datatable-sticky-border);
       }
     }
 
@@ -109,7 +109,7 @@
         --mdc-filled-text-field-active-indicator-color: #999;
         --mat-form-field-hover-state-layer-opacity: 0;
         --mdc-filled-text-field-container-shape: 0;
-        --mdc-filled-text-field-container-color: var(--datatable-background);
+        --mdc-filled-text-field-container-color: var(--ngx-mat-datatable-background);
 
         ::ng-deep {
           .mat-mdc-form-field-bottom-align {
@@ -128,6 +128,16 @@
     }
 
     .mat-mdc-row {
+      &.has-click {
+        cursor: pointer;
+        &:hover {
+          .mat-mdc-cell {
+            color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary)) !important;
+            background-color: var(--ngx-mat-datatable-hover-bgcolor, var(--mat-sys-primary)) !important;
+          }
+        }
+      }
+
       &:last-child {
         .mat-mdc-cell {
           border-bottom-color: var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));
@@ -167,8 +177,8 @@
 }
 
 #paginator {
-  --mat-paginator-container-background-color: var(--datatable-background);
-  border-top: 1px solid var(--datatable-border-color);
+  --mat-paginator-container-background-color: var(--ngx-mat-datatable-background);
+  border-top: 1px solid var(--ngx-mat-datatable-border-color);
 }
 
 #loading {

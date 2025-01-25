@@ -1,4 +1,4 @@
 <!-- @format -->
 
 @let value = row | get: column.property;
-{{ value | number: column.format : column.locale }}
+{{ value | transform: row : column | number: column.format : column.locale }}

@@ -55,9 +55,9 @@ import { TIME_UNIT, TimeUnitSelectComponent } from '../time-unit-select/time-uni
     },
   ],
 })
-export class HeaderDurationFilterComponent implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderDurationFilterComponent<Record> implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
-  column!: DatatableSearchDurationColumn;
+  column!: DatatableSearchDurationColumn<Record>;
 
   control!: FormControl<any>;
   selectControl = new FormControl<number | undefined>(undefined);
