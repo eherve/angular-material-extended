@@ -232,7 +232,7 @@
             <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
           }
         } @else if (column.prefix) {
-          <span [outerHTML]="column.prefix"></span>
+          <span [outerHTML]="column.prefix | safeHtml"></span>
         }
         @switch (column.type) {
           @case ('number') {
@@ -251,7 +251,7 @@
             <lib-cell-duration-value [column]="column" [row]="row"></lib-cell-duration-value>
           }
           @default {
-            <span [outerHTML]="value | transform: row : column"></span>
+            <span [outerHTML]="value | transform: row : column | safeHtml"></span>
           }
         }
         @if (column.suffixContentId) {
@@ -260,7 +260,7 @@
             <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
           }
         } @else if (column.suffix) {
-          <span [outerHTML]="column.suffix"></span>
+          <span [outerHTML]="column.suffix | safeHtml"></span>
         }
       }
     </div>
