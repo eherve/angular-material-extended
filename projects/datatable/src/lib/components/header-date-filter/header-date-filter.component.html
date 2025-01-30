@@ -3,7 +3,7 @@
 @if (selectControl) {
   @if (['<>', '≤≥'].includes(operatorControl.value!)) {
     <mat-form-field class="ngx-datatable-date-filter" appearance="fill" [class.has-value]="selectControl.value">
-      <mat-label [innerHTML]="column.header"></mat-label>
+      <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
 
       <lib-operator-select matPrefix [formControl]="operatorControl"></lib-operator-select>
 
@@ -20,7 +20,7 @@
     </mat-form-field>
   } @else {
     <mat-form-field class="ngx-datatable-date-filter" appearance="fill" [class.has-value]="selectControl.value">
-      <mat-label [innerHTML]="column.header"></mat-label>
+      <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
 
       <lib-operator-select matPrefix [formControl]="operatorControl"></lib-operator-select>
 

@@ -28,6 +28,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { debounceTime, Subscription } from 'rxjs';
+import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { DatatableSearchDurationColumn } from '../../types/datatable-column.type';
 import { OPERATOR, OperatorSelectComponent } from '../operator-select/operator-select.component';
 import { TIME_UNIT, TimeUnitSelectComponent } from '../time-unit-select/time-unit-select.component';
@@ -44,6 +45,7 @@ import { TIME_UNIT, TimeUnitSelectComponent } from '../time-unit-select/time-uni
     ReactiveFormsModule,
     OperatorSelectComponent,
     TimeUnitSelectComponent,
+    SafeHtmlPipe,
   ],
   templateUrl: './header-duration-filter.component.html',
   styleUrl: './header-duration-filter.component.scss',

@@ -32,10 +32,11 @@ import { MatDatepickerIntl, MatDatepickerModule } from '@angular/material/datepi
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import moment from 'moment';
 import { debounceTime, Subscription } from 'rxjs';
+import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { DatatableSearchDateColumn } from '../../types/datatable-column.type';
 import { OPERATOR, OperatorSelectComponent } from '../operator-select/operator-select.component';
-import moment, { Moment } from 'moment';
 
 @Component({
   selector: 'lib-header-date-filter',
@@ -49,6 +50,7 @@ import moment, { Moment } from 'moment';
     MatInputModule,
     ReactiveFormsModule,
     OperatorSelectComponent,
+    SafeHtmlPipe,
   ],
   templateUrl: './header-date-filter.component.html',
   styleUrl: './header-date-filter.component.scss',

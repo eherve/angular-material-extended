@@ -2,7 +2,7 @@
 
 @if (selectControl) {
   <mat-form-field class="ngx-datatable-duration-filter" appearance="fill" [class.has-value]="selectControl.value">
-    <mat-label [innerHTML]="column.header"></mat-label>
+    <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
 
     <lib-operator-select disableRange matPrefix [formControl]="operatorControl"></lib-operator-select>
 

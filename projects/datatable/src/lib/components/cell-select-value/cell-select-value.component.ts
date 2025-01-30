@@ -5,13 +5,14 @@ import { Component, Input } from '@angular/core';
 import { MatLabel } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { GetPipe } from '../../pipes/get.pipe';
+import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { SelectOptionPipe } from '../../pipes/select-option.pipe';
 import { TransformPipe } from '../../pipes/transform.pipe';
 import { DatatableSelectColumn } from '../../types/datatable-column.type';
 
 @Component({
   selector: 'lib-cell-select-value',
-  imports: [CommonModule, SelectOptionPipe, GetPipe, MatIconModule, MatLabel, TransformPipe],
+  imports: [CommonModule, SelectOptionPipe, GetPipe, MatIconModule, MatLabel, TransformPipe, SafeHtmlPipe],
   templateUrl: './cell-select-value.component.html',
   styleUrl: './cell-select-value.component.scss',
 })

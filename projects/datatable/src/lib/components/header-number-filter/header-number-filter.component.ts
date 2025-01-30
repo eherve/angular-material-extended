@@ -9,7 +9,7 @@ import {
   inject,
   Injector,
   Input,
-  OnDestroy
+  OnDestroy,
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -26,6 +26,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { Subscription } from 'rxjs';
+import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { DatatableSearchNumberColumn } from '../../types/datatable-column.type';
 import { OperatorSelectComponent } from '../operator-select/operator-select.component';
 
@@ -41,6 +42,7 @@ import { OperatorSelectComponent } from '../operator-select/operator-select.comp
     MatMenuModule,
     ReactiveFormsModule,
     OperatorSelectComponent,
+    SafeHtmlPipe,
   ],
   templateUrl: './header-number-filter.component.html',
   styleUrl: './header-number-filter.component.scss',

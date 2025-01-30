@@ -2,7 +2,7 @@
 
 @if (selectControl) {
   <mat-form-field appearance="fill">
-    <mat-label [innerHTML]="column.header"></mat-label>
+    <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
     <input
       #input
       type="text"
@@ -50,6 +50,6 @@
         {{ option.icon }}
       </mat-icon>
     }
-    <mat-label [style.color]="option.color" [innerHTML]="option.name"></mat-label>
+    <mat-label [style.color]="option.color" [innerHTML]="option.name | safeHtml"></mat-label>
   </div>
 </ng-template>

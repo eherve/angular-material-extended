@@ -1,3 +1,5 @@
+/** @format */
+
 import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
@@ -23,6 +25,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Subscription } from 'rxjs';
+import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { DatatableSearchTextColumn } from '../../types/datatable-column.type';
 
 @Component({
@@ -35,6 +38,7 @@ import { DatatableSearchTextColumn } from '../../types/datatable-column.type';
     MatIconModule,
     MatInputModule,
     ReactiveFormsModule,
+    SafeHtmlPipe,
   ],
   templateUrl: './header-text-filter.component.html',
   styleUrl: './header-text-filter.component.scss',

@@ -30,10 +30,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { BehaviorSubject, debounceTime, filter, map, startWith, Subject, Subscription, switchMap, tap } from 'rxjs';
-import {
-  DatatableSearchAutocompleteColumn,
-  DatatableSearchListOption,
-} from '../../types/datatable-column.type';
+import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
+import { DatatableSearchAutocompleteColumn, DatatableSearchListOption } from '../../types/datatable-column.type';
 
 @Component({
   selector: 'lib-header-autocomplete-filter',
@@ -48,6 +46,7 @@ import {
     MatInputModule,
     MatProgressBarModule,
     ReactiveFormsModule,
+    SafeHtmlPipe,
   ],
   templateUrl: './header-autocomplete-filter.component.html',
   styleUrl: './header-autocomplete-filter.component.scss',

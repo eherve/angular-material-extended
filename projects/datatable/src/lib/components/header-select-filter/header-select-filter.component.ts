@@ -25,6 +25,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { Subscription } from 'rxjs';
+import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { SelectOptionPipe } from '../../pipes/select-option.pipe';
 import { DatatableSearchSelectColumn } from '../../types/datatable-column.type';
 
@@ -39,6 +40,7 @@ import { DatatableSearchSelectColumn } from '../../types/datatable-column.type';
     MatSelectModule,
     ReactiveFormsModule,
     SelectOptionPipe,
+    SafeHtmlPipe,
   ],
   templateUrl: './header-select-filter.component.html',
   styleUrl: './header-select-filter.component.scss',

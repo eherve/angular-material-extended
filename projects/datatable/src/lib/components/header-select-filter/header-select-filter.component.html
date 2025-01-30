@@ -2,7 +2,7 @@
 
 @if (selectControl) {
   <mat-form-field appearance="fill">
-    <mat-label [innerHTML]="column.header"></mat-label>
+    <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
     <mat-select [formControl]="selectControl" [placeholder]="column.placeholder!">
       @let options = column.options | async;
 
@@ -11,7 +11,7 @@
         @if (option) {
           <ng-container *ngTemplateOutlet="selectOption; context: { option }"></ng-container>
         } @else {
-          <mat-label [innerHTML]="selectControl.value"></mat-label>
+          <mat-label [innerHTML]="selectControl.value | safeHtml"></mat-label>
         }
       </mat-select-trigger>
       @for (option of options; track option) {
@@ -39,6 +39,6 @@
         {{ option.icon }}
       </mat-icon>
     }
-    <mat-label [style.color]="option.color" [innerHTML]="option.name"></mat-label>
+    <mat-label [style.color]="option.color" [innerHTML]="option.name | safeHtml"></mat-label>
   </div>
 </ng-template>

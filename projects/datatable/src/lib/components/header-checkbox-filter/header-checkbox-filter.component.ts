@@ -25,6 +25,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { filter, Subscription, tap } from 'rxjs';
+import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { DatatableSearchCheckboxColumn } from '../../types/datatable-column.type';
 
 @Component({
@@ -37,6 +38,7 @@ import { DatatableSearchCheckboxColumn } from '../../types/datatable-column.type
     MatIconModule,
     MatCheckboxModule,
     ReactiveFormsModule,
+    SafeHtmlPipe,
   ],
   templateUrl: './header-checkbox-filter.component.html',
   styleUrl: './header-checkbox-filter.component.scss',

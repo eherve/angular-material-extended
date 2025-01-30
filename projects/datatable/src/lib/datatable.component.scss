@@ -1,7 +1,10 @@
 /** @format */
 
 :host {
-  display: block;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+  max-height: 100%;
 
   --ngx-mat-datatable-background: #ffffff;
   --ngx-mat-datatable-border-color: #ccc;
@@ -11,11 +14,11 @@
 
 #container {
   display: flex;
+  flex: 1 1 100%;
   box-sizing: border-box;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  height: 100%;
   width: 100%;
 
   background-color: var(--ngx-mat-datatable-background);
@@ -178,7 +181,26 @@
 
 #paginator {
   --mat-paginator-container-background-color: var(--ngx-mat-datatable-background);
+  --mat-form-field-container-height: 24px;
+  --mat-form-field-container-vertical-padding: 4px;
+  --mat-paginator-container-size: 46px;
   border-top: 1px solid var(--ngx-mat-datatable-border-color);
+
+  ::ng-deep {
+    .mat-mdc-select {
+      display: flex;
+    }
+    .mat-mdc-paginator-touch-target {
+      height: 24px;
+    }
+
+    .mat-mdc-paginator-range-actions {
+      button {
+        --mdc-icon-button-state-layer-size: 36px;
+        padding: 6px;
+      }
+    }
+  }
 }
 
 #loading {

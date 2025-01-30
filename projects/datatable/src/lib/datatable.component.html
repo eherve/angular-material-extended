@@ -1,6 +1,6 @@
 <!-- @format -->
 
-<div *ngIf="dataSource" id="container">
+<div *ngIf="dataSource" id="container" >
   <ng-container *ngTemplateOutlet="actionsTmpl"></ng-container>
 
   <div id="table-container" intersectionObserver (intersection)="load($event.intersect)">
