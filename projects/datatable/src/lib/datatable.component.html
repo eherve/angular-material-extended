@@ -68,7 +68,7 @@
           mat-icon-button
           color="primary"
           class="icon-only action"
-          [ngxMatTooltip]="options.actions?.columns?.tooltip || 'Afficher / masquer des colonnes'"
+          [matTooltip]="options.actions?.columns?.tooltip || 'Afficher / masquer des colonnes'"
           [matMenuTriggerFor]="columnsMenu"
           (menuOpened)="openUpdateColumnDisplay()"
           (menuClosed)="closeUpdateColumnDisplay()">
@@ -147,7 +147,7 @@
 </mat-menu>
 
 <ng-template #headerTmpl let-column="column">
-  <div class="header-container" [ngxMatTooltip]="column.tooltip">
+  <div class="header-container" [matTooltip]="column.tooltip">
     <div class="header" [formGroup]="searchFormGroup">
       @if (column.searchable) {
         @switch (column.type) {
@@ -218,7 +218,7 @@
 
 <ng-template #cellTmpl let-column="column" let-row="row">
   @defer (on viewport) {
-    <div class="cell">
+    <div class="cell" [style.place-content]="column.align">
       @let value = row | get: column.property;
       @if (column.cellComponent) {
         <ng-container *ngComponentOutlet="column.cellComponent; inputs: { column, row, value }" />

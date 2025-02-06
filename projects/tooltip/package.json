@@ -1,6 +1,6 @@
 {
   "name": "@eherve/angular-material-tooltip",
-  "version": "19.0.0",
+  "version": "19.0.1",
   "author": "Eric Herve <eric.herve.95@gmail.com>",
   "repository": {
     "type": "git",
@@ -11,6 +11,7 @@
     "access": "public"
   },
   "peerDependencies": {
+    "@angular/animations": "^19.0.4",
     "@angular/cdk": "^19.0.4",
     "@angular/common": "^19.0.4",
     "@angular/core": "^19.0.4",

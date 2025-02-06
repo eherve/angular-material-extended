@@ -13,12 +13,11 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import 'moment/locale/fr';
+import { NgxMatDatatableIntl } from '../../projects/datatable/src/lib/datatable.intl';
 import { NgxMatDatatableModule } from '../../projects/datatable/src/public-api';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TableComponent } from './table/table.component';
-import { NgxMatDatatableIntl } from '../../projects/datatable/src/lib/datatable.intl';
-
 registerLocaleData(localeFr);
 
 class AppDatatableIntl extends NgxMatDatatableIntl {

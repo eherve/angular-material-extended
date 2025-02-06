@@ -30,6 +30,7 @@ type BaseColumn = {
   };
 
   tooltip?: string;
+  align?: 'start' | 'center' | 'end';
 };
 
 export type DatatableComponentColumn = BaseColumn & {
@@ -38,11 +39,11 @@ export type DatatableComponentColumn = BaseColumn & {
 export type DatatableContentColumn = BaseColumn & {
   cellContentId: string;
 };
-export type DatatableValueColumn<Record> = BaseColumn & { color?: Color<Record> } & (
-    | { prefix?: string }
-    | { prefixContentId?: string }
-  ) &
-  ({ suffix?: string } | { suffixContentId?: string }) & { transform?: (value: any, row: Record) => any };
+export type DatatableValueColumn<Record> = BaseColumn & {
+  color?: Color<Record>;
+  transform?: (value: any, row: Record) => any;
+} & ({ prefix?: string; prefixContentId?: undefined } | { prefix?: undefined; prefixContentId?: string }) &
+  ({ suffix?: string } | { suffixContentId?: string });
 
 type Column<Record> = DatatableComponentColumn | DatatableContentColumn | DatatableValueColumn<Record>;
 
@@ -107,6 +108,7 @@ export type DatatableDateColumn<Record> = Column<Record> & {
   timezone?: string;
   locale?: string;
   withDuration?: boolean;
+  durationRefreshTime?: number;
 };
 export type DatatableSearchDateColumn<Record> = DatatableDateColumn<Record> &
   SearchableColumn<Record> & {

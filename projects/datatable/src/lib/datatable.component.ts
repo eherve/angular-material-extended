@@ -26,7 +26,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { debounceTime, Subscription } from 'rxjs';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
@@ -42,18 +41,17 @@ import { HeaderNumberFilterComponent } from './components/header-number-filter/h
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { DatagridDataSource } from './datasource';
+import { NgxMatDatatableIntl } from './datatable.intl';
 import { NgxMatDatatableContentDirective } from './directives/datatable-cell.directive';
+import { ColorPipe } from './pipes/color.pipe';
 import { FindContentPipe } from './pipes/find-cell-content.pipe';
 import { GetPipe } from './pipes/get.pipe';
-
-import { NgxMatDatatableIntl } from './datatable.intl';
-import { ColorPipe } from './pipes/color.pipe';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { TransformPipe } from './pipes/transform.pipe';
 import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
 import { DatatableColumn } from './types/datatable-column.type';
 import { DatatableOptions } from './types/datatable-options.type';
-import { NgxMatTooltipModule } from '../../../tooltip/src/public-api';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Injectable()
 class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
@@ -105,7 +103,7 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     MatTableModule,
     ReactiveFormsModule,
     SafeHtmlPipe,
-    NgxMatTooltipModule,
+    MatTooltipModule,
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }],
   selector: 'ngx-mat-datatable',

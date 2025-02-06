@@ -2,9 +2,9 @@
 
 import { Component, Input } from '@angular/core';
 import { clone, deburr, filter, includes, map, orderBy, slice, toLower, trim, uniqBy } from 'lodash-es';
+import moment from 'moment';
 import { of } from 'rxjs';
 import { DatasourceService, DatatableColumn, DatatableOptions } from '../../projects/datatable/src/public-api';
-import moment from 'moment';
 
 moment.locale('fr');
 
@@ -27,10 +27,10 @@ while (i++ < 100) {
         : undefined
       );
     })(),
-    date: new Date(Date.now() + (Math.random() - 0.5) * 1000 * 60 * 60 * 24 * 30),
+    date: new Date(Date.now() + (Math.random() - 0.5) * 1000 * 60),
     duration: moment
-      .duration(moment().diff(moment().subtract(Math.random() * 1000 * 60 * 60, 'seconds')))
-      .valueOf() as number,
+      .duration(moment().diff(moment().subtract(Math.random() * 1000 * 60 * 60, 'milliseconds')))
+      .as('millisecond') as number,
     autocomplete: (() => {
       const rand = Math.round(Math.random() * 100);
       return `option ${rand}`;
@@ -111,6 +111,7 @@ export class AppComponent {
         sticky: true,
         sortable: true,
         searchable: true,
+        align: 'end',
         color: row => ['blue', 'green'][row.number % 2],
       },
       {
@@ -121,7 +122,7 @@ export class AppComponent {
         format: '0.0-2',
         suffix: '<b>ml</b>',
         color: 'red',
-        tooltip: `<i>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</i>`,
+        tooltip: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`,
       },
       {
         type: 'text',
@@ -140,12 +141,14 @@ export class AppComponent {
         format: 'L LT',
         placeholder: 'DD/MM/YYYY',
         withDuration: true,
+        durationRefreshTime: 1000 * 5,
       },
       {
         type: 'duration',
         columnDef: 'duration',
         header: 'Durée',
         property: 'duration',
+        align: 'center',
         searchable: true,
       },
       {

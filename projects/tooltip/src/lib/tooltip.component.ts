@@ -1,8 +1,7 @@
 /** @format */
 
 import { animate, style, transition, trigger } from '@angular/animations';
-import { ConnectedOverlayPositionChange, ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
-import { CommonModule } from '@angular/common';
+import { ConnectedOverlayPositionChange, ConnectedPosition } from '@angular/cdk/overlay';
 import { ChangeDetectorRef, Component, ElementRef, Input, TemplateRef } from '@angular/core';
 
 const topPosition: ConnectedPosition = {
