@@ -8,6 +8,11 @@
   flex-direction: row;
 }
 
+mat-icon,
+mat-label {
+  color: currentColor;
+}
+
 :host-context(tr.has-click:hover) {
   mat-icon,
   mat-label {

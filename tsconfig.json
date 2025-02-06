@@ -4,7 +4,8 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "angular-material-datatable": ["dist/angular-material-datatable"]
+      "angular-material-datatable": ["./dist/angular-material-datatable"],
+      "tooltip": ["./dist/angular-material-tooltip"]
     },
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",

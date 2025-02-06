@@ -53,6 +53,7 @@ import { TransformPipe } from './pipes/transform.pipe';
 import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
 import { DatatableColumn } from './types/datatable-column.type';
 import { DatatableOptions } from './types/datatable-options.type';
+import { NgxMatTooltipModule } from '../../../tooltip/src/public-api';
 
 @Injectable()
 class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
@@ -102,9 +103,9 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatTooltipModule,
     ReactiveFormsModule,
     SafeHtmlPipe,
+    NgxMatTooltipModule,
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }],
   selector: 'ngx-mat-datatable',

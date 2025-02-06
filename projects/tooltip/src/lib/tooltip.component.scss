@@ -1,0 +1,9 @@
+/** @format */
+
+.ngx-mat-tooltip {
+  border: var(--ngx-mat-tooltip-border, 1px solid var(--mat-sys-primary));
+  border-radius: var(--ngx-mat-tooltip-border-radius, 4px);
+  padding: var(--ngx-mat-tooltip-padding, 8px);
+  background-color: var(--ngx-mat-tooltip-background-color, white);
+  max-width: var(--ngx-mat-tooltip-max-width, calc(var(--trigger-width) * 2px));
+}

@@ -108,7 +108,6 @@
       mat-form-field {
         min-width: auto;
         flex: 1 1 100%;
-        margin: 6px 0;
         --mdc-filled-text-field-active-indicator-color: #999;
         --mat-form-field-hover-state-layer-opacity: 0;
         --mdc-filled-text-field-container-shape: 0;
@@ -151,6 +150,17 @@
     }
   }
 
+  .header-container {
+    display: flex;
+    box-sizing: border-box;
+    place-content: center start;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
+    min-height: var(--mat-form-field-container-height, 56px);
+    margin: 6px 0;
+  }
+
   .header {
     width: 100%;
     display: flex;
@@ -189,6 +199,7 @@
   ::ng-deep {
     .mat-mdc-select {
       display: flex;
+      height: 24px;
     }
     .mat-mdc-paginator-touch-target {
       height: 24px;

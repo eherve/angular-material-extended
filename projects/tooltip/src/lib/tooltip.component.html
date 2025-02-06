@@ -1,0 +1,26 @@
+<!-- @format -->
+
+@if (trigger) {
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="trigger"
+    [cdkConnectedOverlayOpen]="isOpen"
+    [cdkConnectedOverlayPositions]="positions"
+    (positionChange)="positionChange($event)">
+    <div
+      @fade
+      class="ngx-mat-tooltip {{ position?.panelClass }}"
+      (mouseenter)="onMouseEnter()"
+      (mouseleave)="onMouseLeave()"
+      [style.--trigger-width]="trigger.nativeElement.clientWidth"
+      [style.--trigger-height]="trigger.nativeElement.clientHeight">
+      @if (templateRef) {
+        <ng-container *ngTemplateOutlet="templateRef; context: templateContext"> </ng-container>
+      }
+
+      @if (content) {
+        <div [innerHTML]="content"></div>
+      }
+    </div>
+  </ng-template>
+}

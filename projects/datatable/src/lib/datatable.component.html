@@ -1,6 +1,6 @@
 <!-- @format -->
 
-<div *ngIf="dataSource" id="container" >
+<div *ngIf="dataSource" id="container">
   <ng-container *ngTemplateOutlet="actionsTmpl"></ng-container>
 
   <div id="table-container" intersectionObserver (intersection)="load($event.intersect)">
@@ -68,7 +68,7 @@
           mat-icon-button
           color="primary"
           class="icon-only action"
-          [matTooltip]="options.actions?.columns?.tooltip || 'Afficher / masquer des colonnes'"
+          [ngxMatTooltip]="options.actions?.columns?.tooltip || 'Afficher / masquer des colonnes'"
           [matMenuTriggerFor]="columnsMenu"
           (menuOpened)="openUpdateColumnDisplay()"
           (menuClosed)="closeUpdateColumnDisplay()">
@@ -147,44 +147,46 @@
 </mat-menu>
 
 <ng-template #headerTmpl let-column="column">
-  <div class="header" [formGroup]="searchFormGroup">
-    @if (column.searchable) {
-      @switch (column.type) {
-        @case ('text') {
-          <lib-header-text-filter [column]="column" [formControlName]="column.columnDef"></lib-header-text-filter>
+  <div class="header-container" [ngxMatTooltip]="column.tooltip">
+    <div class="header" [formGroup]="searchFormGroup">
+      @if (column.searchable) {
+        @switch (column.type) {
+          @case ('text') {
+            <lib-header-text-filter [column]="column" [formControlName]="column.columnDef"></lib-header-text-filter>
+          }
+          @case ('number') {
+            <lib-header-number-filter [column]="column" [formControlName]="column.columnDef"></lib-header-number-filter>
+          }
+          @case ('select') {
+            <lib-header-select-filter [column]="column" [formControlName]="column.columnDef"></lib-header-select-filter>
+          }
+          @case ('autocomplete') {
+            <lib-header-autocomplete-filter
+              [column]="column"
+              [formControlName]="column.columnDef"></lib-header-autocomplete-filter>
+          }
+          @case ('checkbox') {
+            <lib-header-checkbox-filter
+              [column]="column"
+              [formControlName]="column.columnDef"></lib-header-checkbox-filter>
+          }
+          @case ('date') {
+            <lib-header-date-filter [column]="column" [formControlName]="column.columnDef"></lib-header-date-filter>
+          }
+          @case ('duration') {
+            <lib-header-duration-filter
+              [column]="column"
+              [formControlName]="column.columnDef"></lib-header-duration-filter>
+          }
+          @default {
+            <span>{{ column.header }}</span>
+          }
         }
-        @case ('number') {
-          <lib-header-number-filter [column]="column" [formControlName]="column.columnDef"></lib-header-number-filter>
-        }
-        @case ('select') {
-          <lib-header-select-filter [column]="column" [formControlName]="column.columnDef"></lib-header-select-filter>
-        }
-        @case ('autocomplete') {
-          <lib-header-autocomplete-filter
-            [column]="column"
-            [formControlName]="column.columnDef"></lib-header-autocomplete-filter>
-        }
-        @case ('checkbox') {
-          <lib-header-checkbox-filter
-            [column]="column"
-            [formControlName]="column.columnDef"></lib-header-checkbox-filter>
-        }
-        @case ('date') {
-          <lib-header-date-filter [column]="column" [formControlName]="column.columnDef"></lib-header-date-filter>
-        }
-        @case ('duration') {
-          <lib-header-duration-filter
-            [column]="column"
-            [formControlName]="column.columnDef"></lib-header-duration-filter>
-        }
-        @default {
-          <span>{{ column.header }}</span>
-        }
+      } @else {
+        <span>{{ column.header }}</span>
       }
-    } @else {
-      <span>{{ column.header }}</span>
-    }
-    <ng-container *ngTemplateOutlet="headerActionsTmpl; context: { column }"></ng-container>
+      <ng-container *ngTemplateOutlet="headerActionsTmpl; context: { column }"></ng-container>
+    </div>
   </div>
 </ng-template>
 

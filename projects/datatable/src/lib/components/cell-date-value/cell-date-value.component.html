@@ -2,8 +2,8 @@
 
 @let value = row | get: column.property | transform: row : column;
 @if (value) {
-  {{ value | momentFormat: column }}
+  <span class="date"> {{ value | momentFormat: column }} </span>
   @if (column.withDuration) {
-    ({{ value | duration: column }})
+    <span class="duration"> ({{ value | duration: column }}) </span>
   }
 }

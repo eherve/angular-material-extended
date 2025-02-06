@@ -28,6 +28,8 @@ type BaseColumn = {
     index: number;
     dir: DatasourceRequestOrderDir;
   };
+
+  tooltip?: string;
 };
 
 export type DatatableComponentColumn = BaseColumn & {

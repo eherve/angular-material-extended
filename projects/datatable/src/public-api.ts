@@ -4,8 +4,9 @@
  * @format
  */
 
-export * from './lib/datatable.component';
 export * from './lib/datatable.module';
+
+export * from './lib/datatable.component';
 export * from './lib/directives/datatable-cell.directive';
 
 export * from './lib/types/datasource-service.type';
