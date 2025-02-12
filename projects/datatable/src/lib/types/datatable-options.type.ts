@@ -8,6 +8,7 @@ export type DatatableOptions<Record> = {
 
   columns: DatatableColumn<Record>[];
   columnMinWith?: number;
+  rowMaxHeight?: number;
 
   pageSizeOptions?: number[];
   pageSizeOptionsIndex?: number;

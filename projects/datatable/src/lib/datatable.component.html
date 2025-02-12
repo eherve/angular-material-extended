@@ -218,7 +218,7 @@
 
 <ng-template #cellTmpl let-column="column" let-row="row">
   @defer (on viewport) {
-    <div class="cell" [style.place-content]="column.align">
+    <div class="cell" [style.place-content]="column.align" [style.max-height.px]="options.rowMaxHeight">
       @let value = row | get: column.property;
       @if (column.cellComponent) {
         <ng-container *ngComponentOutlet="column.cellComponent; inputs: { column, row, value }" />

@@ -1,6 +1,5 @@
 <!-- @format -->
 
-@let value = row | get: column.property;
-@if (value) {
-  {{ value | transform: row : column | duration: column }}
+@if (duration) {
+  {{ duration }}
 }

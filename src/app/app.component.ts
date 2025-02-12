@@ -89,6 +89,7 @@ export class AppComponent {
       rowClick: row => console.log(row),
     },
     columnMinWith: 120,
+    rowMaxHeight: 36,
     columns: [
       {
         type: 'text',
