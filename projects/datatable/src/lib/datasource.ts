@@ -8,7 +8,7 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
   loading$ = new BehaviorSubject<boolean>(true);
   recordsTotal = 0;
   recordsFiltered = 0;
-  rowSize: number = 0;
+  rowSize: number = 0; // row size in kb
 
   private options?: DatasourceRequestOptions;
   private dataStream = new BehaviorSubject<Record[]>([]);
@@ -49,7 +49,6 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
       const kiloBytes = size / 1024;
       total += kiloBytes / 1024;
     }
-    this.rowSize = data.length ? total / data.length : 0;
-    console.warn('rowSize', this.rowSize, 8 / this.rowSize);
+    this.rowSize = total && data.length ? total / data.length : 0;
   }
 }

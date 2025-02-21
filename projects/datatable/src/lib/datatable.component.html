@@ -29,6 +29,7 @@
         mat-row
         *matRowDef="let row; columns: displayedColumns"
         [class.has-click]="options.actions?.rowClick"
+        [style.color]="options.rowColor ? options.rowColor(row) : undefined"
         (click)="rowClick(row)"></tr>
       <tr class="mat-row" *matNoDataRow>
         <td [attr.colspan]="displayedColumns.length">

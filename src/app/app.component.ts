@@ -88,6 +88,7 @@ export class AppComponent {
       refresh: true,
       rowClick: row => console.log(row),
     },
+    rowColor: row => 'green',
     columnMinWith: 120,
     rowMaxHeight: 36,
     columns: [

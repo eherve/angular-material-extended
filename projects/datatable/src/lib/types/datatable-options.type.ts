@@ -23,4 +23,6 @@ export type DatatableOptions<Record> = {
     refresh?: boolean;
     rowClick?: boolean | ((row: Record) => void);
   };
+
+  rowColor?: (row: Record) => string;
 };
