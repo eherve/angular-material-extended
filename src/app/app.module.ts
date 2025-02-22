@@ -21,6 +21,7 @@ import { TableComponent } from './table/table.component';
 registerLocaleData(localeFr);
 
 class AppDatatableIntl extends NgxMatDatatableIntl {
+  override locale: string = 'fr';
   public override noDateLabel = 'Aucune donnée pour les filtres sélectionnés';
 }
 

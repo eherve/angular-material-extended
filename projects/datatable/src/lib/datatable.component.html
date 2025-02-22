@@ -18,7 +18,8 @@
             mat-cell
             *matCellDef="let row"
             [style.min-width.px]="column.minWidth || options.columnMinWith"
-            [style.color]="row | color: column">
+            [style.color]="row | color: column : options"
+            [style.background-color]="row | backgroundColor: column : options">
             <ng-container *ngTemplateOutlet="cellTmpl; context: { column, row }"></ng-container>
           </td>
         </ng-container>
@@ -29,7 +30,6 @@
         mat-row
         *matRowDef="let row; columns: displayedColumns"
         [class.has-click]="options.actions?.rowClick"
-        [style.color]="options.rowColor ? options.rowColor(row) : undefined"
         (click)="rowClick(row)"></tr>
       <tr class="mat-row" *matNoDataRow>
         <td [attr.colspan]="displayedColumns.length">
@@ -75,6 +75,15 @@
           (menuClosed)="closeUpdateColumnDisplay()">
           <mat-icon>view_column</mat-icon>
         </button>
+      </div>
+
+      <div *ngIf="options.actions?.export" class="action">
+        <button mat-icon-button color="primary" class="icon-only" [disabled]="exporting" (click)="export()">
+          <mat-icon>download</mat-icon>
+        </button>
+        <div class="action-loader" *ngIf="exporting" @fade>
+          <mat-spinner [diameter]="32"></mat-spinner>
+        </div>
       </div>
 
       <div *ngIf="options.actions?.refresh" class="action">

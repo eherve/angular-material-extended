@@ -35,6 +35,7 @@ const LABELS: { [locale: string]: Labels } = {
 
 @Injectable()
 export class NgxMatDatatableIntl {
+  locale:string = 'en';
   noDateLabel!: string;
   itemsPerPageLabel!: string;
   nextPageLabel!: string;

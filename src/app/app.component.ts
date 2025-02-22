@@ -1,10 +1,15 @@
 /** @format */
 
-import { Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, Input, ViewChild } from '@angular/core';
 import { clone, deburr, filter, includes, map, orderBy, slice, toLower, trim, uniqBy } from 'lodash-es';
 import moment from 'moment';
 import { of } from 'rxjs';
-import { DatasourceService, DatatableColumn, DatatableOptions } from '../../projects/datatable/src/public-api';
+import {
+  NgxMatDatatableComponent,
+  DatasourceService,
+  DatatableColumn,
+  DatatableOptions,
+} from '../../projects/datatable/src/public-api';
 
 moment.locale('fr');
 
@@ -12,6 +17,7 @@ const DATA: any[] = [];
 let i = 0;
 while (i++ < 100) {
   DATA.push({
+    index: i,
     label: `Label ${i}`,
     embedded: {
       label: `Embedded label ${i}`,
@@ -29,7 +35,7 @@ while (i++ < 100) {
     })(),
     date: new Date(Date.now() + (Math.random() - 0.5) * 1000 * 60),
     duration: moment
-      .duration(moment().diff(moment().subtract(Math.random() * 1000 * 60 * 60, 'milliseconds')))
+      .duration(moment().diff(moment().subtract(Math.random() * 1000 * 60 * 60 * 5, 'milliseconds')))
       .as('millisecond') as number,
     autocomplete: (() => {
       const rand = Math.round(Math.random() * 100);
@@ -75,6 +81,11 @@ const service: DatasourceService<any> = options => {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
+  private changeDetectorRef = inject(ChangeDetectorRef);
+
+  @ViewChild(NgxMatDatatableComponent)
+  datatable?: NgxMatDatatableComponent;
+
   datatableOptions: DatatableOptions<any> = {
     service,
     pageSizeOptions: [10, 20, 50, 100],
@@ -85,10 +96,15 @@ export class AppComponent {
         sticky: true,
         reorder: true,
       },
+      export: true,
       refresh: true,
       rowClick: row => console.log(row),
     },
-    rowColor: row => 'green',
+    rowColor: 'green',
+    rowBackgroundColor: column =>
+      column.sticky ? undefined
+      : column.type === 'duration' ? 'pink'
+      : 'yellow',
     columnMinWith: 120,
     rowMaxHeight: 36,
     columns: [
@@ -163,7 +179,13 @@ export class AppComponent {
         searchable: true,
         sortable: true,
         options: of(
-          DATA.map(d => ({ value: d.reference, name: d.reference, color: 'red', icon: 'home', iconColor: 'blue' }))
+          DATA.map(d => ({
+            value: d.reference,
+            name: d.reference.toUpperCase(),
+            color: 'red',
+            icon: 'home',
+            iconColor: 'blue',
+          }))
         ),
       },
       {
@@ -243,6 +265,14 @@ export class AppComponent {
       },
     ],
   };
+
+  constructor() {
+    let i = 0;
+    setInterval(() => {
+      this.datatableOptions.rowColor = ['green', 'red', 'black', 'blue'][++i % 4];
+      this.datatable?.redraw((record: any) => !(record.index % i));
+    }, 5000);
+  }
 }
 
 @Component({

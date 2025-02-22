@@ -42,6 +42,17 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
     if (this.options) this.loadData(this.options);
   }
 
+  redraw(match?: (record: Record) => boolean) {
+    const data: Record[] = [];
+    this.dataStream.value.forEach(d => {
+      if (match) {
+        if (match(d)) data.push({ ...d });
+        else data.push(d);
+      } else data.push({ ...d });
+    });
+    this.dataStream.next(data);
+  }
+
   private calculateRowSize(data: Record[]) {
     let total = 0;
     for (let row of data) {

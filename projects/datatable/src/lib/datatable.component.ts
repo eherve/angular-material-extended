@@ -26,8 +26,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
-import { debounceTime, Subscription } from 'rxjs';
+import { debounceTime, lastValueFrom, Subscription } from 'rxjs';
+import * as XLSX from 'xlsx';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
 import { CellDateValueComponent } from './components/cell-date-value/cell-date-value.component';
 import { CellDurationValueComponent } from './components/cell-duration-value/cell-duration-value.component';
@@ -43,15 +45,17 @@ import { HeaderTextFilterComponent } from './components/header-text-filter/heade
 import { DatagridDataSource } from './datasource';
 import { NgxMatDatatableIntl } from './datatable.intl';
 import { NgxMatDatatableContentDirective } from './directives/datatable-cell.directive';
+import { BackgroundColorPipe } from './pipes/background-color.pipe';
 import { ColorPipe } from './pipes/color.pipe';
 import { FindContentPipe } from './pipes/find-cell-content.pipe';
 import { GetPipe } from './pipes/get.pipe';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { TransformPipe } from './pipes/transform.pipe';
 import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
-import { DatatableColumn } from './types/datatable-column.type';
+import { DatatableColumn, DatatableDurationColumn, DatatableSelectColumn } from './types/datatable-column.type';
 import { DatatableOptions } from './types/datatable-options.type';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { get } from './tools/get.tool';
+import { duration } from './tools/duration.tool';
 
 @Injectable()
 class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
@@ -104,6 +108,7 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     ReactiveFormsModule,
     SafeHtmlPipe,
     MatTooltipModule,
+    BackgroundColorPipe,
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }],
   selector: 'ngx-mat-datatable',
@@ -180,8 +185,85 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.loadPage();
   }
 
+  redraw(match?: (record: Record) => boolean) {
+    this.dataSource.redraw(match);
+  }
+
+  exporting = false;
+  async export() {
+    this.exporting = true;
+    try {
+      const columns = this.buildRequestColumns();
+      const order = this.buildOrder(columns);
+      const max = Math.min(Math.floor(5 / this.dataSource.rowSize), this.dataSource.recordsFiltered);
+      const chunks = [];
+      for (let i = 0; i < Math.ceil(this.dataSource.recordsFiltered / max); ++i) {
+        chunks.push({ start: i, length: max });
+      }
+
+      const data = (
+        await Promise.all(
+          chunks.map(c =>
+            this.options.service({ draw: Date.now().toString(), columns, order, start: c.start, length: c.length })
+          )
+        )
+      ).reduce((pv, cv) => (pv.push(...cv.data), pv), [] as any[]);
+      const rows: any[] = [];
+      for (let d of data) {
+        const row: any = {};
+        for (let c of this.options.columns) {
+          if (c.hidden) continue;
+          let value = get(d, c.property);
+          if (c.export) c.export(row, value, d);
+          else {
+            if ((c as any).transform) value = (c as any).transform(value, d);
+            switch (c.type) {
+              case 'select':
+                this.buildExportSelectColumn(c as any, row, value);
+                break;
+              case 'duration':
+                this.buildExportDurationColumn(c as any, row, value);
+                break;
+              default:
+                row[c.header] = value;
+            }
+          }
+        }
+        rows.push(row);
+      }
+
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'export');
+      const filename = typeof this.options.actions?.export === 'string' ? this.options.actions.export : 'export';
+      await XLSX.writeFile(workbook, `${filename}-${Date.now()}.xlsx`);
+    } finally {
+      this.exporting = false;
+    }
+  }
+
+  private async buildExportSelectColumn(column: DatatableSelectColumn<Record>, row: any, value: any) {
+    row[column.header] = (await lastValueFrom(column.options)).find(option => option.value === value)?.name ?? value;
+  }
+
+  private async buildExportDurationColumn(column: DatatableDurationColumn<Record>, row: any, value: any) {
+    row[`${column.header} ms`] = value;
+    row[column.header] = duration(value, column);
+  }
+
   loadPage() {
     const columns = this.buildRequestColumns();
+    const order = this.buildOrder(columns);
+    this.dataSource.loadData({
+      draw: Date.now().toString(),
+      columns,
+      start: this.paginator!.pageIndex,
+      length: this.paginator!.pageSize,
+      order,
+    });
+  }
+
+  private buildOrder(columns: DatasourceRequestColumn[]): DatasourceRequestOrder[] {
     const order: DatasourceRequestOrder[] = [];
     this.options.columns
       .filter(c => !!c.order)
@@ -190,13 +272,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
         const index = columns.findIndex(column => column.data === (c.sortProperty || c.property));
         if (index !== -1) order.push({ column: index, dir: c.order!.dir });
       });
-    this.dataSource.loadData({
-      draw: Date.now().toString(),
-      columns,
-      start: this.paginator!.pageIndex,
-      length: this.paginator!.pageSize,
-      order,
-    });
+    return order;
   }
 
   updateColumns: UpdateColumn<Record>[] = [];
@@ -282,6 +358,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.options.columns.forEach(column => {
       if (column.hidden) return;
       displayedColumns.push(column.columnDef);
+      if (column.type && ['number', 'date', 'duration'].includes(column.type)) {
+        if (!(column as any).locale) (column as any).locale = this.datatableIntl.locale;
+      }
     });
     this.displayedColumns = displayedColumns;
   }

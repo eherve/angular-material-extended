@@ -31,6 +31,8 @@ type BaseColumn = {
 
   tooltip?: string;
   align?: 'start' | 'center' | 'end';
+
+  export?: (exportRow: any, value: any, row: any) => void;
 };
 
 export type DatatableComponentColumn = BaseColumn & {
@@ -41,6 +43,7 @@ export type DatatableContentColumn = BaseColumn & {
 };
 export type DatatableValueColumn<Record> = BaseColumn & {
   color?: Color<Record>;
+  backgroundColor?: Color<Record>;
   transform?: (value: any, row: Record) => any;
 } & ({ prefix?: string; prefixContentId?: undefined } | { prefix?: undefined; prefixContentId?: string }) &
   ({ suffix?: string } | { suffixContentId?: string });
