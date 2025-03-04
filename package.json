@@ -12,7 +12,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "publish:datatable": "ng build NgxMatDatatable && cd dist/datatable && npm publish && cd -"
+    "publish:datatable": "ng build NgxMatDatatable && cd dist/datatable && npm publish && cd -",
+    "publish:tooltip": "ng build NgxMatTooltip && cd dist/tooltip && npm publish && cd -"
   },
   "private": false,
   "publishConfig": {

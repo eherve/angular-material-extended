@@ -1,6 +1,6 @@
 /** @format */
 
-import { Inject, Injectable, LOCALE_ID, OnInit } from '@angular/core';
+import { inject, Inject, Injectable, LOCALE_ID, OnInit } from '@angular/core';
 
 type Labels = {
   noDateLabel: string;
@@ -35,7 +35,7 @@ const LABELS: { [locale: string]: Labels } = {
 
 @Injectable()
 export class NgxMatDatatableIntl {
-  locale:string = 'en';
+  locale: string = inject(LOCALE_ID);
   noDateLabel!: string;
   itemsPerPageLabel!: string;
   nextPageLabel!: string;
@@ -52,8 +52,8 @@ export class NgxMatDatatableIntl {
     return `${startIndex + 1} - ${endIndex} ${this.onLabel} ${length}`;
   };
 
-  constructor(@Inject(LOCALE_ID) locale: string) {
-    this.setLabels(LABELS[locale] || DEFAULT_LABELS);
+  constructor() {
+    this.setLabels(LABELS[this.locale] || DEFAULT_LABELS);
   }
 
   private setLabels(labels: Labels) {

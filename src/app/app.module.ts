@@ -1,6 +1,6 @@
 /** @format */
 
-import { LOCALE_ID, NgModule } from '@angular/core';
+import { Injectable, LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { registerLocaleData } from '@angular/common';
@@ -20,8 +20,8 @@ import { AppComponent } from './app.component';
 import { TableComponent } from './table/table.component';
 registerLocaleData(localeFr);
 
+@Injectable()
 class AppDatatableIntl extends NgxMatDatatableIntl {
-  override locale: string = 'fr';
   public override noDateLabel = 'Aucune donnée pour les filtres sélectionnés';
 }
 
