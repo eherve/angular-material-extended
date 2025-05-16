@@ -13,15 +13,13 @@
         </div>
       </ng-template>
       <ng-template ngxMatDatatableContent="suffix" let-value="value"> &nbsp;Suffix {{ value }} </ng-template>
+      <ng-template ngxMatDatatableContent="kind-float-avg" let-data="data">
+        <div fxLayout="row wrap" fxLayoutGap="8px">
+          @for (d of data; track d) {
+            <span class="facet-indicator-label"> {{ d._id }} : {{ d.value | number: '0.0-2' }} </span>
+          }
+        </div>
+      </ng-template>
     </ngx-mat-datatable>
-  </mat-card-content>
-</mat-card>
-
-<mat-card [style.margin]="'16px auto'" [style.height.px]="800">
-  <mat-card-header>
-    <mat-card-title>Table</mat-card-title>
-  </mat-card-header>
-  <mat-card-content [style.position]="'relative'" [style.overflow]="'hidden'">
-    <app-table></app-table>
   </mat-card-content>
 </mat-card>

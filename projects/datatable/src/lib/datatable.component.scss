@@ -24,31 +24,31 @@
   background-color: var(--ngx-mat-datatable-background);
 }
 
-#actions {
+#head {
   width: 100%;
   display: flex;
   box-sizing: border-box;
-  place-content: center space-between;
-  align-items: center;
+  place-content: end space-between;
+  align-items: end;
   flex-direction: row;
   border-bottom: 1px solid var(--ngx-mat-datatable-border-color);
 
-  #actions-start,
-  #actions-center,
-  #actions-end {
+  #head-start,
+  #head-center,
+  #head-end {
     display: flex;
     box-sizing: border-box;
-    align-items: center;
+    align-items: end;
     flex-direction: row;
   }
-  #actions-start {
-    place-content: center start;
+  #head-start {
+    place-content: end start;
   }
-  #actions-center {
-    place-content: center center;
+  #head-center {
+    place-content: end center;
   }
-  #actions-end {
-    place-content: center end;
+  #head-end {
+    place-content: end end;
   }
 
   .action {
@@ -186,6 +186,9 @@
     align-items: center;
     flex-direction: row;
     width: 100%;
+    & > * {
+      display: inline-flex;
+    }
   }
 }
 
@@ -264,5 +267,43 @@
   #no-data-label {
     position: relative;
     margin-left: -50%;
+  }
+}
+
+.facet {
+  margin: 8px;
+  --mdc-elevated-card-container-color: transparent;
+
+  mat-card-content {
+    display: flex;
+    box-sizing: border-box;
+    place-content: center center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 4px;
+  }
+
+  .facet-indicator {
+    display: flex;
+    box-sizing: border-box;
+    flex-direction: column;
+    place-content: center center;
+    align-items: center;
+    position: relative;
+    margin: 4px;
+
+    &.has-action {
+      cursor: pointer;
+    }
+
+    .facet-indicator-label {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1em;
+      padding: 2px;
+    }
   }
 }

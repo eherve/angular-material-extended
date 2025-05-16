@@ -11,6 +11,7 @@ type Labels = {
   firstPageLabel: string;
   onLabel: string;
 };
+
 const DEFAULT_LABELS: Labels = {
   noDateLabel: 'No data',
   itemsPerPageLabel: `Items per page:`,
@@ -33,6 +34,23 @@ const LABELS: { [locale: string]: Labels } = {
   },
 };
 
+type NumberOptions = {
+  separator: string;
+  decimal: string;
+};
+
+const DEFAULT_NUMBER_OPTIONS = {
+  separator: ',',
+  decimal: '.',
+};
+
+const NUMBER_OPTIONS: { [locale: string]: NumberOptions } = {
+  fr: {
+    separator: ' ',
+    decimal: ',',
+  },
+};
+
 @Injectable()
 export class NgxMatDatatableIntl {
   locale: string = inject(LOCALE_ID);
@@ -44,6 +62,8 @@ export class NgxMatDatatableIntl {
   firstPageLabel!: string;
   onLabel!: string;
 
+  numberOptions!: NumberOptions;
+
   getRangeLabel = (page: number, pageSize: number, length: number): string => {
     if (length === 0 || pageSize === 0) return `0 ${this.onLabel} ${length}`;
     length = Math.max(length, 0);
@@ -53,7 +73,8 @@ export class NgxMatDatatableIntl {
   };
 
   constructor() {
-    this.setLabels(LABELS[this.locale] || DEFAULT_LABELS);
+    this.setLabels(LABELS[this.locale] ?? DEFAULT_LABELS);
+    this.numberOptions = NUMBER_OPTIONS[this.locale] ?? DEFAULT_NUMBER_OPTIONS;
   }
 
   private setLabels(labels: Labels) {

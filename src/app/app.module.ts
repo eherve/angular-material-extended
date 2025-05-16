@@ -17,7 +17,6 @@ import { NgxMatDatatableIntl } from '../../projects/datatable/src/lib/datatable.
 import { NgxMatDatatableModule } from '../../projects/datatable/src/public-api';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { TableComponent } from './table/table.component';
 registerLocaleData(localeFr);
 
 @Injectable()
@@ -26,7 +25,7 @@ class AppDatatableIntl extends NgxMatDatatableIntl {
 }
 
 @NgModule({
-  declarations: [AppComponent, TableComponent],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

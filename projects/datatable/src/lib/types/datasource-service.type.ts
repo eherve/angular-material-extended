@@ -1,3 +1,4 @@
+/** @format */
 
 export type DatasourceRequestSearch = {
   value: any;
@@ -26,6 +27,14 @@ export type DatasourceRequestOrder = {
   dir: DatasourceRequestOrderDir;
 };
 
+export type DatasourceRequestFacetOperator = 'count' | ['sum', string] | ['avg', string];
+export type DatasourceRequestFacet = {
+  id: string;
+  kind: 'indicator';
+  property: string;
+  operator: DatasourceRequestFacetOperator;
+};
+
 export type DatasourceRequestOptions = {
   draw: string;
 
@@ -38,7 +47,11 @@ export type DatasourceRequestOptions = {
   length?: number;
 
   search?: DatasourceRequestSearch;
+
+  facets?: DatasourceRequestFacet[];
 };
+
+export type DatasourceResultFacet = { _id: any; value: number };
 
 export type DatasourceResult<T> = {
   draw: string;
@@ -48,6 +61,8 @@ export type DatasourceResult<T> = {
   recordsFiltered: number;
 
   data: T[];
+
+  facets?: { [id: string]: DatasourceResultFacet[] };
 };
 
 export type DatasourceService<Record> = (options: DatasourceRequestOptions) => Promise<DatasourceResult<Record>>;

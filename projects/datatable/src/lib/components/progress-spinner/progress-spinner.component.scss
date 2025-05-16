@@ -1,0 +1,66 @@
+/** @format */
+
+#container {
+  position: relative;
+
+  #foreground {
+    --mdc-circular-progress-active-indicator-color: var(--progress-spinner-color, varvar(--mat-sys-primary));
+    ::ng-deep {
+      .mdc-circular-progress__determinate-circle {
+        stroke-width: var(--progress-spinner-stroke-width, 5%) !important;
+      }
+    }
+  }
+
+  #background {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    --mdc-circular-progress-active-indicator-color: var(--progress-spinner-color, var(--mat-sys-primary));
+
+    ::ng-deep {
+      .mdc-circular-progress__determinate-circle {
+        stroke-width: var(--progress-spinner-stroke-width, calc(5% + 2px)) !important;
+        stroke-opacity: var(--progress-spinner-background-opacity, 0.2);
+      }
+    }
+  }
+
+  #inner-block {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    box-sizing: content-box;
+    display: flex;
+    flex-direction: column;
+    place-content: center center;
+    align-items: center;
+
+    overflow: hidden;
+    border-radius: 50%;
+    margin: calc(var(--progress-spinner-stroke-width, calc(5% + 2px)) + 2px);
+
+    line-height: 1em;
+  }
+
+  &:hover {
+    #foreground {
+      ::ng-deep {
+        .mdc-circular-progress__determinate-circle {
+          stroke-width: var(--progress-spinner-stroke-width, calc(5% + 2px)) !important;
+        }
+      }
+    }
+    #background {
+        ::ng-deep {
+            .mdc-circular-progress__determinate-circle {
+                stroke-opacity: var(--progress-spinner-background-opacity, 0.33);
+            }
+          }
+    }
+  }
+}

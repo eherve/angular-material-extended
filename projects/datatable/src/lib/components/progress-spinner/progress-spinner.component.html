@@ -1,0 +1,20 @@
+<!-- @format -->
+
+<div id="container" [style.font-size]="fontSize" [style.width.px]="diameter" [style.height.px]="diameter">
+  <mat-progress-spinner id="background" [diameter]="diameter" mode="determinate" [value]="100"> </mat-progress-spinner>
+  <mat-progress-spinner
+    id="foreground"
+    [diameter]="diameter"
+    mode="determinate"
+    [value]="value"
+    intersectionObserver
+    (intersection)="load($event.intersect)">
+  </mat-progress-spinner>
+  <div id="inner-block">
+    <mat-label
+      [countUp]="value"
+      [options]="datatableIntl.numberOptions | merge: { suffix: '%', duration: 0.6 }"
+      [reanimateOnClick]="false"></mat-label>
+    <ng-content></ng-content>
+  </div>
+</div>

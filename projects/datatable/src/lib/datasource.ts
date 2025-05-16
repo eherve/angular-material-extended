@@ -2,12 +2,13 @@
 
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DatasourceRequestOptions, DatasourceService } from './types/datasource-service.type';
+import { DatasourceRequestOptions, DatasourceResultFacet, DatasourceService } from './types/datasource-service.type';
 
 export class DatagridDataSource<Record> extends DataSource<Record> {
   loading$ = new BehaviorSubject<boolean>(true);
-  recordsTotal = 0;
   recordsFiltered = 0;
+  recordsTotal?: number;
+  facets?: { [id: string]: DatasourceResultFacet[] };
   rowSize: number = 0; // row size in kb
 
   private options?: DatasourceRequestOptions;
@@ -31,6 +32,7 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
       if (options.draw !== result.draw) return;
       this.recordsTotal = result.recordsTotal;
       this.recordsFiltered = result.recordsFiltered;
+      this.facets = result.facets;
       this.dataStream.next(result.data);
       this.calculateRowSize(result.data);
     } finally {

@@ -20,6 +20,7 @@ import {
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -27,6 +28,7 @@ import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/mat
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { CountUpModule } from 'ngx-countup';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { debounceTime, lastValueFrom, Subscription } from 'rxjs';
 import * as XLSX from 'xlsx';
@@ -42,20 +44,29 @@ import { HeaderDurationFilterComponent } from './components/header-duration-filt
 import { HeaderNumberFilterComponent } from './components/header-number-filter/header-number-filter.component';
 import { HeaderSelectFilterComponent } from './components/header-select-filter/header-select-filter.component';
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
+import { ProgressSpinnerComponent } from './components/progress-spinner/progress-spinner.component';
 import { DatagridDataSource } from './datasource';
 import { NgxMatDatatableIntl } from './datatable.intl';
 import { NgxMatDatatableContentDirective } from './directives/datatable-cell.directive';
 import { BackgroundColorPipe } from './pipes/background-color.pipe';
 import { ColorPipe } from './pipes/color.pipe';
+import { FilterPipe } from './pipes/filter.pipe';
 import { FindContentPipe } from './pipes/find-cell-content.pipe';
+import { FindPipe } from './pipes/find.pipe';
 import { GetPipe } from './pipes/get.pipe';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
+import { SortFacetEntriesPipe } from './pipes/sort-facet-entries.pipe';
+import { SumPipe } from './pipes/sum.pipe';
 import { TransformPipe } from './pipes/transform.pipe';
-import { DatasourceRequestColumn, DatasourceRequestOrder } from './types/datasource-service.type';
+import { duration } from './tools/duration.tool';
+import { get } from './tools/get.tool';
+import {
+  DatasourceRequestColumn,
+  DatasourceRequestOrder,
+  DatasourceResultFacet,
+} from './types/datasource-service.type';
 import { DatatableColumn, DatatableDurationColumn, DatatableSelectColumn } from './types/datatable-column.type';
 import { DatatableOptions } from './types/datatable-options.type';
-import { get } from './tools/get.tool';
-import { duration } from './tools/duration.tool';
 
 @Injectable()
 class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
@@ -109,6 +120,13 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     SafeHtmlPipe,
     MatTooltipModule,
     BackgroundColorPipe,
+    FilterPipe,
+    SumPipe,
+    MatCardModule,
+    CountUpModule,
+    ProgressSpinnerComponent,
+    FindPipe,
+    SortFacetEntriesPipe,
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }],
   selector: 'ngx-mat-datatable',
@@ -260,6 +278,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       start: this.paginator!.pageIndex,
       length: this.paginator!.pageSize,
       order,
+      facets: this.options.facets,
     });
   }
 
@@ -314,6 +333,13 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       this.options.actions.rowClick(row);
       this.rowClicked.emit(row);
     }
+  }
+
+  facetClick(column: DatatableColumn<Record> | undefined, result: DatasourceResultFacet) {
+    if (!column) return;
+    const control = this.searchFormGroup?.controls[column.columnDef];
+    if (!control) return;
+    if (result._id !== control.value?.value) control.setValue({ value: result._id });
   }
 
   private buildRequestColumns(): DatasourceRequestColumn[] {

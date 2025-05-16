@@ -1,7 +1,7 @@
 <!-- @format -->
 
 <div *ngIf="dataSource" id="container">
-  <ng-container *ngTemplateOutlet="actionsTmpl"></ng-container>
+  <ng-container *ngTemplateOutlet="headTmpl"></ng-container>
 
   <div id="table-container" intersectionObserver (intersection)="load($event.intersect)">
     <table id="table" mat-table [fixedLayout]="false" [dataSource]="dataSource" multiTemplateDataRows>
@@ -54,13 +54,34 @@
   </div>
 </div>
 
-<ng-template #actionsTmpl>
-  <div id="actions">
-    <div id="actions-start"></div>
+<ng-template #headTmpl>
+  <div id="head">
+    <div id="head-start">
+      @for (facetOptions of options.facets | filter: { position: 'start' }; track facetOptions) {
+        <ng-container *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"></ng-container>
+      }
+      @for (action of options.actions?.user | filter: { position: 'start' }; track action) {
+        <ng-container *ngTemplateOutlet="actionTmpl; context: { action }"></ng-container>
+      }
+    </div>
 
-    <div id="actions-center"></div>
+    <div id="head-center">
+      @for (facetOptions of options.facets | filter: { position: 'center' }; track facetOptions) {
+        <ng-container *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"></ng-container>
+      }
+      @for (action of options.actions?.user | filter: { position: 'center' }; track action) {
+        <ng-container *ngTemplateOutlet="actionTmpl; context: { action }"></ng-container>
+      }
+    </div>
 
-    <div id="actions-end">
+    <div id="head-end">
+      @for (facetOptions of options.facets | filter: { position: 'end' }; track facetOptions) {
+        <ng-container *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"></ng-container>
+      }
+      @for (action of options.actions?.user | filter: { position: 'end' }; track action) {
+        <ng-container *ngTemplateOutlet="actionTmpl; context: { action }"></ng-container>
+      }
+
       <div
         *ngIf="
           options.actions?.columns?.hideAndShow || options.actions?.columns?.sticky || options.actions?.columns?.reorder
@@ -278,5 +299,59 @@
     </div>
   } @placeholder {
     <div class="cell"></div>
+  }
+</ng-template>
+
+<ng-template #actionTmpl let-action="action">
+  <div [matTooltip]="action.tooltip">
+    <button mat-icon-button (click)="action.onclick(this)">
+      <mat-icon>{{ action.icon }}</mat-icon>
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #facetsTmpl let-facetOptions="facetOptions">
+  @let column = options.columns | find: { property: facetOptions.property };
+  @let data = (dataSource.facets ?? {})[facetOptions.id] | sortFacetEntries: facetOptions;
+  @if (data) {
+    @if (facetOptions.contentId) {
+      @let cell = contentRefs | findContent: facetOptions.contentId;
+      @if (cell) {
+        <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, facetOptions, data }" />
+      }
+    } @else {
+      @let size = facetOptions.size ?? 80;
+      @let fontSize = facetOptions.fontSize ?? '1em';
+      @let total = (data | sum: 'value') || 1;
+      <mat-card class="facet">
+        @if (facetOptions.name) {
+          <mat-card-header>
+            <mat-label>{{ facetOptions.name }}</mat-label>
+          </mat-card-header>
+        }
+        <mat-card-content>
+          @for (d of data; track d) {
+            @let style = facetOptions.style ? facetOptions.style(d._id) : null;
+            @let percent = (d.value / total) * 100;
+            <div
+              class="facet-indicator"
+              [class.has-action]="column?.searchable !== false"
+              (click)="facetClick(column, d)">
+              <lib-progress-spinner [diameter]="size" [color]="style?.color" [fontSize]="fontSize" [value]="percent">
+                <mat-label>{{ style?.name ?? d._id }}</mat-label>
+              </lib-progress-spinner>
+              <mat-label
+                class="facet-indicator-label"
+                [style.font-size]="fontSize"
+                [countUp]="d.value"
+                [options]="datatableIntl.numberOptions"
+                [reanimateOnClick]="false">
+                {{ d.value | number: '0.0-2' }}
+              </mat-label>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
   }
 </ng-template>

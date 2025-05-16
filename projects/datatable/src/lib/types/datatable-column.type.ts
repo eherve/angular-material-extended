@@ -122,6 +122,7 @@ export type DatatableSearchDateColumn<Record> = DatatableDateColumn<Record> &
 export type DatatableDurationColumn<Record> = Column<Record> & {
   type: 'duration';
   locale?: string;
+  largest?: number;
 };
 export type DatatableSearchDurationColumn<Record> = DatatableDurationColumn<Record> &
   SearchableColumn<Record> & {

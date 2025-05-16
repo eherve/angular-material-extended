@@ -1,14 +1,32 @@
 /** @format */
 
-import { ChangeDetectorRef, Component, inject, Input, ViewChild } from '@angular/core';
-import { clone, deburr, filter, includes, map, orderBy, slice, toLower, trim, uniqBy } from 'lodash-es';
+import { Component, Input, ViewChild } from '@angular/core';
+import {
+  clone,
+  deburr,
+  each,
+  filter,
+  groupBy,
+  includes,
+  keys,
+  map,
+  meanBy,
+  orderBy,
+  slice,
+  sumBy,
+  toLower,
+  trim,
+  uniqBy,
+} from 'lodash-es';
 import moment from 'moment';
 import { of } from 'rxjs';
 import {
-  NgxMatDatatableComponent,
+  DatasourceResult,
+  DatasourceResultFacet,
   DatasourceService,
   DatatableColumn,
   DatatableOptions,
+  NgxMatDatatableComponent,
 } from '../../projects/datatable/src/public-api';
 
 moment.locale('fr');
@@ -42,6 +60,7 @@ while (i++ < 100) {
       return `option ${rand}`;
     })(),
     template: `Template ${i}`,
+    kind: ['kind 1', 'kind 2', 'kind 3', 'kind 4', 'kind 5'][i % 5],
     templateSearch: i,
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
@@ -67,11 +86,25 @@ const service: DatasourceService<any> = options => {
     );
   }
   const recordsFiltered = data.length;
+
+  const facets: { [id: string]: DatasourceResultFacet[] } = {};
+  each(options.facets, facet => {
+    const f: DatasourceResultFacet[] = (facets[facet.id] = []);
+    const group = groupBy(data, facet.property);
+    const groupKeys = keys(group);
+    if (facet.operator === 'count') facets[facet.id] = map(groupKeys, _id => ({ _id, value: group[_id].length }));
+    else if (facet.operator[0] === 'sum') {
+      facets[facet.id] = map(groupKeys, _id => ({ _id, value: sumBy(group[_id], facet.operator[1]) }));
+    } else if (facet.operator[0] === 'avg') {
+      facets[facet.id] = map(groupKeys, _id => ({ _id, value: meanBy(group[_id], facet.operator[1]) }));
+    }
+  });
+
   data = data.slice(options.start! * options.length!, (options.start! + 1) * options.length!);
   console.log('service', options, data);
-  return new Promise(resolve => {
-    setTimeout(() => resolve({ draw: options.draw, recordsTotal: DATA.length, recordsFiltered, data }), 300);
-  });
+  return new Promise<DatasourceResult<any>>(resolve => {
+    setTimeout(() => resolve({ draw: options.draw, recordsTotal: DATA.length, recordsFiltered, data, facets }), 300);
+  }).then(res => (console.log('res', res), res));
 };
 
 @Component({
@@ -81,8 +114,6 @@ const service: DatasourceService<any> = options => {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  private changeDetectorRef = inject(ChangeDetectorRef);
-
   @ViewChild(NgxMatDatatableComponent)
   datatable?: NgxMatDatatableComponent;
 
@@ -99,7 +130,65 @@ export class AppComponent {
       export: true,
       refresh: true,
       rowClick: row => console.log(row),
+      user: [
+        {
+          position: 'start',
+          kind: 'icon',
+          icon: 'add',
+          tooltip: 'test action start',
+          onclick: datagrid => console.warn('user.start.add', datagrid),
+        },
+        {
+          position: 'center',
+          kind: 'icon',
+          icon: 'add',
+          tooltip: 'test action center',
+          onclick: datagrid => console.warn('user.center.add', datagrid),
+        },
+        {
+          position: 'end',
+          kind: 'icon',
+          icon: 'add',
+          tooltip: 'test action end',
+          onclick: datagrid => console.warn('user.end.add', datagrid),
+        },
+      ],
     },
+    facets: [
+      {
+        id: 'kind-count',
+        position: 'start',
+        kind: 'indicator',
+        property: 'kind',
+        operator: 'count',
+        size: 80,
+        style: _id =>
+          ({
+            'kind 1': { color: '#cbf078' },
+            'kind 2': { color: '#f8f398' },
+            'kind 3': { color: '#f1b963' },
+            'kind 4': { color: '#e46161' },
+            'kind 5': { color: '#0092ca' },
+          })[_id],
+      },
+      {
+        id: 'kind-float-sum',
+        name: 'Kind float sum',
+        position: 'start',
+        kind: 'indicator',
+        property: 'kind',
+        operator: ['sum', 'float'],
+      },
+      {
+        id: 'kind-float-avg',
+        name: 'Kind float average',
+        position: 'start',
+        kind: 'indicator',
+        property: 'kind',
+        operator: ['avg', 'float'],
+        contentId: 'kind-float-avg'
+      },
+    ],
     rowColor: 'green',
     rowBackgroundColor: column =>
       column.sticky ? undefined
@@ -147,6 +236,14 @@ export class AppComponent {
         columnDef: 'embedded-label',
         header: 'Embedded label',
         property: 'embedded.label',
+        sortable: true,
+        searchable: true,
+      },
+      {
+        type: 'text',
+        columnDef: 'kind',
+        header: 'Kind',
+        property: 'kind',
         sortable: true,
         searchable: true,
       },

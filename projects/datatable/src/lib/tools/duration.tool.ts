@@ -2,9 +2,10 @@
 
 import humanizeDuration, { HumanizerOptions } from 'humanize-duration';
 
-export function duration(data: number | string | Date, options: { locale?: string }): string | null {
+export function duration(data: number | string | Date, options: { locale?: string; largest?: number }): string | null {
   const durationOption: HumanizerOptions = { maxDecimalPoints: 0, largest: 1, fallbacks: ['en'] };
   if (options?.locale) durationOption.language = options.locale;
+  if (options?.largest) durationOption.largest = options.largest;
 
   let value: number | undefined;
   if (typeof data === 'number') value = data;
