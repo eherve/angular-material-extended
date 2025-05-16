@@ -2,17 +2,27 @@
 
 @let options = $any(column.options | async);
 @let value = row | get: column.property | transform: row : column;
-@let option = row | get: column.property | selectOption: options;
 
-@if (option) {
-  <div class="option">
-    @if (option.icon) {
-      <mat-icon [style.color]="option.iconColor" [style.margin-right.px]="8">
-        {{ option.icon }}
-      </mat-icon>
-    }
-    <mat-label [style.color]="option.color" [innerHTML]="option.name | safeHtml"></mat-label>
-  </div>
+@if (column.multiple) {
+  @for (v of value; track v) {
+    <ng-container *ngTemplateOutlet="optionTmpl; context: { value: v }"></ng-container>
+  }
 } @else {
-  {{ value }}
+  <ng-container *ngTemplateOutlet="optionTmpl; context: { value }"></ng-container>
 }
+
+<ng-template #optionTmpl let-value="value">
+  @let option = value | selectOption: options;
+  @if (option) {
+    <div class="option">
+      @if (option.icon) {
+        <mat-icon [style.color]="option.iconColor" [style.margin-right.px]="8">
+          {{ option.icon }}
+        </mat-icon>
+      }
+      <mat-label [style.color]="option.color" [innerHTML]="option.name | safeHtml"></mat-label>
+    </div>
+  } @else {
+    {{ value }}
+  }
+</ng-template>
