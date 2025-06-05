@@ -12,7 +12,7 @@ export type DatatableOptions<Record> = {
   service: DatasourceService<Record>;
 
   configService?: {
-    get?: () => Promise<DatatableConfig>;
+    get?: () => Promise<DatatableConfig | undefined>;
     set?: (config: DatatableConfig) => Promise<void>;
   };
 

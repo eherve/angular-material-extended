@@ -427,7 +427,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   private async applyConfig() {
-    if (this.options?.configService?.get) this.config = await this.options.configService.get();
+    if (this.options?.configService?.get) {
+      const config = await this.options.configService.get();
+      this.config = config ?? this.config;
+    }
     if (this.options?.columns && this.config?.columns) {
       this.config.columns.forEach((updated, index) => {
         const columnIndex = this.options.columns.findIndex(c => c.columnDef === updated.columnDef);
