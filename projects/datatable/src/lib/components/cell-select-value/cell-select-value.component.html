@@ -4,9 +4,11 @@
 @let value = row | get: column.property | transform: row : column;
 
 @if (column.multiple) {
-  @for (v of value; track v) {
-    <ng-container *ngTemplateOutlet="optionTmpl; context: { value: v }"></ng-container>
-  }
+  <div id="options">
+    @for (v of value; track v) {
+      <ng-container *ngTemplateOutlet="optionTmpl; context: { value: v }"></ng-container>
+    }
+  </div>
 } @else {
   <ng-container *ngTemplateOutlet="optionTmpl; context: { value }"></ng-container>
 }

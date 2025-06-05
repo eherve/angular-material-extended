@@ -67,6 +67,7 @@ import {
 } from './types/datasource-service.type';
 import { DatatableColumn, DatatableDurationColumn, DatatableSelectColumn } from './types/datatable-column.type';
 import { DatatableOptions } from './types/datatable-options.type';
+import { DatatableConfig } from './types/config.type';
 
 @Injectable()
 class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
@@ -149,11 +150,19 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   @Input('options')
   options!: DatatableOptions<Record>;
 
-  @Output()
-  onDisplayChanged = new EventEmitter<DatatableColumn<Record>[]>();
+  // @Input('config')
+  // set setConfig(config: DatatableConfig) {
+  //   this.config = config;
+  //   this.applyConfig();
+  // }
+  @Input()
+  config?: DatatableConfig;
 
   @Output()
   rowClicked = new EventEmitter<Record>();
+
+  @Output()
+  configUpdated = new EventEmitter<DatatableConfig>();
 
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
@@ -174,6 +183,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   ngOnInit(): void {
     if (!this.options?.service) throw new Error(`missing mongoose datatable component service`);
     if (!this.options?.columns) throw new Error(`missing mongoose datatable component columns`);
+    this.applyConfig();
     this.buildDisplayColumns();
     this.buildSearchFormGroup();
     this.dataSource = new DatagridDataSource<Record>(this.options.service);
@@ -187,7 +197,12 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   load(intersect: boolean) {
     if (!intersect || this.loaded) return;
     this.loaded = true;
-    this.subscriptions.add(this.paginator?.page.subscribe(() => this.loadPage()));
+    this.subscriptions.add(
+      this.paginator?.page.subscribe(() => {
+        this.updateConfig();
+        this.loadPage();
+      })
+    );
     this.loadPage();
   }
 
@@ -313,8 +328,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.updateColumns.forEach((updated, index) => {
       const columnIndex = this.options.columns.findIndex(c => c.columnDef === updated.columnDef);
       if (columnIndex == -1) return;
-      if (columnIndex !== index) moveItemInArray(this.options.columns, index, columnIndex);
-      const column = this.options.columns[columnIndex];
+      if (columnIndex !== index) moveItemInArray(this.options.columns, columnIndex, index);
+      const column = this.options.columns[index];
       if (updated.sticky !== column.sticky) column.sticky = updated.sticky;
       if (updated.hidden !== column.hidden) {
         column.hidden = updated.hidden;
@@ -322,7 +337,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       }
     });
     this.buildDisplayColumns();
-    this.onDisplayChanged.emit(this.options.columns);
+    this.updateConfig();
     if (reload) this.loadPage();
   }
 
@@ -414,5 +429,30 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       .filter(c => !!c.order)
       .sort((c1, c2) => c1.order!.index - c2.order!.index)
       .forEach(c => (c.order!.index = index++));
+  }
+
+  private applyConfig() {
+    if (this.options?.columns && this.config?.columns) {
+      this.config.columns.forEach((updated, index) => {
+        const columnIndex = this.options.columns.findIndex(c => c.columnDef === updated.columnDef);
+        if (columnIndex == -1) return;
+        if (columnIndex !== index) moveItemInArray(this.options.columns, columnIndex, index);
+        const column = this.options.columns[index];
+        if (updated.sticky !== column.sticky) column.sticky = updated.sticky;
+        if (updated.hidden !== column.hidden) column.hidden = updated.hidden;
+      });
+      this.buildDisplayColumns();
+    }
+    if (this.options && typeof this.config?.pageSizeOptionsIndex === 'number') {
+      this.options.pageSizeOptionsIndex = this.config.pageSizeOptionsIndex;
+    }
+  }
+
+  private updateConfig() {
+    const pageSizeOptions = this.options.pageSizeOptions ?? [5, 10, 20, 50, 100];
+    const pageSizeOptionsIndex = pageSizeOptions.indexOf(this.paginator?.pageSize ?? 0);
+    const columns = this.options.columns.map(c => ({ columnDef: c.columnDef, sticky: c.sticky, hidden: c.hidden }));
+    this.config = { columns, pageSizeOptionsIndex };
+    this.configUpdated.next(this.config);
   }
 }

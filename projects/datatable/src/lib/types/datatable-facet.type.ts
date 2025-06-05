@@ -20,12 +20,12 @@ export type IndicatorFacetOptions = BaseFacetOptions & {
   operator: FacetOptionsOperator;
 
   options?: FacetOptionsOptions[];
-  style?: (_id: string) => { color?: string; name?: string } | undefined;
+  style?: (_id: any) => { color?: string; name?: string } | undefined;
 
   size?: number;
   fontSize?: string;
 
-  contentId?:string
+  contentId?: string;
 };
 
 export type FacetOptions = IndicatorFacetOptions;

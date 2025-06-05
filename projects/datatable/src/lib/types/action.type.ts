@@ -11,6 +11,7 @@ export type IconAction<Record> = BaseAction & {
   icon: string;
   onclick: (datagrid: NgxMatDatatableComponent<Record>) => void;
   tooltip?: string;
+  color?: string;
 };
 
 export type Action<Record> = IconAction<Record>;

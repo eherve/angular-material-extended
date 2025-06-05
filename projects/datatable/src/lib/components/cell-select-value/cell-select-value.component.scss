@@ -6,6 +6,7 @@
   place-content: center start;
   align-items: center;
   flex-direction: row;
+  padding: 4px;
 }
 
 mat-icon,
@@ -18,4 +19,13 @@ mat-label {
   mat-label {
     color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary)) !important;
   }
+}
+
+.options {
+  display: flex;
+  box-sizing: border-box;
+  place-content: start start;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
 }

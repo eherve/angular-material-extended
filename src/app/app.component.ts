@@ -28,6 +28,7 @@ import {
   DatatableOptions,
   NgxMatDatatableComponent,
 } from '../../projects/datatable/src/public-api';
+import { DatatableConfig } from '../../projects/datatable/src/lib/types/config.type';
 
 moment.locale('fr');
 
@@ -135,6 +136,7 @@ export class AppComponent {
           position: 'start',
           kind: 'icon',
           icon: 'add',
+          color: 'red',
           tooltip: 'test action start',
           onclick: datagrid => console.warn('user.start.add', datagrid),
         },
@@ -162,7 +164,7 @@ export class AppComponent {
         property: 'kind',
         operator: 'count',
         size: 80,
-        style: _id =>
+        style: (_id: string) =>
           ({
             'kind 1': { color: '#cbf078' },
             'kind 2': { color: '#f8f398' },
@@ -186,7 +188,7 @@ export class AppComponent {
         kind: 'indicator',
         property: 'kind',
         operator: ['avg', 'float'],
-        contentId: 'kind-float-avg'
+        contentId: 'kind-float-avg',
       },
     ],
     rowColor: 'green',
@@ -363,12 +365,24 @@ export class AppComponent {
     ],
   };
 
+  // config:any;
+  config = {
+    columns: this.datatableOptions.columns
+      .map(c => ({ columnDef: c.columnDef, sticky: c.sticky, hidden: c.hidden }))
+      .reverse(),
+    pageSizeOptionsIndex: 2,
+  };
+
   constructor() {
     let i = 0;
     setInterval(() => {
       this.datatableOptions.rowColor = ['green', 'red', 'black', 'blue'][++i % 4];
       this.datatable?.redraw((record: any) => !(record.index % i));
     }, 5000);
+  }
+
+  updatedConfig(config: DatatableConfig) {
+    console.warn(config);
   }
 }
 

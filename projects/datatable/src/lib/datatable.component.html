@@ -45,7 +45,7 @@
     id="paginator"
     [length]="dataSource.recordsFiltered"
     [pageSizeOptions]="options.pageSizeOptions || [5, 10, 20, 50, 100]"
-    [pageSize]="(options.pageSizeOptions || [5, 10, 20, 50, 100])[options.pageSizeOptionsIndex || 0]"
+    [pageSize]="(options.pageSizeOptions ?? [5, 10, 20, 50, 100])[options.pageSizeOptionsIndex ?? 0]"
     [showFirstLastButtons]="true">
   </mat-paginator>
 
@@ -99,7 +99,7 @@
       </div>
 
       <div *ngIf="options.actions?.export" class="action">
-        <button mat-icon-button color="primary" class="icon-only" [disabled]="exporting" (click)="export()">
+        <button mat-icon-button color="primary" [disabled]="exporting" (click)="export()">
           <mat-icon>download</mat-icon>
         </button>
         <div class="action-loader" *ngIf="exporting" @fade>
@@ -108,12 +108,7 @@
       </div>
 
       <div *ngIf="options.actions?.refresh" class="action">
-        <button
-          mat-icon-button
-          color="primary"
-          class="icon-only"
-          [disabled]="dataSource.loading$ | async"
-          (click)="loadPage()">
+        <button mat-icon-button color="primary" [disabled]="dataSource.loading$ | async" (click)="loadPage()">
           <mat-icon>sync</mat-icon>
         </button>
         <div class="action-loader" *ngIf="dataSource.loading$ | async" @fade>
@@ -303,8 +298,8 @@
 </ng-template>
 
 <ng-template #actionTmpl let-action="action">
-  <div [matTooltip]="action.tooltip">
-    <button mat-icon-button (click)="action.onclick(this)">
+  <div class="action user-action" [matTooltip]="action.tooltip">
+    <button [style.--action-color]="action.color" mat-icon-button (click)="action.onclick(this)">
       <mat-icon>{{ action.icon }}</mat-icon>
     </button>
   </div>

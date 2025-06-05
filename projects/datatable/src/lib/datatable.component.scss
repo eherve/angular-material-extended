@@ -1,5 +1,7 @@
 /** @format */
 
+@use '@angular/material' as mat;
+
 :host {
   overflow: hidden;
   display: flex;
@@ -58,6 +60,16 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+    }
+
+    &.user-action {
+      .mat-mdc-icon-button {
+        @include mat.icon-button-overrides(
+          (
+            icon-color: var(--action-color, var(--mat-sys-primary)),
+          )
+        );
+      }
     }
   }
 }
