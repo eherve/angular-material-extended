@@ -1,57 +1,60 @@
 <!-- @format -->
 
-<div *ngIf="dataSource" id="container">
-  <ng-container *ngTemplateOutlet="headTmpl"></ng-container>
+@if (dataSource) {
+  <div id="container">
+    <ng-container *ngTemplateOutlet="headTmpl"></ng-container>
 
-  <div id="table-container" intersectionObserver (intersection)="load($event.intersect)">
-    <table id="table" mat-table [fixedLayout]="false" [dataSource]="dataSource" multiTemplateDataRows>
-      @for (column of options.columns; track column) {
-        <ng-container [matColumnDef]="column.columnDef" [sticky]="column.sticky">
-          <th
-            mat-header-cell
-            *matHeaderCellDef
-            [class.searchable]="column.searchable"
-            [style.min-width.px]="column.minWidth || options.columnMinWith">
-            <ng-container *ngTemplateOutlet="headerTmpl; context: { column }"></ng-container>
-          </th>
-          <td
-            mat-cell
-            *matCellDef="let row"
-            [style.min-width.px]="column.minWidth || options.columnMinWith"
-            [style.color]="row | color: column : options"
-            [style.background-color]="row | backgroundColor: column : options">
-            <ng-container *ngTemplateOutlet="cellTmpl; context: { column, row }"></ng-container>
+    <div id="table-container" intersectionObserver (intersection)="load($event.intersect)">
+      <table id="table" mat-table [fixedLayout]="false" [dataSource]="dataSource" multiTemplateDataRows>
+        @for (column of options.columns; track column) {
+          <ng-container [matColumnDef]="column.columnDef" [sticky]="column.sticky">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              [class.searchable]="column.searchable"
+              [style.min-width.px]="column.minWidth || options.columnMinWith">
+              <ng-container *ngTemplateOutlet="headerTmpl; context: { column }"></ng-container>
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let row"
+              [style.min-width.px]="column.minWidth || options.columnMinWith"
+              [style.color]="row | color: column : options"
+              [style.background-color]="row | backgroundColor: column : options">
+              <ng-container *ngTemplateOutlet="cellTmpl; context: { column, row }"></ng-container>
+            </td>
+          </ng-container>
+        }
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr
+          mat-row
+          *matRowDef="let row; columns: displayedColumns"
+          [class.has-click]="options.actions?.rowClick"
+          (click)="rowClick(row)"></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td [attr.colspan]="displayedColumns.length">
+            <div id="no-data">
+              <span id="no-data-label"> {{ datatableIntl.noDateLabel }}</span>
+            </div>
           </td>
-        </ng-container>
-      }
+        </tr>
+      </table>
+    </div>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-      <tr
-        mat-row
-        *matRowDef="let row; columns: displayedColumns"
-        [class.has-click]="options.actions?.rowClick"
-        (click)="rowClick(row)"></tr>
-      <tr class="mat-row" *matNoDataRow>
-        <td [attr.colspan]="displayedColumns.length">
-          <div id="no-data">
-            <span id="no-data-label"> {{ datatableIntl.noDateLabel }}</span>
-          </div>
-        </td>
-      </tr>
-    </table>
+    <mat-paginator
+      id="paginator"
+      [length]="dataSource.recordsFiltered"
+      [pageSizeOptions]="options.pageSizeOptions || [5, 10, 20, 50, 100]"
+      [pageSize]="(options.pageSizeOptions ?? [5, 10, 20, 50, 100])[options.pageSizeOptionsIndex ?? 0]"
+      [showFirstLastButtons]="true">
+    </mat-paginator>
   </div>
-
-  <mat-paginator
-    id="paginator"
-    [length]="dataSource.recordsFiltered"
-    [pageSizeOptions]="options.pageSizeOptions || [5, 10, 20, 50, 100]"
-    [pageSize]="(options.pageSizeOptions ?? [5, 10, 20, 50, 100])[options.pageSizeOptionsIndex ?? 0]"
-    [showFirstLastButtons]="true">
-  </mat-paginator>
-
-  <div id="loading" *ngIf="dataSource.loading$ | async" @fade>
-    <mat-spinner></mat-spinner>
-  </div>
+}
+<div id="loading" *ngIf="!dataSource || (dataSource.loading$ | async)" @fade>
+  <ng-content select="[loader-spinner]">
+    <mat-spinner loader-spinner></mat-spinner>
+  </ng-content>
 </div>
 
 <ng-template #headTmpl>

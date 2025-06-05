@@ -1,6 +1,7 @@
 /** @format */
 
 import { Action } from './action.type';
+import { DatatableConfig } from './config.type';
 import { DatasourceService } from './datasource-service.type';
 import { DatatableColumn, DatatableValueColumn } from './datatable-column.type';
 import { FacetOptions as Statistic } from './datatable-facet.type';
@@ -9,6 +10,11 @@ type Color<Record> = string | ((column: DatatableValueColumn<Record>, row: Recor
 
 export type DatatableOptions<Record> = {
   service: DatasourceService<Record>;
+
+  configService?: {
+    get?: () => Promise<DatatableConfig>;
+    set?: (config: DatatableConfig) => Promise<void>;
+  };
 
   columns: DatatableColumn<Record>[];
   columnMinWith?: number;

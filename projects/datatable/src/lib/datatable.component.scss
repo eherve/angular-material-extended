@@ -237,13 +237,11 @@
   bottom: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.16);
-
-  mat-spinner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+  display: flex;
+  box-sizing: border-box;
+  place-content: center center;
+  align-items: center;
+  flex-direction: row;
 }
 
 ::ng-deep {

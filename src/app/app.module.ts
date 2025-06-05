@@ -17,6 +17,7 @@ import { NgxMatDatatableIntl } from '../../projects/datatable/src/lib/datatable.
 import { NgxMatDatatableModule } from '../../projects/datatable/src/public-api';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 registerLocaleData(localeFr);
 
 @Injectable()
@@ -36,6 +37,7 @@ class AppDatatableIntl extends NgxMatDatatableIntl {
     MatButtonModule,
     MatIconModule,
     NgxMatDatatableModule,
+    MatProgressSpinnerModule,
   ],
   providers: [
     provideAnimationsAsync(),

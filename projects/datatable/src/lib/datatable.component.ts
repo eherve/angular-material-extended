@@ -150,11 +150,6 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   @Input('options')
   options!: DatatableOptions<Record>;
 
-  // @Input('config')
-  // set setConfig(config: DatatableConfig) {
-  //   this.config = config;
-  //   this.applyConfig();
-  // }
   @Input()
   config?: DatatableConfig;
 
@@ -180,10 +175,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private subscriptions = new Subscription();
   private changeDetectorRef = inject(ChangeDetectorRef);
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     if (!this.options?.service) throw new Error(`missing mongoose datatable component service`);
     if (!this.options?.columns) throw new Error(`missing mongoose datatable component columns`);
-    this.applyConfig();
+    await this.applyConfig();
     this.buildDisplayColumns();
     this.buildSearchFormGroup();
     this.dataSource = new DatagridDataSource<Record>(this.options.service);
@@ -431,7 +426,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       .forEach(c => (c.order!.index = index++));
   }
 
-  private applyConfig() {
+  private async applyConfig() {
+    if (this.options?.configService?.get) this.config = await this.options.configService.get();
     if (this.options?.columns && this.config?.columns) {
       this.config.columns.forEach((updated, index) => {
         const columnIndex = this.options.columns.findIndex(c => c.columnDef === updated.columnDef);
@@ -454,5 +450,6 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     const columns = this.options.columns.map(c => ({ columnDef: c.columnDef, sticky: c.sticky, hidden: c.hidden }));
     this.config = { columns, pageSizeOptionsIndex };
     this.configUpdated.next(this.config);
+    if (this.options?.configService?.set) this.options.configService.set(this.config);
   }
 }

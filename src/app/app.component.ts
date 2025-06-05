@@ -120,6 +120,25 @@ export class AppComponent {
 
   datatableOptions: DatatableOptions<any> = {
     service,
+    configService: {
+      get: async () => {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            resolve({
+              columns: this.datatableOptions.columns.map(c => ({
+                columnDef: c.columnDef,
+                sticky: c.sticky,
+                hidden: c.hidden,
+              })),
+              pageSizeOptionsIndex: 0,
+            });
+          }, 1000);
+        });
+      },
+      set: async (config: DatatableConfig) => {
+        console.warn('configService set', config);
+      },
+    },
     pageSizeOptions: [10, 20, 50, 100],
     pageSizeOptionsIndex: 1,
     actions: {

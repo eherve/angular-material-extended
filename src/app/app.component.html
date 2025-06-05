@@ -11,6 +11,7 @@
       [options]="datatableOptions"
       [config]="config"
       (configUpdated)="updatedConfig($event)">
+      <mat-spinner [style.--mdc-circular-progress-active-indicator-color]="'red'" loader-spinner></mat-spinner>
       <ng-template ngxMatDatatableContent="description" let-value="value">
         <div>
           <div>Desc.</div>
