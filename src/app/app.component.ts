@@ -21,11 +21,11 @@ import {
 import moment from 'moment';
 import { of } from 'rxjs';
 import {
-  DatasourceResult,
-  DatasourceResultFacet,
-  DatasourceService,
+  NgxMatDatasourceResult,
+  NgxMatDatasourceResultFacet,
+  NgxMatDatasourceService,
   DatatableColumn,
-  DatatableOptions,
+  NgxMatDatatableOptions,
   NgxMatDatatableComponent,
 } from '../../projects/datatable/src/public-api';
 import { DatatableConfig } from '../../projects/datatable/src/lib/types/config.type';
@@ -65,10 +65,11 @@ while (i++ < 100) {
     templateSearch: i,
     description:
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+    additionalProperty: `additionalProperty-${i}`,
   });
 }
 
-const service: DatasourceService<any> = options => {
+const service: NgxMatDatasourceService<any> = options => {
   let data = clone(DATA).filter(d => {
     for (let c of options.columns) {
       if (!c.search) continue;
@@ -88,9 +89,9 @@ const service: DatasourceService<any> = options => {
   }
   const recordsFiltered = data.length;
 
-  const facets: { [id: string]: DatasourceResultFacet[] } = {};
+  const facets: { [id: string]: NgxMatDatasourceResultFacet[] } = {};
   each(options.facets, facet => {
-    const f: DatasourceResultFacet[] = (facets[facet.id] = []);
+    const f: NgxMatDatasourceResultFacet[] = (facets[facet.id] = []);
     const group = groupBy(data, facet.property);
     const groupKeys = keys(group);
     if (facet.operator === 'count') facets[facet.id] = map(groupKeys, _id => ({ _id, value: group[_id].length }));
@@ -103,7 +104,7 @@ const service: DatasourceService<any> = options => {
 
   data = data.slice(options.start! * options.length!, (options.start! + 1) * options.length!);
   console.log('service', options, data);
-  return new Promise<DatasourceResult<any>>(resolve => {
+  return new Promise<NgxMatDatasourceResult<any>>(resolve => {
     setTimeout(() => resolve({ draw: options.draw, recordsTotal: DATA.length, recordsFiltered, data, facets }), 300);
   }).then(res => (console.log('res', res), res));
 };
@@ -118,7 +119,7 @@ export class AppComponent {
   @ViewChild(NgxMatDatatableComponent)
   datatable?: NgxMatDatatableComponent;
 
-  datatableOptions: DatatableOptions<any> = {
+  datatableOptions: NgxMatDatatableOptions<any> = {
     service,
     configService: {
       get: async () => {
@@ -217,6 +218,7 @@ export class AppComponent {
       : 'yellow',
     columnMinWith: 120,
     rowMaxHeight: 36,
+    additionalProperties: ['additionalProperty'],
     columns: [
       {
         type: 'text',

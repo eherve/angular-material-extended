@@ -1,6 +1,6 @@
 /** @format */
 
-export type DatasourceRequestSearch = {
+export type NgxMatDatasourceRequestSearch = {
   value: any;
 
   regex?: boolean;
@@ -8,7 +8,7 @@ export type DatasourceRequestSearch = {
   chunks?: string[];
 };
 
-export type DatasourceRequestColumn = {
+export type NgxMatDatasourceRequestColumn = {
   data: string;
 
   name?: string;
@@ -17,43 +17,43 @@ export type DatasourceRequestColumn = {
 
   orderable?: boolean;
 
-  search?: DatasourceRequestSearch;
+  search?: NgxMatDatasourceRequestSearch;
 };
 
-export type DatasourceRequestOrderDir = 'asc' | 'desc';
+export type NgxMatDatasourceRequestOrderDir = 'asc' | 'desc';
 
-export type DatasourceRequestOrder = {
+export type NgxMatDatasourceRequestOrder = {
   column: number;
-  dir: DatasourceRequestOrderDir;
+  dir: NgxMatDatasourceRequestOrderDir;
 };
 
-export type DatasourceRequestFacetOperator = 'count' | ['sum', string] | ['avg', string];
-export type DatasourceRequestFacet = {
+export type NgxMatDatasourceRequestFacetOperator = 'count' | ['sum', string] | ['avg', string];
+export type NgxMatDatasourceRequestFacet = {
   id: string;
   kind: 'indicator';
   property: string;
-  operator: DatasourceRequestFacetOperator;
+  operator: NgxMatDatasourceRequestFacetOperator;
 };
 
-export type DatasourceRequestOptions = {
+export type NgxMatDatasourceRequestOptions = {
   draw: string;
 
-  columns: DatasourceRequestColumn[];
+  columns: NgxMatDatasourceRequestColumn[];
 
-  order?: DatasourceRequestOrder[];
+  order?: NgxMatDatasourceRequestOrder[];
 
   start?: number;
 
   length?: number;
 
-  search?: DatasourceRequestSearch;
+  search?: NgxMatDatasourceRequestSearch;
 
-  facets?: DatasourceRequestFacet[];
+  facets?: NgxMatDatasourceRequestFacet[];
 };
 
-export type DatasourceResultFacet = { _id: any; value: number };
+export type NgxMatDatasourceResultFacet = { _id: any; value: number };
 
-export type DatasourceResult<T> = {
+export type NgxMatDatasourceResult<T> = {
   draw: string;
 
   recordsTotal: number;
@@ -62,7 +62,9 @@ export type DatasourceResult<T> = {
 
   data: T[];
 
-  facets?: { [id: string]: DatasourceResultFacet[] };
+  facets?: { [id: string]: NgxMatDatasourceResultFacet[] };
 };
 
-export type DatasourceService<Record> = (options: DatasourceRequestOptions) => Promise<DatasourceResult<Record>>;
+export type NgxMatDatasourceService<Record> = (
+  options: NgxMatDatasourceRequestOptions
+) => Promise<NgxMatDatasourceResult<Record>>;

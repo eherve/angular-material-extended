@@ -2,19 +2,19 @@
 
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DatasourceRequestOptions, DatasourceResultFacet, DatasourceService } from './types/datasource-service.type';
+import { NgxMatDatasourceRequestOptions, NgxMatDatasourceResultFacet, NgxMatDatasourceService } from './types/datasource-service.type';
 
 export class DatagridDataSource<Record> extends DataSource<Record> {
   loading$ = new BehaviorSubject<boolean>(true);
   recordsFiltered = 0;
   recordsTotal?: number;
-  facets?: { [id: string]: DatasourceResultFacet[] };
+  facets?: { [id: string]: NgxMatDatasourceResultFacet[] };
   rowSize: number = 0; // row size in kb
 
-  private options?: DatasourceRequestOptions;
+  private options?: NgxMatDatasourceRequestOptions;
   private dataStream = new BehaviorSubject<Record[]>([]);
 
-  constructor(private service: DatasourceService<Record>) {
+  constructor(private service: NgxMatDatasourceService<Record>) {
     super();
   }
 
@@ -24,7 +24,7 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
 
   disconnect() {}
 
-  async loadData(options: DatasourceRequestOptions): Promise<void> {
+  async loadData(options: NgxMatDatasourceRequestOptions): Promise<void> {
     this.options = options;
     this.loading$.next(true);
     try {

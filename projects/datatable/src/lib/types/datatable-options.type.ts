@@ -2,14 +2,14 @@
 
 import { Action } from './action.type';
 import { DatatableConfig } from './config.type';
-import { DatasourceService } from './datasource-service.type';
+import { NgxMatDatasourceService } from './datasource-service.type';
 import { DatatableColumn, DatatableValueColumn } from './datatable-column.type';
 import { FacetOptions as Statistic } from './datatable-facet.type';
 
 type Color<Record> = string | ((column: DatatableValueColumn<Record>, row: Record) => string | undefined);
 
-export type DatatableOptions<Record> = {
-  service: DatasourceService<Record>;
+export type NgxMatDatatableOptions<Record> = {
+  service: NgxMatDatasourceService<Record>;
 
   configService?: {
     get?: () => Promise<DatatableConfig | undefined>;
@@ -22,6 +22,8 @@ export type DatatableOptions<Record> = {
 
   pageSizeOptions?: number[];
   pageSizeOptionsIndex?: number;
+
+  additionalProperties?: string[];
 
   actions?: {
     columns?: {

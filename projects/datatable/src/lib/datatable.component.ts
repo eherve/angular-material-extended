@@ -61,12 +61,12 @@ import { TransformPipe } from './pipes/transform.pipe';
 import { duration } from './tools/duration.tool';
 import { get } from './tools/get.tool';
 import {
-  DatasourceRequestColumn,
-  DatasourceRequestOrder,
-  DatasourceResultFacet,
+  NgxMatDatasourceRequestColumn,
+  NgxMatDatasourceRequestOrder,
+  NgxMatDatasourceResultFacet,
 } from './types/datasource-service.type';
 import { DatatableColumn, DatatableDurationColumn, DatatableSelectColumn } from './types/datatable-column.type';
-import { DatatableOptions } from './types/datatable-options.type';
+import { NgxMatDatatableOptions } from './types/datatable-options.type';
 import { DatatableConfig } from './types/config.type';
 
 @Injectable()
@@ -148,7 +148,7 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
 })
 export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy {
   @Input('options')
-  options!: DatatableOptions<Record>;
+  options!: NgxMatDatatableOptions<Record>;
 
   @Input()
   config?: DatatableConfig;
@@ -292,8 +292,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     });
   }
 
-  private buildOrder(columns: DatasourceRequestColumn[]): DatasourceRequestOrder[] {
-    const order: DatasourceRequestOrder[] = [];
+  private buildOrder(columns: NgxMatDatasourceRequestColumn[]): NgxMatDatasourceRequestOrder[] {
+    const order: NgxMatDatasourceRequestOrder[] = [];
     this.options.columns
       .filter(c => !!c.order)
       .sort((c1, c2) => c1.order!.index - c2.order!.index)
@@ -345,19 +345,22 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     }
   }
 
-  facetClick(column: DatatableColumn<Record> | undefined, result: DatasourceResultFacet) {
+  facetClick(column: DatatableColumn<Record> | undefined, result: NgxMatDatasourceResultFacet) {
     if (!column) return;
     const control = this.searchFormGroup?.controls[column.columnDef];
     if (!control) return;
     if (result._id !== control.value?.value) control.setValue({ value: result._id });
   }
 
-  private buildRequestColumns(): DatasourceRequestColumn[] {
-    const columns: DatasourceRequestColumn[] = [];
-    const additionalColumns: DatasourceRequestColumn[] = [];
+  private buildRequestColumns(): NgxMatDatasourceRequestColumn[] {
+    const columns: NgxMatDatasourceRequestColumn[] = [];
+    const additionalColumns: NgxMatDatasourceRequestColumn[] = [];
+    if (this.options.additionalProperties) {
+      this.options.additionalProperties.forEach(property => this.addAdditionalColumn(additionalColumns, property));
+    }
     this.options.columns.forEach(c => {
       if (c.hidden) return;
-      const column: DatasourceRequestColumn = { data: c.property, name: c.columnDef, searchable: c.searchable };
+      const column: NgxMatDatasourceRequestColumn = { data: c.property, name: c.columnDef, searchable: c.searchable };
       if (c.sortProperty && c.order) this.addAdditionalColumn(additionalColumns, c.sortProperty);
       if (c.searchable) {
         const control = this.searchFormGroup.controls[c.columnDef];
@@ -379,7 +382,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     return columns;
   }
 
-  private addAdditionalColumn(additionalColumns: DatasourceRequestColumn[], data: string, search?: any) {
+  private addAdditionalColumn(additionalColumns: NgxMatDatasourceRequestColumn[], data: string, search?: any) {
     let column = additionalColumns.find(c => c.data === data);
     if (!column) additionalColumns.push((column = { data }));
     if (search) {

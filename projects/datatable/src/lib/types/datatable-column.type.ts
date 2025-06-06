@@ -2,7 +2,7 @@
 
 import { ComponentType } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
-import { DatasourceRequestOrderDir } from './datasource-service.type';
+import { NgxMatDatasourceRequestOrderDir } from './datasource-service.type';
 
 type Color<Record> = string | ((row: Record) => string | undefined);
 
@@ -26,7 +26,7 @@ type BaseColumn = {
   sortProperty?: string;
   order?: {
     index: number;
-    dir: DatasourceRequestOrderDir;
+    dir: NgxMatDatasourceRequestOrderDir;
   };
 
   tooltip?: string;
@@ -74,6 +74,7 @@ export type DatatableSearchListOption = {
   value: any;
   name: string;
   color?: string;
+  iconSrc?: 'mat-icon' | 'svg';
   icon?: string;
   iconColor?: string;
 };
