@@ -217,6 +217,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.dataSource.redraw(match);
   }
 
+  refreshColumns() {
+    this.buildDisplayColumns();
+  }
+
   exporting = false;
   async export() {
     this.exporting = true;
