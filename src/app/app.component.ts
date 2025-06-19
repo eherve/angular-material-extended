@@ -161,6 +161,11 @@ export class AppComponent {
           onclick: datagrid => console.warn('user.start.add', datagrid),
         },
         {
+          position: 'start',
+          kind: 'template',
+          contentId: 'action'
+        },
+        {
           position: 'center',
           kind: 'icon',
           icon: 'add',

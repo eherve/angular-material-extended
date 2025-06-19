@@ -14,4 +14,9 @@ export type IconAction<Record> = BaseAction & {
   color?: string;
 };
 
-export type Action<Record> = IconAction<Record>;
+export type TemplateAction = BaseAction & {
+  kind: 'template';
+  contentId: string;
+};
+
+export type Action<Record> = IconAction<Record> | TemplateAction;

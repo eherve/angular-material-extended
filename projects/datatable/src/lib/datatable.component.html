@@ -301,11 +301,23 @@
 </ng-template>
 
 <ng-template #actionTmpl let-action="action">
-  <div class="action user-action" [matTooltip]="action.tooltip">
-    <button [style.--action-color]="action.color" mat-icon-button (click)="action.onclick(this)">
-      <mat-icon>{{ action.icon }}</mat-icon>
-    </button>
-  </div>
+  @switch (action.kind) {
+    @case ('icon') {
+      <div class="action user-action" [matTooltip]="action.tooltip">
+        <button [style.--action-color]="action.color" mat-icon-button (click)="action.onclick(this)">
+          <mat-icon>{{ action.icon }}</mat-icon>
+        </button>
+      </div>
+    }
+    @case ('template') {
+      <div class="action user-action">
+        @let content = contentRefs | findContent: action.contentId;
+        @if (content) {
+          <ng-container *ngTemplateOutlet="content.templateRef; context: { datatable: this }" />
+        }
+      </div>
+    }
+  }
 </ng-template>
 
 <ng-template #facetsTmpl let-facetOptions="facetOptions">
