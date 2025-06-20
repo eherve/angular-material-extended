@@ -42,4 +42,6 @@ export type NgxMatDatatableOptions<Record> = {
 
   rowColor?: Color<Record>;
   rowBackgroundColor?: Color<Record>;
+
+  disableRowAnimation?: boolean;
 };

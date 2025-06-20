@@ -175,6 +175,11 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private subscriptions = new Subscription();
   private changeDetectorRef = inject(ChangeDetectorRef);
 
+  get data(): Record[] | undefined {
+    return this._data;
+  }
+  private _data?: Record[];
+
   async ngOnInit(): Promise<void> {
     if (!this.options?.service) throw new Error(`missing mongoose datatable component service`);
     if (!this.options?.columns) throw new Error(`missing mongoose datatable component columns`);
@@ -215,6 +220,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   redraw(match?: (record: Record) => boolean) {
     this.dataSource.redraw(match);
+    this.changeDetectorRef.detectChanges();
   }
 
   refreshColumns() {
@@ -283,10 +289,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     row[column.header] = duration(value, column);
   }
 
-  loadPage() {
+  async loadPage() {
     const columns = this.buildRequestColumns();
     const order = this.buildOrder(columns);
-    this.dataSource.loadData({
+    await this.dataSource.loadData({
       draw: Date.now().toString(),
       columns,
       start: this.paginator!.pageIndex,
@@ -294,6 +300,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       order,
       facets: this.options.facets,
     });
+    this._data = this.dataSource.data;
   }
 
   private buildOrder(columns: NgxMatDatasourceRequestColumn[]): NgxMatDatasourceRequestOrder[] {

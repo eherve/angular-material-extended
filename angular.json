@@ -61,7 +61,8 @@
               "buildTarget": "angular-material-extended:build:production"
             },
             "development": {
-              "buildTarget": "angular-material-extended:build:development"
+              "buildTarget": "angular-material-extended:build:development",
+              "port": 4242
             }
           },
           "defaultConfiguration": "development"
@@ -145,10 +146,7 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/tooltip/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         }
       }

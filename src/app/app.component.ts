@@ -163,7 +163,7 @@ export class AppComponent {
         {
           position: 'start',
           kind: 'template',
-          contentId: 'action'
+          contentId: 'action',
         },
         {
           position: 'center',
@@ -402,8 +402,10 @@ export class AppComponent {
   constructor() {
     let i = 0;
     setInterval(() => {
+      console.log('interval', i);
       this.datatableOptions.rowColor = ['green', 'red', 'black', 'blue'][++i % 4];
-      this.datatable?.redraw((record: any) => !(record.index % i));
+      each(this.datatable?.dataSource.data, v => (v.label = `changed by ${i}`));
+      this.datatable?.redraw((record: any) => !(record.index % (i % 10)));
     }, 5000);
   }
 

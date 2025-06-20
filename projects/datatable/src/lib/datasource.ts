@@ -2,7 +2,11 @@
 
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { NgxMatDatasourceRequestOptions, NgxMatDatasourceResultFacet, NgxMatDatasourceService } from './types/datasource-service.type';
+import {
+  NgxMatDatasourceRequestOptions,
+  NgxMatDatasourceResultFacet,
+  NgxMatDatasourceService,
+} from './types/datasource-service.type';
 
 export class DatagridDataSource<Record> extends DataSource<Record> {
   loading$ = new BehaviorSubject<boolean>(true);
@@ -11,8 +15,12 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
   facets?: { [id: string]: NgxMatDatasourceResultFacet[] };
   rowSize: number = 0; // row size in kb
 
+  get data(): Record[] {
+    return this.dataStream.value;
+  }
+
   private options?: NgxMatDatasourceRequestOptions;
-  private dataStream = new BehaviorSubject<Record[]>([]);
+  protected dataStream = new BehaviorSubject<Record[]>([]);
 
   constructor(private service: NgxMatDatasourceService<Record>) {
     super();
