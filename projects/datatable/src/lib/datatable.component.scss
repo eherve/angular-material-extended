@@ -317,3 +317,65 @@
     }
   }
 }
+
+.chips-facet {
+  margin-right: 8px;
+
+  .chip-facet {
+    overflow: hidden;
+    --test-color: contrast-color(currentColor);
+    @include mat.chips-overrides(
+      (
+        label-text-color: var(--facet-color),
+        outline-color: var(--facet-color),
+      )
+    );
+
+    &.has-action {
+      cursor: pointer;
+    }
+
+    ::ng-deep {
+      .mat-mdc-chip-action,
+      .mat-mdc-standard-chip {
+        cursor: inherit;
+        padding: 0;
+      }
+      .mat-mdc-chip-action-label {
+        height: 100%;
+        width: 100%;
+      }
+    }
+
+    .chip-facet-content {
+      width: 100%;
+      display: flex;
+      box-sizing: border-box;
+      place-content: center space-between;
+      align-items: center;
+      flex-direction: row;
+
+      height: 100%;
+      width: 100%;
+
+      .chip-facet-key,
+      .chip-facet-value {
+        height: 100%;
+        padding-left: 8px;
+        padding-right: 8px;
+        display: flex;
+        box-sizing: border-box;
+        place-content: center space-between;
+        align-items: center;
+        flex-direction: row;
+      }
+      .chip-facet-key {
+        background-color: var(--mdc-chip-label-text-color);
+        color: var(--facet-label-color, var(--mdc-chip-elevated-container-color));
+      }
+      .chip-facet-value {
+        color: var(--facet-value-color, var(--mdc-chip-label-text-color));
+      }
+    }
+  }
+}

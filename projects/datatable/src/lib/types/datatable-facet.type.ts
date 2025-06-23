@@ -9,23 +9,33 @@ type BaseFacetOptions = {
 };
 
 export type FacetOptionsOptions = {
-  _id: string;
-  color?: string;
+  value: string;
   name?: string;
+  color?: string;
+  labelColor?: string;
 };
 
-export type IndicatorFacetOptions = BaseFacetOptions & {
+type IndicatorFacetOptions = BaseFacetOptions & {
   kind: 'indicator';
   property: string;
   operator: FacetOptionsOperator;
-
-  options?: FacetOptionsOptions[];
-  style?: (_id: any) => { color?: string; name?: string } | undefined;
-
-  size?: number;
-  fontSize?: string;
-
-  contentId?: string;
 };
 
-export type FacetOptions = IndicatorFacetOptions;
+export type ContentIdFacetOptions = IndicatorFacetOptions & {
+  contentId?: string;
+};
+export type ProgressSpinnerFacetOptions = IndicatorFacetOptions & {
+  display: 'progress-spinner';
+  options?: FacetOptionsOptions[];
+  size?: number;
+  fontSize?: string;
+};
+
+export type ChipFacetOptions = IndicatorFacetOptions & {
+  display: 'chips';
+  options?: FacetOptionsOptions[];
+  size?: number;
+  fontSize?: string;
+};
+
+export type FacetOptions = ContentIdFacetOptions | ProgressSpinnerFacetOptions | ChipFacetOptions;

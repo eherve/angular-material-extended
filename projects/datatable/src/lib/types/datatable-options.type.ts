@@ -4,7 +4,7 @@ import { Action } from './action.type';
 import { DatatableConfig } from './config.type';
 import { NgxMatDatasourceService } from './datasource-service.type';
 import { DatatableColumn, DatatableValueColumn } from './datatable-column.type';
-import { FacetOptions as Statistic } from './datatable-facet.type';
+import { FacetOptions } from './datatable-facet.type';
 
 type Color<Record> = string | ((column: DatatableValueColumn<Record>, row: Record) => string | undefined);
 
@@ -38,7 +38,7 @@ export type NgxMatDatatableOptions<Record> = {
     user?: Action<Record>[];
   };
 
-  facets?: Statistic[];
+  facets?: FacetOptions[];
 
   rowColor?: Color<Record>;
   rowBackgroundColor?: Color<Record>;

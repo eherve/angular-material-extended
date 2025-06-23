@@ -28,6 +28,7 @@ import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/mat
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
 import { CountUpModule } from 'ngx-countup';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { debounceTime, lastValueFrom, Subscription } from 'rxjs';
@@ -68,6 +69,8 @@ import {
 import { DatatableColumn, DatatableDurationColumn, DatatableSelectColumn } from './types/datatable-column.type';
 import { NgxMatDatatableOptions } from './types/datatable-options.type';
 import { DatatableConfig } from './types/config.type';
+import { FindInPipe } from './pipes/find-in.pipe';
+import { OrderByPipe } from './pipes/order-by.pipe';
 
 @Injectable()
 class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
@@ -117,6 +120,7 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatTableModule,
+    MatChipsModule,
     ReactiveFormsModule,
     SafeHtmlPipe,
     MatTooltipModule,
@@ -127,6 +131,8 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     CountUpModule,
     ProgressSpinnerComponent,
     FindPipe,
+    FindInPipe,
+    OrderByPipe,
     SortFacetEntriesPipe,
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }],

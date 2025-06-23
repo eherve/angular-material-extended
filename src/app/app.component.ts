@@ -189,22 +189,29 @@ export class AppComponent {
         property: 'kind',
         operator: 'count',
         size: 80,
-        style: (_id: string) =>
-          ({
-            'kind 1': { color: '#cbf078' },
-            'kind 2': { color: '#f8f398' },
-            'kind 3': { color: '#f1b963' },
-            'kind 4': { color: '#e46161' },
-            'kind 5': { color: '#0092ca' },
-          })[_id],
+        options: [
+          { value: 'kind 1', color: '#cbf078', labelColor: '#000000' },
+          { value: 'kind 2', color: '#f8f398', labelColor: '#000000' },
+          { value: 'kind 3', color: '#f1b963' },
+          { value: 'kind 4', color: '#e46161' },
+          { value: 'kind 5', color: '#0092ca' },
+        ],
       },
       {
         id: 'kind-float-sum',
         name: 'Kind float sum',
         position: 'start',
         kind: 'indicator',
+        display: 'chips',
         property: 'kind',
         operator: ['sum', 'float'],
+        options: [
+          { value: 'kind 1', color: '#cbf078', labelColor: '#000000', name: 'Kind - 1' },
+          { value: 'kind 2', color: '#f8f398', labelColor: '#000000', name: 'Kind - 2' },
+          { value: 'kind 3', color: '#f1b963', name: 'Kind - 3' },
+          { value: 'kind 4', color: '#e46161', name: 'Kind - 4' },
+          // { value: 'kind 5', color: '#0092ca', name: 'Kind - 5' },
+        ],
       },
       {
         id: 'kind-float-avg',

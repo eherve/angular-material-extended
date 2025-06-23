@@ -327,7 +327,7 @@
 
 <ng-template #facetsTmpl let-facetOptions="facetOptions">
   @let column = options.columns | find: { property: facetOptions.property };
-  @let data = (dataSource.facets ?? {})[facetOptions.id] | sortFacetEntries: facetOptions;
+  @let data = (dataSource.facets ?? {})[facetOptions.id] | sortFacetEntries: facetOptions.options;
   @if (data) {
     @if (facetOptions.contentId) {
       @let cell = contentRefs | findContent: facetOptions.contentId;
@@ -335,38 +335,75 @@
         <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, facetOptions, data }" />
       }
     } @else {
-      @let size = facetOptions.size ?? 80;
-      @let fontSize = facetOptions.fontSize ?? '1em';
-      @let total = (data | sum: 'value') || 1;
-      <mat-card class="facet">
-        @if (facetOptions.name) {
-          <mat-card-header>
-            <mat-label>{{ facetOptions.name }}</mat-label>
-          </mat-card-header>
+      @switch (facetOptions.display) {
+        @case ('chips') {
+          <ng-container *ngTemplateOutlet="facetsChipsTmpl; context: { column, data, facetOptions }"></ng-container>
         }
-        <mat-card-content>
-          @for (d of data; track d) {
-            @let style = facetOptions.style ? facetOptions.style(d._id) : null;
-            @let percent = (d.value / total) * 100;
-            <div
-              class="facet-indicator"
-              [class.has-action]="column?.searchable !== false"
-              (click)="facetClick(column, d)">
-              <lib-progress-spinner [diameter]="size" [color]="style?.color" [fontSize]="fontSize" [value]="percent">
-                <mat-label>{{ style?.name ?? d._id }}</mat-label>
-              </lib-progress-spinner>
-              <mat-label
-                class="facet-indicator-label"
-                [style.font-size]="fontSize"
-                [countUp]="d.value"
-                [options]="datatableIntl.numberOptions"
-                [reanimateOnClick]="false">
-                {{ d.value | number: '0.0-2' }}
-              </mat-label>
-            </div>
-          }
-        </mat-card-content>
-      </mat-card>
+        @default {
+          <ng-container
+            *ngTemplateOutlet="facetsProgressSpinnersTmpl; context: { column, data, facetOptions }"></ng-container>
+        }
+      }
     }
   }
+</ng-template>
+
+<ng-template #facetsChipsTmpl let-column="column" let-data="data" let-facetOptions="facetOptions">
+  @let size = facetOptions.size;
+  @let fontSize = facetOptions.fontSize ?? '1em';
+  <!-- @let total = (data | sum: 'value') || 1; -->
+  <mat-chip-set class="chips-facet">
+    @for (d of data | orderBy: '_id'; track d) {
+      @let name = (facetOptions.options | find: { value: d._id })?.name ?? d._id;
+      @let color = (facetOptions.options | find: { value: d._id })?.color ?? 'var(--mat-sys-primary)';
+      @let labelColor = (facetOptions.options | find: { value: d._id })?.labelColor;
+      <!-- @let percent = (d.value / total) * 100; -->
+      <mat-chip
+        class="chip-facet"
+        [class.has-action]="column?.searchable !== false"
+        (click)="facetClick(column, d)"
+        [style.--facet-color]="color"
+        [style.--facet-label-color]="labelColor ?? 'var(--mat-sys-on-primary)'"
+        [style.--facet-value-color]="labelColor ?? color"
+        [style.width.px]="size">
+        <div class="chip-facet-content" [style.font-size.px]="fontSize">
+          <div class="chip-facet-key">{{ name }}</div>
+          <div class="chip-facet-value">{{ d.value | number: '0.0-2' }}</div>
+        </div>
+      </mat-chip>
+    }
+  </mat-chip-set>
+</ng-template>
+
+<ng-template #facetsProgressSpinnersTmpl let-column="column" let-data="data" let-facetOptions="facetOptions">
+  @let size = facetOptions.size ?? 80;
+  @let fontSize = facetOptions.fontSize ?? '1em';
+  @let total = (data | sum: 'value') || 1;
+  <mat-card class="facet">
+    @if (facetOptions.name) {
+      <mat-card-header>
+        <mat-label>{{ facetOptions.name }}</mat-label>
+      </mat-card-header>
+    }
+    <mat-card-content>
+      @for (d of data; track d) {
+        @let name = (facetOptions.options | find: { value: d._id })?.name ?? d._id;
+        @let color = (facetOptions.options | find: { value: d._id })?.color ?? 'var(--mat-sys-primary)';
+        @let percent = (d.value / total) * 100;
+        <div class="facet-indicator" [class.has-action]="column?.searchable !== false" (click)="facetClick(column, d)">
+          <lib-progress-spinner [diameter]="size" [color]="color" [fontSize]="fontSize" [value]="percent">
+            <mat-label>{{ name }}</mat-label>
+          </lib-progress-spinner>
+          <mat-label
+            class="facet-indicator-label"
+            [style.font-size]="fontSize"
+            [countUp]="d.value"
+            [options]="datatableIntl.numberOptions"
+            [reanimateOnClick]="false">
+            {{ d.value | number: '0.0-2' }}
+          </mat-label>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
 </ng-template>
