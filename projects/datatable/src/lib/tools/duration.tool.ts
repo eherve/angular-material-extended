@@ -14,7 +14,7 @@ export function duration(data: number | string | Date, options: { locale?: strin
     if (isNaN(date.valueOf())) return null;
     value = Date.now() - date.valueOf();
   } else if (typeof data?.valueOf === 'function') value = Date.now() - data.valueOf();
-  if (!value) return null;
+  if (value === undefined || value === null) return null;
 
   return humanizeDuration(value, durationOption);
 }

@@ -21,6 +21,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angul
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -28,7 +29,6 @@ import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/mat
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatChipsModule } from '@angular/material/chips';
 import { CountUpModule } from 'ngx-countup';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { debounceTime, lastValueFrom, Subscription } from 'rxjs';
@@ -55,12 +55,14 @@ import { FilterPipe } from './pipes/filter.pipe';
 import { FindContentPipe } from './pipes/find-cell-content.pipe';
 import { FindPipe } from './pipes/find.pipe';
 import { GetPipe } from './pipes/get.pipe';
+import { OrderByPipe } from './pipes/order-by.pipe';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { SortFacetEntriesPipe } from './pipes/sort-facet-entries.pipe';
 import { SumPipe } from './pipes/sum.pipe';
 import { TransformPipe } from './pipes/transform.pipe';
 import { duration } from './tools/duration.tool';
 import { get } from './tools/get.tool';
+import { DatatableConfig } from './types/config.type';
 import {
   NgxMatDatasourceRequestColumn,
   NgxMatDatasourceRequestOrder,
@@ -68,9 +70,6 @@ import {
 } from './types/datasource-service.type';
 import { DatatableColumn, DatatableDurationColumn, DatatableSelectColumn } from './types/datatable-column.type';
 import { NgxMatDatatableOptions } from './types/datatable-options.type';
-import { DatatableConfig } from './types/config.type';
-import { FindInPipe } from './pipes/find-in.pipe';
-import { OrderByPipe } from './pipes/order-by.pipe';
 
 @Injectable()
 class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
@@ -131,7 +130,6 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     CountUpModule,
     ProgressSpinnerComponent,
     FindPipe,
-    FindInPipe,
     OrderByPipe,
     SortFacetEntriesPipe,
   ],
@@ -165,6 +163,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   @Output()
   configUpdated = new EventEmitter<DatatableConfig>();
 
+  @Output()
+  ready = new EventEmitter<NgxMatDatatableComponent>();
+
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
   @ContentChildren(NgxMatDatatableContentDirective)
@@ -193,6 +194,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.buildDisplayColumns();
     this.buildSearchFormGroup();
     this.dataSource = new DatagridDataSource<Record>(this.options.service);
+    this.ready.emit(this);
     this.changeDetectorRef.detectChanges();
   }
 

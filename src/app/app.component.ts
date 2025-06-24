@@ -53,7 +53,7 @@ while (i++ < 100) {
       );
     })(),
     date: new Date(Date.now() + (Math.random() - 0.5) * 1000 * 60),
-    duration: moment
+    duration: i < 3 ? 0 : moment
       .duration(moment().diff(moment().subtract(Math.random() * 1000 * 60 * 60 * 5, 'milliseconds')))
       .as('millisecond') as number,
     autocomplete: (() => {
