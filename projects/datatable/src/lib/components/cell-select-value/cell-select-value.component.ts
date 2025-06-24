@@ -9,10 +9,11 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { SelectOptionPipe } from '../../pipes/select-option.pipe';
 import { TransformPipe } from '../../pipes/transform.pipe';
 import { DatatableSelectColumn } from '../../types/datatable-column.type';
+import { IsArrayPipe } from '../../pipes/is-array.pipe';
 
 @Component({
   selector: 'lib-cell-select-value',
-  imports: [CommonModule, SelectOptionPipe, GetPipe, MatIconModule, MatLabel, TransformPipe, SafeHtmlPipe],
+  imports: [CommonModule, SelectOptionPipe, GetPipe, IsArrayPipe, MatIconModule, MatLabel, TransformPipe, SafeHtmlPipe],
   templateUrl: './cell-select-value.component.html',
   styleUrl: './cell-select-value.component.scss',
 })

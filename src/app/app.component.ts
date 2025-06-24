@@ -53,9 +53,12 @@ while (i++ < 100) {
       );
     })(),
     date: new Date(Date.now() + (Math.random() - 0.5) * 1000 * 60),
-    duration: i < 3 ? 0 : moment
-      .duration(moment().diff(moment().subtract(Math.random() * 1000 * 60 * 60 * 5, 'milliseconds')))
-      .as('millisecond') as number,
+    duration:
+      i < 3 ? 0 : (
+        (moment
+          .duration(moment().diff(moment().subtract(Math.random() * 1000 * 60 * 60 * 5, 'milliseconds')))
+          .as('millisecond') as number)
+      ),
     autocomplete: (() => {
       const rand = Math.round(Math.random() * 100);
       return `option ${rand}`;
@@ -76,7 +79,11 @@ const service: NgxMatDatasourceService<any> = options => {
       if (c.search.regex && !deburr(toLower(trim(d[c.data]))).includes(deburr(toLower(trim(c.search.value))))) {
         return false;
       }
-      if (!c.search.regex && d[c.data] !== c.search.value) return false;
+      if (!c.search.regex) {
+        if (c.search.operator === '$in') {
+          if (!includes(c.search.value, d[c.data])) return false;
+        } else if (d[c.data] !== c.search.value) return false;
+      }
     }
     return true;
   });
@@ -310,6 +317,26 @@ export class AppComponent {
         minWidth: 400,
         searchable: true,
         sortable: true,
+        options: of(
+          DATA.map(d => ({
+            value: d.reference,
+            name: d.reference.toUpperCase(),
+            color: 'red',
+            icon: 'home',
+            iconColor: 'blue',
+          }))
+        ),
+      },
+      {
+        type: 'select',
+        columnDef: 'reference-m',
+        header: 'Référence multiple',
+        property: 'reference',
+        placeholder: 'Sélectionnez une référence',
+        minWidth: 400,
+        searchable: true,
+        sortable: true,
+        multiple: true,
         options: of(
           DATA.map(d => ({
             value: d.reference,

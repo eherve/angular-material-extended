@@ -80,11 +80,12 @@ export type DatatableSearchListOption = {
 };
 export type DatatableSelectColumn<Record> = Column<Record> & {
   type: 'select';
-  multiple?:boolean;
+  isArrayValue?: boolean;
   options: Observable<DatatableSearchListOption[]>;
 };
 export type DatatableSearchSelectColumn<Record> = DatatableSelectColumn<Record> &
   SearchableColumn<Record> & {
+    multiple?: boolean;
     placeholder?: string;
   };
 

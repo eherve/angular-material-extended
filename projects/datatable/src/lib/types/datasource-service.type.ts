@@ -1,7 +1,11 @@
 /** @format */
 
+export type NgxMatDatasourceRequestSearchOperator = '>' | '>=' | '≥' | '<' | '≤' | '<>' | '≤≥' | '><' | '≥≤' | '$in' | '$nin';
+
 export type NgxMatDatasourceRequestSearch = {
   value: any;
+
+  operator?: NgxMatDatasourceRequestSearchOperator;
 
   regex?: boolean;
 

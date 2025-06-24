@@ -3,15 +3,28 @@
 @if (selectControl) {
   <mat-form-field appearance="fill">
     <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
-    <mat-select [formControl]="selectControl" [placeholder]="column.placeholder!">
+    <mat-select [formControl]="selectControl" [placeholder]="column.placeholder!" [multiple]="column.multiple">
       @let options = column.options | async;
 
       <mat-select-trigger>
-        @let option = selectControl.value | selectOption: options;
-        @if (option) {
-          <ng-container *ngTemplateOutlet="selectOption; context: { option }"></ng-container>
+        @if (column.multiple && selectControl.value | isArray) {
+          <div class="options">
+            @for (v of selectControl.value; track v) {
+              @let option = v | selectOption: options;
+              @if (option) {
+                <ng-container *ngTemplateOutlet="selectOption; context: { option }"></ng-container>
+              } @else {
+                <mat-label [innerHTML]="v | safeHtml"></mat-label>
+              }
+            }
+          </div>
         } @else {
-          <mat-label [innerHTML]="selectControl.value | safeHtml"></mat-label>
+          @let option = selectControl.value | selectOption: options;
+          @if (option) {
+            <ng-container *ngTemplateOutlet="selectOption; context: { option }"></ng-container>
+          } @else {
+            <mat-label [innerHTML]="selectControl.value | safeHtml"></mat-label>
+          }
         }
       </mat-select-trigger>
       @for (option of options; track option) {

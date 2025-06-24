@@ -25,6 +25,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { Subscription } from 'rxjs';
+import { IsArrayPipe } from '../../pipes/is-array.pipe';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { SelectOptionPipe } from '../../pipes/select-option.pipe';
 import { DatatableSearchSelectColumn } from '../../types/datatable-column.type';
@@ -41,6 +42,7 @@ import { DatatableSearchSelectColumn } from '../../types/datatable-column.type';
     ReactiveFormsModule,
     SelectOptionPipe,
     SafeHtmlPipe,
+    IsArrayPipe,
   ],
   templateUrl: './header-select-filter.component.html',
   styleUrl: './header-select-filter.component.scss',
@@ -68,8 +70,14 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
 
   private subsink = new Subscription();
 
-  writeValue = (value: any) => {
-    if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
+  writeValue = (controlValue: any) => {
+    if (controlValue?.value !== this.selectControl.value) {
+      const value = controlValue?.value;
+      if (value && !Array.isArray(value) && this.column.multiple) {
+        this.selectControl.setValue([value]);
+      } else this.selectControl.setValue(value);
+    }
+    this.changeDetectorRef.detectChanges();
   };
 
   registerOnChange(onChange: any): void {
@@ -87,7 +95,7 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
         if (value === undefined) this.control.setValue(undefined);
-        else this.control.setValue({ value, regex: false });
+        else this.control.setValue({ value, operator: this.column.multiple ? '$in' : undefined, regex: false });
       })
     );
     this.changeDetectorRef.detectChanges();
