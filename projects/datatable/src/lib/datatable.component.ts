@@ -31,7 +31,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CountUpModule } from 'ngx-countup';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
-import { debounceTime, lastValueFrom, Subscription } from 'rxjs';
+import * as rxjs from 'rxjs';
 import * as XLSX from 'xlsx';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
 import { CellDateValueComponent } from './components/cell-date-value/cell-date-value.component';
@@ -164,6 +164,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   configUpdated = new EventEmitter<DatatableConfig>();
 
   @Output()
+  searchUpdated = new EventEmitter<any>();
+
+  @Output()
   ready = new EventEmitter<NgxMatDatatableComponent>();
 
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
@@ -179,7 +182,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   datatableIntl = inject(NgxMatDatatableIntl);
 
-  private subscriptions = new Subscription();
+  private subscriptions = new rxjs.Subscription();
   private changeDetectorRef = inject(ChangeDetectorRef);
 
   get data(): Record[] | undefined {
@@ -289,7 +292,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   private async buildExportSelectColumn(column: DatatableSelectColumn<Record>, row: any, value: any) {
-    row[column.header] = (await lastValueFrom(column.options)).find(option => option.value === value)?.name ?? value;
+    row[column.header] =
+      (await rxjs.lastValueFrom(column.options)).find(option => option.value === value)?.name ?? value;
   }
 
   private async buildExportDurationColumn(column: DatatableDurationColumn<Record>, row: any, value: any) {
@@ -425,15 +429,25 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   private buildSearchFormGroup() {
     this.searchFormGroup = new FormGroup(
-      this.options.columns.reduce((controls, column) => {
-        if (column.searchable) {
-          controls[column.columnDef] = new FormControl({ value: undefined, disabled: false });
-        }
-        return controls;
-      }, {} as any)
+      this.options.columns.reduce(
+        (controls, column) => {
+          if (column.searchable) {
+            const control = new FormControl({ value: undefined, disabled: false });
+            controls[column.columnDef] = control;
+            if (typeof column.searchUpdated === 'function') {
+              this.subscriptions.add(
+                control.valueChanges.pipe(rxjs.debounceTime(500)).subscribe(value => column.searchUpdated!(value))
+              );
+            }
+          }
+          return controls;
+        },
+        {} as { [columnDef: string]: FormControl }
+      )
     );
     this.subscriptions.add(
-      this.searchFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(value => {
+      this.searchFormGroup.valueChanges.pipe(rxjs.debounceTime(500)).subscribe(value => {
+        this.searchUpdated.next(value);
         this.paginator!.pageIndex = 0;
         this.loadPage();
       })

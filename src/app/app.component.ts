@@ -288,6 +288,9 @@ export class AppComponent {
         property: 'kind',
         sortable: true,
         searchable: true,
+        searchUpdated: value => {
+          console.log('column kind search', value);
+        },
       },
       {
         type: 'date',
@@ -444,7 +447,11 @@ export class AppComponent {
   }
 
   updatedConfig(config: DatatableConfig) {
-    console.warn(config);
+    console.log('updatedConfig', config);
+  }
+
+  searchUpdated(search: any) {
+    console.log('searchUpdated', search);
   }
 }
 

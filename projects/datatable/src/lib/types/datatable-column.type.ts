@@ -33,6 +33,7 @@ type BaseColumn = {
   align?: 'start' | 'center' | 'end';
 
   export?: (exportRow: any, value: any, row: any) => void;
+  searchUpdated?: (value: any) => void;
 };
 
 export type DatatableComponentColumn = BaseColumn & {

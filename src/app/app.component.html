@@ -10,7 +10,8 @@
       [style.width.%]="100"
       [options]="datatableOptions"
       [config]="config"
-      (configUpdated)="updatedConfig($event)">
+      (configUpdated)="updatedConfig($event)"
+      (searchUpdated)="searchUpdated($event)">
       <mat-spinner [style.--mdc-circular-progress-active-indicator-color]="'red'" loader-spinner></mat-spinner>
       <ng-template ngxMatDatatableContent="action">
         <button mat-button>Test</button>
