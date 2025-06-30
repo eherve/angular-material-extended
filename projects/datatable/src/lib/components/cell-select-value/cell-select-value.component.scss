@@ -17,7 +17,7 @@ mat-label {
 :host-context(tr.has-click:hover) {
   mat-icon,
   mat-label {
-    color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary)) !important;
+    color: var(--datatable-hover-color, var(--mat-sys-on-primary)) !important;
   }
 }
 

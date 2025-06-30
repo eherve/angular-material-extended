@@ -8,10 +8,21 @@
   position: relative;
   max-height: 100%;
 
-  --ngx-mat-datatable-background: #ffffff;
-  --ngx-mat-datatable-border-color: #ccc;
-  --ngx-mat-datatable-sticky-background: var(--ngx-mat-datatable-background);
-  --ngx-mat-datatable-sticky-border: 1px dashed #e6a93a;
+  --datatable-background: var(--ngx-mat-datatable-background, #ffffff);
+  --datatable-color: var(--ngx-mat-datatable-color, var(--mat-sys-primary,));
+  --datatable-border-color: var(--ngx-mat-datatable-border-color, #ccc);
+  --datatable-sticky-background: var(--ngx-mat-datatable-sticky-background, var(--datatable-background));
+  --datatable-sticky-border: var(--ngx-mat-datatable-sticky-border, 1px dashed #e6a93a);
+  --datatable-hover-color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary));
+  --datatable-hover-bgcolor: var(--ngx-mat-datatable-hover-bgcolor, var(--mat-sys-primary));
+
+  @include mat.table-overrides(
+    (
+      background-color: var(--datatable-background),
+      header-headline-color: var(--datatable-color),
+      row-item-label-text-color: var(--datatable-color),
+    )
+  );
 }
 
 #container {
@@ -23,7 +34,7 @@
   overflow: hidden;
   width: 100%;
 
-  background-color: var(--ngx-mat-datatable-background);
+  background-color: var(--datatable-background);
 }
 
 #head {
@@ -33,7 +44,7 @@
   place-content: end space-between;
   align-items: end;
   flex-direction: row;
-  border-bottom: 1px solid var(--ngx-mat-datatable-border-color);
+  border-bottom: 1px solid var(--datatable-border-color);
 
   #head-start,
   #head-center,
@@ -102,15 +113,15 @@
 #table {
   width: 100%;
   max-height: 100%;
-  --mat-table-background-color: var(--ngx-mat-datatable-background);
-  --mat-table-row-item-outline-color: var(--ngx-mat-datatable-border-color);
+  --mat-table-background-color: var(--datatable-background);
+  --mat-table-row-item-outline-color: var(--datatable-border-color);
 
   ::ng-deep {
     .mat-mdc-table-sticky {
       opacity: 1;
-      background: var(--ngx-mat-datatable-sticky-background, var(--ngx-mat-datatable-background, #ffffff));
+      background: var(--datatable-sticky-background, var(--datatable-background, #ffffff));
       &.mat-mdc-table-sticky-border-elem-left {
-        border-right: var(--ngx-mat-datatable-sticky-border);
+        border-right: var(--datatable-sticky-border);
       }
     }
 
@@ -120,10 +131,15 @@
       mat-form-field {
         min-width: auto;
         flex: 1 1 100%;
-        --mdc-filled-text-field-active-indicator-color: #999;
-        --mat-form-field-hover-state-layer-opacity: 0;
-        --mdc-filled-text-field-container-shape: 0;
-        --mdc-filled-text-field-container-color: var(--ngx-mat-datatable-background);
+        @include mat.form-field-overrides(
+          (
+            state-layer-color: var(--datatable-background),
+            filled-container-color: var(--datatable-background),
+            filled-container-shape: 0,
+            hover-state-layer-opacity: 0,
+            filled-active-indicator-color: #999,
+          )
+        );
 
         ::ng-deep {
           .mat-mdc-form-field-bottom-align {
@@ -146,8 +162,8 @@
         cursor: pointer;
         &:hover {
           .mat-mdc-cell {
-            color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary)) !important;
-            background-color: var(--ngx-mat-datatable-hover-bgcolor, var(--mat-sys-primary)) !important;
+            color: var(--datatable-hover-color) !important;
+            background-color: var(--datatable-hover-bgcolor) !important;
           }
         }
       }
@@ -205,11 +221,11 @@
 }
 
 #paginator {
-  --mat-paginator-container-background-color: var(--ngx-mat-datatable-background);
+  --mat-paginator-container-background-color: var(--datatable-background);
   --mat-form-field-container-height: 24px;
   --mat-form-field-container-vertical-padding: 4px;
   --mat-paginator-container-size: 46px;
-  border-top: 1px solid var(--ngx-mat-datatable-border-color);
+  border-top: 1px solid var(--datatable-border-color);
 
   ::ng-deep {
     .mat-mdc-select {
