@@ -13,8 +13,8 @@
   --datatable-border-color: var(--ngx-mat-datatable-border-color, #ccc);
   --datatable-sticky-background: var(--ngx-mat-datatable-sticky-background, var(--datatable-background));
   --datatable-sticky-border: var(--ngx-mat-datatable-sticky-border, 1px dashed #e6a93a);
-  --datatable-hover-color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary));
-  --datatable-hover-bgcolor: var(--ngx-mat-datatable-hover-bgcolor, var(--mat-sys-primary));
+  // --datatable-hover-color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary));
+  // --datatable-hover-bgcolor: var(--ngx-mat-datatable-hover-bgcolor, var(--mat-sys-primary));
 
   @include mat.table-overrides(
     (
@@ -162,6 +162,8 @@
         cursor: pointer;
         &:hover {
           .mat-mdc-cell {
+            --datatable-hover-color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary));
+            --datatable-hover-bgcolor: var(--ngx-mat-datatable-hover-bgcolor, var(--mat-sys-primary));
             color: var(--datatable-hover-color) !important;
             background-color: var(--datatable-hover-bgcolor) !important;
           }
