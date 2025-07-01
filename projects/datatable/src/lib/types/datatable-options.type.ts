@@ -9,6 +9,8 @@ import { FacetOptions } from './datatable-facet.type';
 type Color<Record> = string | ((column: DatatableValueColumn<Record>, row: Record) => string | undefined);
 
 export type NgxMatDatatableOptions<Record> = {
+  title?: string;
+
   service: NgxMatDatasourceService<Record>;
 
   configService?: {

@@ -7,7 +7,9 @@ import {
   ChangeDetectorRef,
   Component,
   ContentChildren,
+  ElementRef,
   EventEmitter,
+  HostBinding,
   inject,
   Injectable,
   Input,
@@ -27,7 +29,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginator, MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
+import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CountUpModule } from 'ngx-countup';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
@@ -190,6 +192,30 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
   private _data?: Record[];
 
+  @ViewChild('container') container?: ElementRef<HTMLDivElement>;
+  @ViewChild('head') head?: ElementRef;
+  @ViewChild(MatTable) matTable?: MatTable<any> & { _elementRef: { nativeElement: any } };
+  observer = new ResizeObserver(entries => {
+    entries.forEach(entry => {
+      console.log('table height', entry.contentRect.height);
+      const containerHeight = this.container?.nativeElement.clientHeight ?? 0;
+      const headerHeight = this.head?.nativeElement.clientHeight ?? 0;
+      const contentHeight = entry.contentRect.height;
+      console.log(
+        'hasScroll',
+        containerHeight,
+        headerHeight,
+        contentHeight,
+        ':',
+        containerHeight - headerHeight - contentHeight,
+        '=>',
+        containerHeight - headerHeight - contentHeight < 0
+      );
+      this.tableContainerOverflow = containerHeight - headerHeight - contentHeight < 0 ? 'auto' : 'inherit';
+    });
+  });
+  @HostBinding('style.--datatable-container-overflow') tableContainerOverflow = 'inherit';
+
   async ngOnInit(): Promise<void> {
     if (!this.options?.service) throw new Error(`missing mongoose datatable component service`);
     if (!this.options?.columns) throw new Error(`missing mongoose datatable component columns`);
@@ -202,12 +228,15 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   ngOnDestroy(): void {
+    if (this.matTable) this.observer.unobserve(this.matTable._elementRef.nativeElement);
     this.subscriptions.unsubscribe();
   }
 
   load(intersect: boolean) {
     if (!intersect || this.loaded) return;
     this.loaded = true;
+    console.log('load', this.matTable);
+    if (this.matTable) this.observer.observe(this.matTable?._elementRef.nativeElement);
     this.subscriptions.add(
       this.paginator?.page.subscribe(() => {
         this.updateConfig();

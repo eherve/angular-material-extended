@@ -127,6 +127,7 @@ export class AppComponent {
   datatable?: NgxMatDatatableComponent;
 
   datatableOptions: NgxMatDatatableOptions<any> = {
+    title: `<b>Table</b> title`,
     service,
     configService: {
       get: async () => {
@@ -147,7 +148,7 @@ export class AppComponent {
         console.warn('configService set', config);
       },
     },
-    pageSizeOptions: [10, 20, 50, 100],
+    pageSizeOptions: [3, 10, 20, 50, 100],
     pageSizeOptionsIndex: 1,
     actions: {
       columns: {

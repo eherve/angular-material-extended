@@ -1,11 +1,11 @@
 <!-- @format -->
 
 @if (dataSource) {
-  <div id="container">
+  <div #container id="container">
     <ng-container *ngTemplateOutlet="headTmpl"></ng-container>
 
     <div id="table-container" intersectionObserver (intersection)="load($event.intersect)">
-      <table id="table" mat-table [fixedLayout]="false" [dataSource]="dataSource" multiTemplateDataRows>
+      <table id="table" #table mat-table [fixedLayout]="false" [dataSource]="dataSource" multiTemplateDataRows>
         @for (column of options.columns; track column) {
           <ng-container [matColumnDef]="column.columnDef" [sticky]="column.sticky">
             <th
@@ -51,6 +51,7 @@
     </mat-paginator>
   </div>
 }
+
 <div id="loading" *ngIf="!dataSource || (dataSource.loading$ | async)" @fade>
   <ng-content select="[loader-spinner]">
     <mat-spinner loader-spinner></mat-spinner>
@@ -58,8 +59,19 @@
 </div>
 
 <ng-template #headTmpl>
-  <div id="head">
+  @let hasColumnDisplay =
+    options.actions?.columns?.hideAndShow || options.actions?.columns?.sticky || options.actions?.columns?.reorder;
+  @let hasHead =
+    !!options.title ||
+    !!options.facets?.length ||
+    !!options.actions?.user?.length ||
+    hasColumnDisplay ||
+    options.actions?.export ||
+    options.actions?.refresh;
+  <div *ngIf="hasHead" id="head" #head>
     <div id="head-start">
+      <span *ngIf="options.title" id="title" [innerHTML]="options.title"></span>
+
       @for (facetOptions of options.facets | filter: { position: 'start' }; track facetOptions) {
         <ng-container *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"></ng-container>
       }
@@ -85,39 +97,42 @@
         <ng-container *ngTemplateOutlet="actionTmpl; context: { action }"></ng-container>
       }
 
-      <div
-        *ngIf="
-          options.actions?.columns?.hideAndShow || options.actions?.columns?.sticky || options.actions?.columns?.reorder
-        ">
-        <button
-          mat-icon-button
-          color="primary"
-          class="icon-only action"
-          [matTooltip]="options.actions?.columns?.tooltip || 'Afficher / masquer des colonnes'"
-          [matMenuTriggerFor]="columnsMenu"
-          (menuOpened)="openUpdateColumnDisplay()"
-          (menuClosed)="closeUpdateColumnDisplay()">
-          <mat-icon>view_column</mat-icon>
-        </button>
-      </div>
-
-      <div *ngIf="options.actions?.export" class="action">
-        <button mat-icon-button color="primary" [disabled]="exporting" (click)="export()">
-          <mat-icon>download</mat-icon>
-        </button>
-        <div class="action-loader" *ngIf="exporting" @fade>
-          <mat-spinner [diameter]="32"></mat-spinner>
+      @if (hasColumnDisplay) {
+        <div class="action">
+          <button
+            mat-icon-button
+            color="primary"
+            class="icon-only action"
+            [matTooltip]="options.actions?.columns?.tooltip || 'Afficher / masquer des colonnes'"
+            [matMenuTriggerFor]="columnsMenu"
+            (menuOpened)="openUpdateColumnDisplay()"
+            (menuClosed)="closeUpdateColumnDisplay()">
+            <mat-icon>view_column</mat-icon>
+          </button>
         </div>
-      </div>
+      }
 
-      <div *ngIf="options.actions?.refresh" class="action">
-        <button mat-icon-button color="primary" [disabled]="dataSource.loading$ | async" (click)="loadPage()">
-          <mat-icon>sync</mat-icon>
-        </button>
-        <div class="action-loader" *ngIf="dataSource.loading$ | async" @fade>
-          <mat-spinner [diameter]="32"></mat-spinner>
+      @if (options.actions?.export) {
+        <div class="action">
+          <button mat-icon-button color="primary" [disabled]="exporting" (click)="export()">
+            <mat-icon>download</mat-icon>
+          </button>
+          <div class="action-loader" *ngIf="exporting" @fade>
+            <mat-spinner [diameter]="32"></mat-spinner>
+          </div>
         </div>
-      </div>
+      }
+
+      @if (options.actions?.refresh) {
+        <div class="action">
+          <button mat-icon-button color="primary" [disabled]="dataSource.loading$ | async" (click)="loadPage()">
+            <mat-icon>sync</mat-icon>
+          </button>
+          <div class="action-loader" *ngIf="dataSource.loading$ | async" @fade>
+            <mat-spinner [diameter]="32"></mat-spinner>
+          </div>
+        </div>
+      }
     </div>
   </div>
 </ng-template>

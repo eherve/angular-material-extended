@@ -3,7 +3,6 @@
 @use '@angular/material' as mat;
 
 :host {
-  overflow: hidden;
   display: flex;
   position: relative;
   max-height: 100%;
@@ -13,8 +12,6 @@
   --datatable-border-color: var(--ngx-mat-datatable-border-color, #ccc);
   --datatable-sticky-background: var(--ngx-mat-datatable-sticky-background, var(--datatable-background));
   --datatable-sticky-border: var(--ngx-mat-datatable-sticky-border, 1px dashed #e6a93a);
-  // --datatable-hover-color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary));
-  // --datatable-hover-bgcolor: var(--ngx-mat-datatable-hover-bgcolor, var(--mat-sys-primary));
 
   @include mat.table-overrides(
     (
@@ -31,7 +28,6 @@
   box-sizing: border-box;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
   width: 100%;
 
   background-color: var(--datatable-background);
@@ -105,7 +101,7 @@
 
 #table-container {
   flex: 1 1 100%;
-  overflow: auto;
+  overflow: var(--datatable-container-overflow, 'inherit');
   width: 100%;
   scrollbar-width: thin;
 }
