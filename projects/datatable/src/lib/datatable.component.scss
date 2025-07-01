@@ -10,6 +10,7 @@
   --datatable-background: var(--ngx-mat-datatable-background, #ffffff);
   --datatable-color: var(--ngx-mat-datatable-color, var(--mat-sys-primary,));
   --datatable-border-color: var(--ngx-mat-datatable-border-color, #ccc);
+  --datatable-sticky-top: var(--ngx-mat-datatable-sticky-top, 0);
   --datatable-sticky-background: var(--ngx-mat-datatable-sticky-background, var(--datatable-background));
   --datatable-sticky-border: var(--ngx-mat-datatable-sticky-border, 1px dashed #e6a93a);
 
@@ -114,6 +115,8 @@
 
   ::ng-deep {
     .mat-mdc-table-sticky {
+      // TODO not working if multiple row are sticky (option not provided yet)
+      top: var(--datatable-sticky-top) !important;
       opacity: 1;
       background: var(--datatable-sticky-background, var(--datatable-background, #ffffff));
       &.mat-mdc-table-sticky-border-elem-left {

@@ -197,20 +197,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   @ViewChild(MatTable) matTable?: MatTable<any> & { _elementRef: { nativeElement: any } };
   observer = new ResizeObserver(entries => {
     entries.forEach(entry => {
-      console.log('table height', entry.contentRect.height);
       const containerHeight = this.container?.nativeElement.clientHeight ?? 0;
       const headerHeight = this.head?.nativeElement.clientHeight ?? 0;
       const contentHeight = entry.contentRect.height;
-      console.log(
-        'hasScroll',
-        containerHeight,
-        headerHeight,
-        contentHeight,
-        ':',
-        containerHeight - headerHeight - contentHeight,
-        '=>',
-        containerHeight - headerHeight - contentHeight < 0
-      );
       this.tableContainerOverflow = containerHeight - headerHeight - contentHeight < 0 ? 'auto' : 'inherit';
     });
   });
