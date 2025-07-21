@@ -198,12 +198,18 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   observer = new ResizeObserver(entries => {
     entries.forEach(entry => {
       const containerHeight = this.container?.nativeElement.clientHeight ?? 0;
+      const containerWidth = this.container?.nativeElement.clientWidth ?? 0;
       const headerHeight = this.head?.nativeElement.clientHeight ?? 0;
+      const headerWidth = this.head?.nativeElement.clientWidth ?? 0;
       const contentHeight = entry.contentRect.height;
-      this.tableContainerOverflow = containerHeight - headerHeight - contentHeight < 0 ? 'auto' : 'inherit';
+      const contentWidth = entry.contentRect.width;
+
+      this.tableContainerOverflowY = containerHeight - headerHeight - contentHeight < 0 ? 'auto' : 'inherit';
+      this.tableContainerOverflowX = containerWidth - headerWidth - contentWidth < 0 ? 'auto' : 'inherit';
     });
   });
-  @HostBinding('style.--datatable-container-overflow') tableContainerOverflow = 'inherit';
+  @HostBinding('style.--datatable-container-overflow-y') tableContainerOverflowY = 'inherit';
+  @HostBinding('style.--datatable-container-overflow-x') tableContainerOverflowX = 'inherit';
 
   async ngOnInit(): Promise<void> {
     if (!this.options?.service) throw new Error(`missing mongoose datatable component service`);
@@ -224,7 +230,6 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   load(intersect: boolean) {
     if (!intersect || this.loaded) return;
     this.loaded = true;
-    console.log('load', this.matTable);
     if (this.matTable) this.observer.observe(this.matTable?._elementRef.nativeElement);
     this.subscriptions.add(
       this.paginator?.page.subscribe(() => {
@@ -320,6 +325,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   async loadPage() {
+    if (!this.dataSource) return;
     const columns = this.buildRequestColumns();
     const order = this.buildOrder(columns);
     await this.dataSource.loadData({
