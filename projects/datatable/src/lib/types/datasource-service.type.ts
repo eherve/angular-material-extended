@@ -1,6 +1,17 @@
 /** @format */
 
-export type NgxMatDatasourceRequestSearchOperator = '>' | '>=' | '≥' | '<' | '≤' | '<>' | '≤≥' | '><' | '≥≤' | '$in' | '$nin';
+export type NgxMatDatasourceRequestSearchOperator =
+  | '>'
+  | '>='
+  | '≥'
+  | '<'
+  | '≤'
+  | '<>'
+  | '≤≥'
+  | '><'
+  | '≥≤'
+  | '$in'
+  | '$nin';
 
 export type NgxMatDatasourceRequestSearch = {
   value: any;
@@ -14,6 +25,8 @@ export type NgxMatDatasourceRequestSearch = {
 
 export type NgxMatDatasourceRequestColumn = {
   data: string;
+
+  projection?: string;
 
   name?: string;
 

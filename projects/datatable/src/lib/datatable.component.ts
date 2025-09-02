@@ -407,7 +407,12 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     }
     this.options.columns.forEach(c => {
       if (c.hidden) return;
-      const column: NgxMatDatasourceRequestColumn = { data: c.property, name: c.columnDef, searchable: c.searchable };
+      const column: NgxMatDatasourceRequestColumn = {
+        data: c.property,
+        projection: c.projection,
+        name: c.columnDef,
+        searchable: c.searchable,
+      };
       if (c.sortProperty && c.order) this.addAdditionalColumn(additionalColumns, c.sortProperty);
       if (c.searchable) {
         const control = this.searchFormGroup.controls[c.columnDef];

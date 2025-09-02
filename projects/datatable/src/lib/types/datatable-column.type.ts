@@ -11,6 +11,7 @@ type BaseColumn = {
   columnDef: string;
   header: string;
   property: string;
+  projection?: any;
 
   additionalProperties?: string[];
 
