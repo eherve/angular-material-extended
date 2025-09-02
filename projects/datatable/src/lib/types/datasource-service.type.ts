@@ -15,12 +15,8 @@ export type NgxMatDatasourceRequestSearchOperator =
 
 export type NgxMatDatasourceRequestSearch = {
   value: any;
-
-  operator?: NgxMatDatasourceRequestSearchOperator;
-
   regex?: boolean;
-
-  chunks?: string[];
+  operator?: NgxMatDatasourceRequestSearchOperator;
 };
 
 export type NgxMatDatasourceRequestColumn = {

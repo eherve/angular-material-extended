@@ -85,7 +85,7 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
         if (!value) this.control.setValue(undefined);
-        else this.control.setValue({ value, regex: true });
+        else this.control.setValue({ value, regex: this.column.regex ?? true });
       })
     );
     this.changeDetectorRef.detectChanges();

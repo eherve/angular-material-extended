@@ -22,6 +22,7 @@ type BaseColumn = {
 
   searchable?: boolean;
   searchProperty?: string;
+  regex?: boolean;
 
   sortable?: boolean;
   sortProperty?: string;
@@ -61,7 +62,10 @@ type SearchableColumn<Record> = Column<Record> & {
 export type DatatableTextColumn<Record> = Column<Record> & {
   type: 'text';
 };
-export type DatatableSearchTextColumn<Record> = DatatableTextColumn<Record> & SearchableColumn<Record> & {};
+export type DatatableSearchTextColumn<Record> = DatatableTextColumn<Record> &
+  SearchableColumn<Record> & {
+    regexp?: boolean;
+  };
 
 // NUMBER
 export type DatatableNumberColumn<Record> = Column<Record> & {
