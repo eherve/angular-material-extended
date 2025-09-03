@@ -131,6 +131,11 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
     this.filter$.next(search);
   }
 
+  displayWith = (value: any) => {
+    if (!this.options) return value;
+    return this.options.find(o => o.value === value)?.name ?? value;
+  };
+
   private buildOptions() {
     this.subsink.add(
       this.filter$
