@@ -218,8 +218,25 @@ export class AppComponent {
           { value: 'kind 2', color: '#f8f398', labelColor: '#000000', name: 'Kind - 2' },
           { value: 'kind 3', color: '#f1b963', name: 'Kind - 3' },
           { value: 'kind 4', color: '#e46161', name: 'Kind - 4' },
-          // { value: 'kind 5', color: '#0092ca', name: 'Kind - 5' },
         ],
+      },
+      {
+        id: 'kind-count',
+        position: 'start',
+        kind: 'indicator',
+        display: 'chips',
+        property: 'kind',
+        operator: 'count',
+        size: 80,
+        option: res => {
+          return [
+            { value: 'kind 1', color: '#cbf078', labelColor: '#000000' },
+            { value: 'kind 2', color: '#f8f398', labelColor: '#000000' },
+            { value: 'kind 3', color: '#f1b963' },
+            { value: 'kind 4', color: '#e46161' },
+            { value: 'kind 5', color: '#0092ca' },
+          ].find(v => v.value === res._id);
+        },
       },
       {
         id: 'kind-float-avg',

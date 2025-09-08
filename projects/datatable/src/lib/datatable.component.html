@@ -369,9 +369,10 @@
   <!-- @let total = (data | sum: 'value') || 1; -->
   <mat-chip-set class="chips-facet">
     @for (d of data | orderBy: '_id'; track d) {
-      @let name = (facetOptions.options | find: { value: d._id })?.name ?? d._id;
-      @let color = (facetOptions.options | find: { value: d._id })?.color ?? 'var(--mat-sys-primary)';
-      @let labelColor = (facetOptions.options | find: { value: d._id })?.labelColor;
+      @let option = facetOptions?.option ? facetOptions.option(d) : (facetOptions.options | find: { value: d._id });
+      @let name = option?.name ?? d._id;
+      @let color = option?.color ?? 'var(--mat-sys-primary)';
+      @let labelColor = option?.labelColor;
       <!-- @let percent = (d.value / total) * 100; -->
       <mat-chip
         class="chip-facet"
@@ -402,8 +403,9 @@
     }
     <mat-card-content>
       @for (d of data; track d) {
-        @let name = (facetOptions.options | find: { value: d._id })?.name ?? d._id;
-        @let color = (facetOptions.options | find: { value: d._id })?.color ?? 'var(--mat-sys-primary)';
+        @let option = facetOptions?.option ? facetOptions.option(d) : (facetOptions.options | find: { value: d._id });
+        @let name = option?.name ?? d._id;
+        @let color = option?.color ?? 'var(--mat-sys-primary)';
         @let percent = (d.value / total) * 100;
         <div class="facet-indicator" [class.has-action]="column?.searchable !== false" (click)="facetClick(column, d)">
           <lib-progress-spinner [diameter]="size" [color]="color" [fontSize]="fontSize" [value]="percent">

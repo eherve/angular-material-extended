@@ -1,5 +1,7 @@
 /** @format */
 
+import { NgxMatDatasourceResultFacet } from './datasource-service.type';
+
 export type FacetOptionsOperator = 'count' | ['sum', string] | ['avg', string];
 
 type BaseFacetOptions = {
@@ -29,6 +31,7 @@ export type ProgressSpinnerFacetOptions = IndicatorFacetOptions & {
   options?: FacetOptionsOptions[];
   size?: number;
   fontSize?: string;
+  option?: (res: NgxMatDatasourceResultFacet) => FacetOptionsOptions | undefined;
 };
 
 export type ChipFacetOptions = IndicatorFacetOptions & {
@@ -36,6 +39,7 @@ export type ChipFacetOptions = IndicatorFacetOptions & {
   options?: FacetOptionsOptions[];
   size?: number;
   fontSize?: string;
+  option?: (res: NgxMatDatasourceResultFacet) => FacetOptionsOptions | undefined;
 };
 
 export type FacetOptions = ContentIdFacetOptions | ProgressSpinnerFacetOptions | ChipFacetOptions;

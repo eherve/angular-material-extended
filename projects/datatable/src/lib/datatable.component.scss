@@ -341,7 +341,6 @@
 
   .chip-facet {
     overflow: hidden;
-    --test-color: contrast-color(currentColor);
     @include mat.chips-overrides(
       (
         label-text-color: var(--facet-color),
