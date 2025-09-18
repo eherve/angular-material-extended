@@ -63,6 +63,7 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   column!: DatatableSearchAutocompleteColumn<Record>;
 
   options: DatatableSearchListOption[] = [];
+  groups: { name: string; options: DatatableSearchListOption[] }[] = [];
   hasMore = false;
   searching = false;
   @ViewChild('input') input!: ElementRef<HTMLInputElement>;
@@ -150,7 +151,13 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
               tap(() => (this.searching = true)),
               switchMap(async () => this.column.options(this.column.limit || 10, skip, search)),
               map(data => {
-                this.options.push(...data);
+                data.forEach(d => {
+                  this.options.push(d);
+                  const name = d.group ?? '';
+                  const group = this.groups.find(g => g.name === name);
+                  if (!group) this.groups.push({ name, options: [d] });
+                  else group.options.push(d);
+                });
                 skip += this.column.limit || 10;
                 this.hasMore = data?.length === (this.column.limit || 10);
                 this.searching = false;

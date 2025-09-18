@@ -79,6 +79,7 @@ export type DatatableSearchNumberColumn<Record> = DatatableNumberColumn<Record> 
 export type DatatableSearchListOption = {
   value: any;
   name: string;
+  group?: string;
   color?: string;
   iconSrc?: 'mat-icon' | 'svg';
   icon?: string;

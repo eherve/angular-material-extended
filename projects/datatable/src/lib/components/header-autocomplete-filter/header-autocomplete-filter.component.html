@@ -14,10 +14,22 @@
       (input)="filter()"
       (focus)="focus()" />
     <mat-autocomplete #auto="matAutocomplete" requireSelection [displayWith]="displayWith">
-      @for (option of options; track option) {
-        <mat-option [value]="option.value">
-          <ng-container *ngTemplateOutlet="autocompleteOption; context: { option }"></ng-container>
-        </mat-option>
+      @if (groups.length > 1) {
+        @for (group of groups; track group) {
+          <mat-optgroup [label]="group.name">
+            @for (option of group.options; track option) {
+              <mat-option [value]="option.value">
+                <ng-container *ngTemplateOutlet="autocompleteOption; context: { option }"></ng-container>
+              </mat-option>
+            }
+          </mat-optgroup>
+        }
+      } @else {
+        @for (option of options; track option) {
+          <mat-option [value]="option.value">
+            <ng-container *ngTemplateOutlet="autocompleteOption; context: { option }"></ng-container>
+          </mat-option>
+        }
       }
 
       <mat-option id="searching-option" disabled>

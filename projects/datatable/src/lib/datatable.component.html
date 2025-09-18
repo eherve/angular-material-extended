@@ -341,11 +341,11 @@
 </ng-template>
 
 <ng-template #facetsTmpl let-facetOptions="facetOptions">
-  @let column = options.columns | find: { property: facetOptions.property };
+  @let column = options.columns | find: { columnDef: facetOptions.columnDef };
   @let data = (dataSource.facets ?? {})[facetOptions.id] | sortFacetEntries: facetOptions.options;
   @if (data) {
     @if (facetOptions.contentId) {
-      @let cell = contentRefs | findContent: facetOptions.contentId;
+      @let cell = contentRefs | findContent: facetOptions.contentId;>>
       @if (cell) {
         <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, facetOptions, data }" />
       }

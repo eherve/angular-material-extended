@@ -195,6 +195,7 @@ export class AppComponent {
         position: 'start',
         kind: 'indicator',
         property: 'kind',
+        columnDef: 'kind',
         operator: 'count',
         size: 80,
         options: [
@@ -212,6 +213,7 @@ export class AppComponent {
         kind: 'indicator',
         display: 'chips',
         property: 'kind',
+        columnDef: 'kind',
         operator: ['sum', 'float'],
         options: [
           { value: 'kind 1', color: '#cbf078', labelColor: '#000000', name: 'Kind - 1' },
@@ -244,6 +246,7 @@ export class AppComponent {
         position: 'start',
         kind: 'indicator',
         property: 'kind',
+        columnDef: 'kind',
         operator: ['avg', 'float'],
         contentId: 'kind-float-avg',
       },
@@ -390,6 +393,7 @@ export class AppComponent {
                           map(DATA, d => ({
                             value: d.autocomplete,
                             name: d.autocomplete,
+                            group: d.autocomplete.slice(0, -1),
                             color: 'blue',
                             icon: 'home',
                             iconColor: 'red',

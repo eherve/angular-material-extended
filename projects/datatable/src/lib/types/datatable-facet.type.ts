@@ -11,7 +11,7 @@ type BaseFacetOptions = {
 };
 
 export type FacetOptionsOptions = {
-  value: string;
+  value: any;
   name?: string;
   color?: string;
   labelColor?: string;
@@ -21,6 +21,7 @@ type IndicatorFacetOptions = BaseFacetOptions & {
   kind: 'indicator';
   property: string;
   operator: FacetOptionsOperator;
+  columnDef?: string;
 };
 
 export type ContentIdFacetOptions = IndicatorFacetOptions & {
