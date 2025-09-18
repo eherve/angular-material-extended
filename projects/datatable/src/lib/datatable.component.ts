@@ -35,6 +35,7 @@ import { CountUpModule } from 'ngx-countup';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import * as rxjs from 'rxjs';
 import * as XLSX from 'xlsx';
+import { FacetOptionsOptions } from '../public-api';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
 import { CellDateValueComponent } from './components/cell-date-value/cell-date-value.component';
 import { CellDurationValueComponent } from './components/cell-duration-value/cell-duration-value.component';
@@ -392,11 +393,16 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     }
   }
 
-  facetClick(column: DatatableColumn<Record> | undefined, result: NgxMatDatasourceResultFacet) {
+  facetClick(
+    column: DatatableColumn<Record> | undefined,
+    result: NgxMatDatasourceResultFacet,
+    option: FacetOptionsOptions
+  ) {
     if (!column) return;
     const control = this.searchFormGroup?.controls[column.columnDef];
     if (!control) return;
-    if (result._id !== control.value?.value) control.setValue({ value: result._id });
+    if (option && option.value !== control.value?.value) control.setValue({ value: option.value });
+    else if (result._id !== control.value?.value) control.setValue({ value: result._id });
   }
 
   private buildRequestColumns(): NgxMatDatasourceRequestColumn[] {

@@ -377,7 +377,7 @@
       <mat-chip
         class="chip-facet"
         [class.has-action]="column?.searchable !== false"
-        (click)="facetClick(column, d)"
+        (click)="facetClick(column, d, option)"
         [style.--facet-color]="color"
         [style.--facet-label-color]="labelColor ?? 'var(--mat-sys-on-primary)'"
         [style.--facet-value-color]="labelColor ?? color"
@@ -407,7 +407,7 @@
         @let name = option?.name ?? d._id;
         @let color = option?.color ?? 'var(--mat-sys-primary)';
         @let percent = (d.value / total) * 100;
-        <div class="facet-indicator" [class.has-action]="column?.searchable !== false" (click)="facetClick(column, d)">
+        <div class="facet-indicator" [class.has-action]="column?.searchable !== false" (click)="facetClick(column, d, option)">
           <lib-progress-spinner [diameter]="size" [color]="color" [fontSize]="fontSize" [value]="percent">
             <mat-label>{{ name }}</mat-label>
           </lib-progress-spinner>

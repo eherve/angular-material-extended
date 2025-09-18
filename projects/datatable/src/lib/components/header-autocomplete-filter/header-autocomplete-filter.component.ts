@@ -101,8 +101,7 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
       this.selectControl.valueChanges.subscribe((value: any) => {
         if (value === undefined) {
           if (this.control.value !== undefined) this.control.setValue(undefined);
-        }
-        if (value === null && !this.options.find(o => o.value === null)) {
+        } else if (value === null && !this.options.find(o => o.value === null)) {
           if (this.control.value !== undefined) this.control.setValue(undefined);
         } else if (this.control.value?.value !== value) this.control.setValue({ value, regex: false });
       })
