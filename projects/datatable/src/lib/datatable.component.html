@@ -345,7 +345,7 @@
   @let data = (dataSource.facets ?? {})[facetOptions.id] | sortFacetEntries: facetOptions.options;
   @if (data) {
     @if (facetOptions.contentId) {
-      @let cell = contentRefs | findContent: facetOptions.contentId;>>
+      @let cell = contentRefs | findContent: facetOptions.contentId;>>>>>
       @if (cell) {
         <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, facetOptions, data }" />
       }
@@ -398,7 +398,7 @@
   <mat-card class="facet">
     @if (facetOptions.name) {
       <mat-card-header>
-        <mat-label>{{ facetOptions.name }}</mat-label>
+        <mat-card-title>{{ facetOptions.name }}</mat-card-title>
       </mat-card-header>
     }
     <mat-card-content>
@@ -407,7 +407,10 @@
         @let name = option?.name ?? d._id;
         @let color = option?.color ?? 'var(--mat-sys-primary)';
         @let percent = (d.value / total) * 100;
-        <div class="facet-indicator" [class.has-action]="column?.searchable !== false" (click)="facetClick(column, d, option)">
+        <div
+          class="facet-indicator"
+          [class.has-action]="column?.searchable !== false"
+          (click)="facetClick(column, d, option)">
           <lib-progress-spinner [diameter]="size" [color]="color" [fontSize]="fontSize" [value]="percent">
             <mat-label>{{ name }}</mat-label>
           </lib-progress-spinner>

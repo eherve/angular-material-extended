@@ -14,7 +14,7 @@
       (input)="filter()"
       (focus)="focus()" />
     <mat-autocomplete #auto="matAutocomplete" requireSelection [displayWith]="displayWith">
-      @if (hasGroups) {
+      @if (column.hasGroup) {
         @for (group of groups; track group) {
           <mat-optgroup [label]="group.name">
             @for (option of group.options; track option) {

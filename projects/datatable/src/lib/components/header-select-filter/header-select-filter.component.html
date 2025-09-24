@@ -4,8 +4,6 @@
   <mat-form-field appearance="fill">
     <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
     <mat-select [formControl]="selectControl" [placeholder]="column.placeholder!" [multiple]="column.multiple">
-      @let options = column.options | async;
-
       <mat-select-trigger>
         @if (column.multiple && selectControl.value | isArray) {
           <div class="options">
@@ -27,10 +25,22 @@
           }
         }
       </mat-select-trigger>
-      @for (option of options; track option) {
-        <mat-option [value]="option.value">
-          <ng-container *ngTemplateOutlet="selectOption; context: { option }"></ng-container>
-        </mat-option>
+      @if (column.hasGroup) {
+        @for (group of groups; track group) {
+          <mat-optgroup [label]="group.name">
+            @for (option of group.options; track option) {
+              <mat-option [value]="option.value">
+                <ng-container *ngTemplateOutlet="selectOption; context: { option }"></ng-container>
+              </mat-option>
+            }
+          </mat-optgroup>
+        }
+      } @else {
+        @for (option of options; track option) {
+          <mat-option [value]="option.value">
+            <ng-container *ngTemplateOutlet="selectOption; context: { option }"></ng-container>
+          </mat-option>
+        }
       }
     </mat-select>
 

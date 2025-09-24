@@ -316,8 +316,12 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   private async buildExportSelectColumn(column: DatatableSelectColumn<Record>, row: any, value: any) {
-    row[column.header] =
-      (await rxjs.lastValueFrom(column.options)).find(option => option.value === value)?.name ?? value;
+    if (Array.isArray(column.options)) {
+      row[column.header] = column.options.find(option => option.value === value)?.name ?? value;
+    } else {
+      row[column.header] =
+        (await rxjs.lastValueFrom(column.options)).find(option => option.value === value)?.name ?? value;
+    }
   }
 
   private async buildExportDurationColumn(column: DatatableDurationColumn<Record>, row: any, value: any) {
@@ -467,7 +471,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       this.options.columns.reduce(
         (controls, column) => {
           if (column.searchable) {
-            const control = new FormControl({ value: undefined, disabled: false });
+            const control = new FormControl({
+              value: column.searchValue !== undefined ? { value: column.searchValue } : undefined,
+              disabled: false,
+            });
             controls[column.columnDef] = control;
             if (typeof column.searchUpdated === 'function') {
               this.subscriptions.add(

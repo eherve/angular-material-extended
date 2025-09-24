@@ -28,7 +28,7 @@ import { Subscription } from 'rxjs';
 import { IsArrayPipe } from '../../pipes/is-array.pipe';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { SelectOptionPipe } from '../../pipes/select-option.pipe';
-import { DatatableSearchSelectColumn } from '../../types/datatable-column.type';
+import { DatatableSearchListOption, DatatableSearchSelectColumn } from '../../types/datatable-column.type';
 
 @Component({
   selector: 'lib-header-select-filter',
@@ -57,6 +57,9 @@ import { DatatableSearchSelectColumn } from '../../types/datatable-column.type';
 export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
   @Input()
   column!: DatatableSearchSelectColumn<Record>;
+
+  options: DatatableSearchListOption[] = [];
+  groups: { name: string; options: DatatableSearchListOption[] }[] = [];
 
   control!: FormControl<any>;
   selectControl = new FormControl();
@@ -98,10 +101,22 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
         else this.control.setValue({ value, operator: this.column.multiple ? '$in' : undefined, regex: false });
       })
     );
+    if (Array.isArray(this.column.options)) this.buildOptions(this.column.options);
+    else this.subsink.add(this.column.options.subscribe(data => this.buildOptions(data)));
     this.changeDetectorRef.detectChanges();
   }
 
   ngOnDestroy(): void {
     this.subsink.unsubscribe();
+  }
+
+  private buildOptions(data: DatatableSearchListOption[]) {
+    data.forEach(d => {
+      this.options.push(d);
+      const name = d.group ?? '';
+      const group = this.groups.find(g => g.name === name);
+      if (!group) this.groups.push({ name, options: [d] });
+      else group.options.push(d);
+    });
   }
 }

@@ -23,6 +23,7 @@ type BaseColumn = {
   searchable?: boolean;
   searchProperty?: string;
   regex?: boolean;
+  searchValue?: any;
 
   sortable?: boolean;
   sortProperty?: string;
@@ -58,6 +59,16 @@ type SearchableColumn<Record> = Column<Record> & {
   searchProperty?: string;
 };
 
+export type DatatableSearchListOption = {
+  value: any;
+  name: string;
+  group?: string;
+  color?: string;
+  iconSrc?: 'mat-icon' | 'svg';
+  icon?: string;
+  iconColor?: string;
+};
+
 // TEXT
 export type DatatableTextColumn<Record> = Column<Record> & {
   type: 'text';
@@ -76,24 +87,16 @@ export type DatatableNumberColumn<Record> = Column<Record> & {
 export type DatatableSearchNumberColumn<Record> = DatatableNumberColumn<Record> & SearchableColumn<Record> & {};
 
 // SELECT
-export type DatatableSearchListOption = {
-  value: any;
-  name: string;
-  group?: string;
-  color?: string;
-  iconSrc?: 'mat-icon' | 'svg';
-  icon?: string;
-  iconColor?: string;
-};
 export type DatatableSelectColumn<Record> = Column<Record> & {
   type: 'select';
   isArrayValue?: boolean;
-  options: Observable<DatatableSearchListOption[]>;
+  options: Observable<DatatableSearchListOption[]> | DatatableSearchListOption[];
 };
 export type DatatableSearchSelectColumn<Record> = DatatableSelectColumn<Record> &
   SearchableColumn<Record> & {
     multiple?: boolean;
     placeholder?: string;
+    hasGroup?: boolean;
   };
 
 // AUTOCOMPLETE
@@ -105,7 +108,9 @@ export type DatatableSearchAutocompleteColumn<Record> = DatatableAutocompleteCol
     placeholder?: string;
     limit?: number;
     loadOnFocus?: boolean;
+    hasGroup?: boolean;
     options: (limit: number, skip: number, search: string) => Promise<DatatableSearchListOption[]>;
+    searchValueOptions?: DatatableSearchListOption[];
   };
 
 // CHECKBOX

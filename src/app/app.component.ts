@@ -361,10 +361,12 @@ export class AppComponent {
         searchable: true,
         sortable: true,
         multiple: true,
+        hasGroup: true,
         options: of(
           DATA.map(d => ({
             value: d.reference,
             name: d.reference.toUpperCase(),
+            group: d.reference.slice(0, -1),
             color: 'red',
             icon: 'home',
             iconColor: 'blue',
@@ -381,6 +383,7 @@ export class AppComponent {
         sortable: true,
         placeholder: 'Sélectionnez une option',
         loadOnFocus: true,
+        hasGroup: true,
         options: async (limit, skip, search) => {
           return new Promise(resolve => {
             setTimeout(
