@@ -405,7 +405,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     if (!column) return;
     const control = this.searchFormGroup?.controls[column.columnDef];
     if (!control) return;
-    if (option && option.value !== control.value?.value) control.setValue({ value: option.value });
+    if (option && option.value !== control.value?.value) control.setValue({ value: option.value, name: option.name });
     else if (result._id !== control.value?.value) control.setValue({ value: result._id });
   }
 

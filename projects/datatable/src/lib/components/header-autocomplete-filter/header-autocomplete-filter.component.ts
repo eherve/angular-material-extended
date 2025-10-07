@@ -81,8 +81,15 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
 
   private subsink = new Subscription();
 
-  writeValue = (value: any) => {
-    if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
+  writeValue = (value: { value: any; name?: string }) => {
+    if (value?.value !== this.selectControl.value) {
+      if (value?.name) {
+        if (!this.options.find(o => o.value === value.value)) {
+          this.options.push({ value: value.value, name: value.name });
+        }
+      }
+      this.selectControl.setValue(value?.value);
+    }
   };
 
   registerOnChange(onChange: any): void {
