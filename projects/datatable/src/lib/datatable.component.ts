@@ -285,7 +285,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       for (let d of data) {
         const row: any = {};
         for (let c of this.options.columns) {
-          if (c.hidden) continue;
+          if (c.hidden || c.disabled) continue;
           let value = get(d, c.property);
           if (c.export) c.export(row, value, d);
           else {
@@ -457,7 +457,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private buildDisplayColumns() {
     const displayedColumns: string[] = [];
     this.options.columns.forEach(column => {
-      if (column.hidden) return;
+      if (column.hidden || !column.disabled) return;
       displayedColumns.push(column.columnDef);
       if (column.type && ['number', 'date', 'duration'].includes(column.type)) {
         if (!(column as any).locale) (column as any).locale = this.datatableIntl.locale;

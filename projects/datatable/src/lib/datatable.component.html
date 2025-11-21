@@ -175,7 +175,7 @@
             [style.margin-right.px]="8">
             <mat-icon>push_pin </mat-icon>
           </button>
-          <span [style.margin-right.px]="8">{{ column.header }}</span>
+          <span [style.margin-right.px]="8" [innerHTML]="column.header"></span>
           <mat-icon
             *ngIf="options.actions?.columns?.reorder"
             size="small"
@@ -345,7 +345,7 @@
   @let data = (dataSource.facets ?? {})[facetOptions.id] | sortFacetEntries: facetOptions.options;
   @if (data) {
     @if (facetOptions.contentId) {
-      @let cell = contentRefs | findContent: facetOptions.contentId;>>>>>
+      @let cell = contentRefs | findContent: facetOptions.contentId;>>>>>>>
       @if (cell) {
         <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, facetOptions, data }" />
       }

@@ -20,6 +20,8 @@ type BaseColumn = {
   sticky?: boolean;
   hidden?: boolean;
 
+  disabled?: boolean;
+
   searchable?: boolean;
   searchProperty?: string;
   regex?: boolean;
