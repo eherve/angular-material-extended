@@ -22,7 +22,7 @@ import {
   ReactiveFormsModule,
   UntypedFormControl,
 } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatAutocomplete, MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -67,6 +67,7 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   hasMore = false;
   searching = false;
   @ViewChild('input') input!: ElementRef<HTMLInputElement>;
+  @ViewChild(MatAutocomplete) auto!: MatAutocomplete;
   control!: FormControl<any>;
   selectControl = new FormControl();
 
@@ -127,9 +128,9 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   }
 
   focus() {
-    if (this.column.loadOnFocus) {
+    if (this.column.loadOnFocus && !this.selectControl.value) {
       const search = this.input.nativeElement.value;
-      if (this.filter$.value !== search) this.filter$.next(search);
+      if (!search.length || this.filter$.value !== search) this.filter$.next(search);
     }
   }
 
@@ -143,6 +144,13 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
     return this.options.find(o => o.value === value)?.name ?? value;
   };
 
+  private getGlobalSearchValue(): any {
+    if (!this.control.parent) return null;
+    let parent = this.control.parent;
+    while (parent.parent) parent = parent.parent;
+    return parent.value;
+  }
+
   private buildOptions() {
     this.options = this.column.searchValue !== undefined ? (this.column.searchValueOptions ?? []) : [];
     this.subsink.add(
@@ -151,12 +159,16 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
           filter(value => typeof value === 'string'),
           debounceTime(300),
           switchMap((search: string) => {
+            this.auto.panel;
             this.options = [];
+            this.groups = [];
             let skip = 0;
             return this.nextPage$.pipe(
               startWith(skip),
               tap(() => (this.searching = true)),
-              switchMap(async () => this.column.options(this.column.limit || 10, skip, search)),
+              switchMap(async () =>
+                this.column.options(this.column.limit || 10, skip, search, this.getGlobalSearchValue())
+              ),
               map(data => {
                 data.forEach(d => {
                   this.options.push(d);

@@ -111,7 +111,7 @@ export type DatatableSearchAutocompleteColumn<Record> = DatatableAutocompleteCol
     limit?: number;
     loadOnFocus?: boolean;
     hasGroup?: boolean;
-    options: (limit: number, skip: number, search: string) => Promise<DatatableSearchListOption[]>;
+    options: (limit: number, skip: number, search: string, filter: any) => Promise<DatatableSearchListOption[]>;
     searchValueOptions?: DatatableSearchListOption[];
   };
 
