@@ -282,9 +282,14 @@
           @if (cell) {
             <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
           }
+        } @else if (column.prefixComponent) {
+          <ng-container *ngComponentOutlet="column.prefixComponent; inputs: { column, row, value }" />
+        } @else if (column.prefixFunction) {
+          <span [outerHTML]="value | valueFunction: column.prefixFunction : row : column | safeHtml"></span>
         } @else if (column.prefix) {
           <span [outerHTML]="column.prefix | safeHtml"></span>
         }
+
         @switch (column.type) {
           @case ('number') {
             <lib-cell-number-value [column]="column" [row]="row"></lib-cell-number-value>
@@ -305,11 +310,16 @@
             <span [outerHTML]="(value | transform: row : column) ?? '' | safeHtml"></span>
           }
         }
+
         @if (column.suffixContentId) {
           @let cell = contentRefs | findContent: column.suffixContentId;
           @if (cell) {
             <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
           }
+        } @else if (column.suffixComponent) {
+          <ng-container *ngComponentOutlet="column.suffixComponent; inputs: { column, row, value }" />
+        } @else if (column.suffixFunction) {
+          <span [outerHTML]="value | valueFunction: column.suffixFunction : row : column | safeHtml"></span>
         } @else if (column.suffix) {
           <span [outerHTML]="column.suffix | safeHtml"></span>
         }
@@ -345,7 +355,7 @@
   @let data = (dataSource.facets ?? {})[facetOptions.id] | sortFacetEntries: facetOptions.options;
   @if (data) {
     @if (facetOptions.contentId) {
-      @let cell = contentRefs | findContent: facetOptions.contentId;>>>>>>>
+      @let cell = contentRefs | findContent: facetOptions.contentId;>>>>>>>>>>>>>>
       @if (cell) {
         <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, facetOptions, data }" />
       }

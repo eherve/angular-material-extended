@@ -2,6 +2,7 @@
 
 import { ComponentType } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
+import { PipeFunction } from '../pipes/suffix-function.pipe';
 import { NgxMatDatasourceRequestOrderDir } from './datasource-service.type';
 
 type Color<Record> = string | ((row: Record) => string | undefined);
@@ -44,19 +45,33 @@ type BaseColumn = {
 export type DatatableComponentColumn = BaseColumn & {
   cellComponent: ComponentType<any>;
 };
+
 export type DatatableContentColumn = BaseColumn & {
   cellContentId: string;
 };
+
+export type DatatablePrefixColumn<Record> =
+  | { prefix?: string }
+  | { prefixContentId?: string }
+  | { prefixFunction?: PipeFunction<Record> }
+  | { prefixComponent?: ComponentType<any> };
+
+export type DatatableSuffixColumn<Record> =
+  | { suffix?: string }
+  | { suffixContentId?: string }
+  | { suffixFunction?: PipeFunction<Record> }
+  | { suffixComponent?: ComponentType<any> };
+
 export type DatatableValueColumn<Record> = BaseColumn & {
   color?: Color<Record>;
   backgroundColor?: Color<Record>;
   transform?: (value: any, row: Record) => any;
-} & ({ prefix?: string; prefixContentId?: undefined } | { prefix?: undefined; prefixContentId?: string }) &
-  ({ suffix?: string } | { suffixContentId?: string });
+} & DatatablePrefixColumn<Record> &
+  DatatableSuffixColumn<Record>;
 
 type Column<Record> = DatatableComponentColumn | DatatableContentColumn | DatatableValueColumn<Record>;
 
-type SearchableColumn<Record> = Column<Record> & {
+type SearchableColumn = {
   searchable: true;
   searchProperty?: string;
 };
@@ -76,7 +91,7 @@ export type DatatableTextColumn<Record> = Column<Record> & {
   type: 'text';
 };
 export type DatatableSearchTextColumn<Record> = DatatableTextColumn<Record> &
-  SearchableColumn<Record> & {
+  SearchableColumn & {
     regexp?: boolean;
   };
 
@@ -86,7 +101,7 @@ export type DatatableNumberColumn<Record> = Column<Record> & {
   format?: string;
   locale?: string;
 };
-export type DatatableSearchNumberColumn<Record> = DatatableNumberColumn<Record> & SearchableColumn<Record> & {};
+export type DatatableSearchNumberColumn<Record> = DatatableNumberColumn<Record> & SearchableColumn & {};
 
 // SELECT
 export type DatatableSelectColumn<Record> = Column<Record> & {
@@ -95,7 +110,7 @@ export type DatatableSelectColumn<Record> = Column<Record> & {
   options: Observable<DatatableSearchListOption[]> | DatatableSearchListOption[];
 };
 export type DatatableSearchSelectColumn<Record> = DatatableSelectColumn<Record> &
-  SearchableColumn<Record> & {
+  SearchableColumn & {
     multiple?: boolean;
     placeholder?: string;
     hasGroup?: boolean;
@@ -106,7 +121,7 @@ export type DatatableAutocompleteColumn<Record> = Column<Record> & {
   type: 'autocomplete';
 };
 export type DatatableSearchAutocompleteColumn<Record> = DatatableAutocompleteColumn<Record> &
-  SearchableColumn<Record> & {
+  SearchableColumn & {
     placeholder?: string;
     limit?: number;
     loadOnFocus?: boolean;
@@ -119,7 +134,7 @@ export type DatatableSearchAutocompleteColumn<Record> = DatatableAutocompleteCol
 export type DatatableCheckboxColumn<Record> = Column<Record> & {
   type: 'checkbox';
 };
-export type DatatableSearchCheckboxColumn<Record> = DatatableCheckboxColumn<Record> & SearchableColumn<Record>;
+export type DatatableSearchCheckboxColumn<Record> = DatatableCheckboxColumn<Record> & SearchableColumn;
 
 // DATE
 export type DatatableDateColumn<Record> = Column<Record> & {
@@ -131,7 +146,7 @@ export type DatatableDateColumn<Record> = Column<Record> & {
   durationRefreshTime?: number;
 };
 export type DatatableSearchDateColumn<Record> = DatatableDateColumn<Record> &
-  SearchableColumn<Record> & {
+  SearchableColumn & {
     placeholder?: string;
   };
 
@@ -142,7 +157,7 @@ export type DatatableDurationColumn<Record> = Column<Record> & {
   largest?: number;
 };
 export type DatatableSearchDurationColumn<Record> = DatatableDurationColumn<Record> &
-  SearchableColumn<Record> & {
+  SearchableColumn & {
     placeholder?: string;
   };
 

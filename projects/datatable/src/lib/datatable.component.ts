@@ -61,6 +61,7 @@ import { GetPipe } from './pipes/get.pipe';
 import { OrderByPipe } from './pipes/order-by.pipe';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { SortFacetEntriesPipe } from './pipes/sort-facet-entries.pipe';
+import { ValueFunctionPipe } from './pipes/suffix-function.pipe';
 import { SumPipe } from './pipes/sum.pipe';
 import { TransformPipe } from './pipes/transform.pipe';
 import { duration } from './tools/duration.tool';
@@ -135,6 +136,7 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     FindPipe,
     OrderByPipe,
     SortFacetEntriesPipe,
+    ValueFunctionPipe,
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }],
   selector: 'ngx-mat-datatable',
