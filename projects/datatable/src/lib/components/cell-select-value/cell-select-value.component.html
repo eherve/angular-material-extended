@@ -21,7 +21,7 @@
           {{ option.icon }}
         </mat-icon>
       }
-      <mat-label [style.color]="option.color" [innerHTML]="option.name | safeHtml"></mat-label>
+      <mat-label *ngIf="!column.iconOnly" [style.color]="option.color" [innerHTML]="option.name | safeHtml"></mat-label>
     </div>
   } @else {
     {{ value }}

@@ -53,11 +53,13 @@ import { DatagridDataSource } from './datasource';
 import { NgxMatDatatableIntl } from './datatable.intl';
 import { NgxMatDatatableContentDirective } from './directives/datatable-cell.directive';
 import { BackgroundColorPipe } from './pipes/background-color.pipe';
-import { ColorPipe } from './pipes/color.pipe';
+import { CellColorPipe } from './pipes/cell-color.pipe';
+import { CellOpacityPipe } from './pipes/cell-opacity.pipe';
 import { FilterPipe } from './pipes/filter.pipe';
 import { FindContentPipe } from './pipes/find-cell-content.pipe';
 import { FindPipe } from './pipes/find.pipe';
 import { GetPipe } from './pipes/get.pipe';
+import { IncludedInPipe } from './pipes/included-in.pipe';
 import { OrderByPipe } from './pipes/order-by.pipe';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { SortFacetEntriesPipe } from './pipes/sort-facet-entries.pipe';
@@ -100,7 +102,7 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     CellDurationValueComponent,
     CellNumberValueComponent,
     CellSelectValueComponent,
-    ColorPipe,
+    CellColorPipe,
     CommonModule,
     TransformPipe,
     DragDropModule,
@@ -137,6 +139,8 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     OrderByPipe,
     SortFacetEntriesPipe,
     ValueFunctionPipe,
+    IncludedInPipe,
+    CellOpacityPipe,
   ],
   providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }],
   selector: 'ngx-mat-datatable',
@@ -180,6 +184,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   contentRefs?: QueryList<NgxMatDatatableContentDirective>;
 
   displayedColumns: string[] = [];
+  disabledRows: Record[] = [];
+
   dataSource!: DatagridDataSource<Record>;
   loaded = false;
 
@@ -344,6 +350,20 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       facets: this.options.facets,
     });
     this._data = this.dataSource.data;
+    this.buildDisabledRows();
+  }
+
+  private buildDisabledRows() {
+    this.disabledRows = [];
+    if (this.options.rowDisabled) {
+      this.dataSource.data?.forEach(d => {
+        if (typeof this.options.rowDisabled === 'string') {
+          if (get(d, this.options.rowDisabled) === true) this.disabledRows.push(d);
+        } else if (typeof this.options.rowDisabled === 'function') {
+          if (this.options.rowDisabled(d)) this.disabledRows.push(d);
+        }
+      });
+    }
   }
 
   private buildOrder(columns: NgxMatDatasourceRequestColumn[]): NgxMatDatasourceRequestOrder[] {
@@ -391,6 +411,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   rowClick(row: Record) {
+    if (this.disabledRows.includes(row)) return;
     if (typeof this.options.actions?.rowClick === 'boolean') {
       this.rowClicked.emit(row);
     } else if (typeof this.options.actions?.rowClick === 'function') {

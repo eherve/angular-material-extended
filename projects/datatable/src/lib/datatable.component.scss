@@ -158,7 +158,7 @@
     }
 
     .mat-mdc-row {
-      &.has-click {
+      &.has-click:not(.is-disabled) {
         cursor: pointer;
         &:hover {
           .mat-mdc-cell {
@@ -167,6 +167,11 @@
             color: var(--datatable-hover-color) !important;
             background-color: var(--datatable-hover-bgcolor) !important;
           }
+        }
+      }
+      &.is-disabled {
+        .mat-mdc-cell {
+          opacity: 0.2;
         }
       }
 

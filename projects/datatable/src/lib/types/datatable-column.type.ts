@@ -107,6 +107,7 @@ export type DatatableSearchNumberColumn<Record> = DatatableNumberColumn<Record> 
 export type DatatableSelectColumn<Record> = Column<Record> & {
   type: 'select';
   isArrayValue?: boolean;
+  iconOnly?:boolean;
   options: Observable<DatatableSearchListOption[]> | DatatableSearchListOption[];
 };
 export type DatatableSearchSelectColumn<Record> = DatatableSelectColumn<Record> &

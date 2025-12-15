@@ -31,6 +31,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import { BehaviorSubject, debounceTime, filter, map, startWith, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
+import { stripHtml } from '../../tools/strip-html.tool';
 import { DatatableSearchAutocompleteColumn, DatatableSearchListOption } from '../../types/datatable-column.type';
 
 @Component({
@@ -140,8 +141,10 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   }
 
   displayWith = (value: any) => {
-    if (!this.options) return value;
-    return this.options.find(o => o.value === value)?.name ?? value;
+    let val;
+    if (!this.options) val = value;
+    else val = this.options.find(o => o.value === value)?.name ?? value;
+    return stripHtml(val);
   };
 
   private getGlobalSearchValue(): any {

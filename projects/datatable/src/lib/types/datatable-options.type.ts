@@ -6,6 +6,7 @@ import { NgxMatDatasourceService } from './datasource-service.type';
 import { DatatableColumn, DatatableValueColumn } from './datatable-column.type';
 import { FacetOptions } from './datatable-facet.type';
 
+type Opacity<Record> = number | ((column: DatatableValueColumn<Record>, row: Record) => number | undefined);
 type Color<Record> = string | ((column: DatatableValueColumn<Record>, row: Record) => string | undefined);
 
 export type NgxMatDatatableOptions<Record> = {
@@ -42,8 +43,10 @@ export type NgxMatDatatableOptions<Record> = {
 
   facets?: FacetOptions[];
 
+  rowOpacity?: Opacity<Record>;
   rowColor?: Color<Record>;
   rowBackgroundColor?: Color<Record>;
+  rowDisabled?: string | ((row: Record) => boolean);
 
   disableRowAnimation?: boolean;
 };

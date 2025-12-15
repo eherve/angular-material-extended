@@ -256,6 +256,7 @@ export class AppComponent {
       column.sticky ? undefined
       : column.type === 'duration' ? 'pink'
       : 'yellow',
+    rowDisabled: row => !(row.index % 3),
     columnMinWith: 120,
     rowMaxHeight: 36,
     additionalProperties: ['additionalProperty'],
@@ -395,7 +396,7 @@ export class AppComponent {
                         uniqBy(
                           map(DATA, d => ({
                             value: d.autocomplete,
-                            name: d.autocomplete,
+                            name: `<span>${d.autocomplete}</span>`,
                             group: d.autocomplete.slice(0, -1),
                             color: 'blue',
                             icon: 'home',
@@ -463,12 +464,12 @@ export class AppComponent {
 
   constructor() {
     let i = 0;
-    setInterval(() => {
-      console.log('interval', i);
-      this.datatableOptions.rowColor = ['green', 'red', 'black', 'blue'][++i % 4];
-      each(this.datatable?.dataSource.data, v => (v.label = `changed by ${i}`));
-      this.datatable?.redraw((record: any) => !(record.index % (i % 10)));
-    }, 5000);
+    // setInterval(() => {
+    //   console.log('interval', i);
+    //   this.datatableOptions.rowColor = ['green', 'red', 'black', 'blue'][++i % 4];
+    //   each(this.datatable?.dataSource.data, v => (v.label = `changed by ${i}`));
+    //   this.datatable?.redraw((record: any) => !(record.index % (i % 10)));
+    // }, 5000);
   }
 
   updatedConfig(config: DatatableConfig) {

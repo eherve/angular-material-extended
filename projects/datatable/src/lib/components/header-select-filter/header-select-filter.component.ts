@@ -102,7 +102,14 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
       })
     );
     if (Array.isArray(this.column.options)) this.buildOptions(this.column.options);
-    else this.subsink.add(this.column.options.subscribe(data => this.buildOptions(data)));
+    else
+      this.subsink.add(
+        this.column.options.subscribe(data => {
+          this.options = [];
+          this.groups = [];
+          this.buildOptions(data);
+        })
+      );
     this.changeDetectorRef.detectChanges();
   }
 

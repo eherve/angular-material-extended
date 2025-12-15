@@ -19,7 +19,8 @@
               mat-cell
               *matCellDef="let row"
               [style.min-width.px]="column.minWidth || options.columnMinWith"
-              [style.color]="row | color: column : options"
+              [style.color]="row | cellColor: column : options"
+              [style.opacity]="row | cellOpacity: column : options"
               [style.background-color]="row | backgroundColor: column : options">
               <ng-container *ngTemplateOutlet="cellTmpl; context: { column, row }"></ng-container>
             </td>
@@ -31,6 +32,7 @@
           mat-row
           *matRowDef="let row; columns: displayedColumns"
           [class.has-click]="options.actions?.rowClick"
+          [class.is-disabled]="row | includedIn: disabledRows"
           (click)="rowClick(row)"></tr>
         <tr class="mat-row" *matNoDataRow>
           <td [attr.colspan]="displayedColumns.length">
@@ -355,7 +357,7 @@
   @let data = (dataSource.facets ?? {})[facetOptions.id] | sortFacetEntries: facetOptions.options;
   @if (data) {
     @if (facetOptions.contentId) {
-      @let cell = contentRefs | findContent: facetOptions.contentId;>>>>>>>>>>>>>>
+      @let cell = contentRefs | findContent: facetOptions.contentId;>>>>>>>>>>>>>>>>>>>>>
       @if (cell) {
         <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, facetOptions, data }" />
       }
