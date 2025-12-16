@@ -67,7 +67,12 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
   private subsink = new Subscription();
 
   writeValue = (value: any) => {
-    if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
+    if (this.column.regex) {
+      if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
+    } else {
+      const val = this.escapeRegExp(this.selectControl.value);
+      if (val !== (value?.value ?? '')) this.selectControl.setValue(val);
+    }
   };
 
   registerOnChange(onChange: any): void {
@@ -85,7 +90,10 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
         if (!value) this.control.setValue(undefined);
-        else this.control.setValue({ value, regex: this.column.regex ?? false });
+        else {
+          if (this.column.regex) this.control.setValue({ value, regex: true });
+          else this.control.setValue({ value: this.escapeRegExp(value), regex: true });
+        }
       })
     );
     this.changeDetectorRef.detectChanges();
@@ -93,5 +101,10 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
 
   ngOnDestroy(): void {
     this.subsink.unsubscribe();
+  }
+
+  private escapeRegExp(value: string): string {
+    if (!value) return '';
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 }

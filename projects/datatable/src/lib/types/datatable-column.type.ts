@@ -25,7 +25,6 @@ type BaseColumn = {
 
   searchable?: boolean;
   searchProperty?: string;
-  regex?: boolean;
   searchValue?: any;
 
   sortable?: boolean;
@@ -92,7 +91,7 @@ export type DatatableTextColumn<Record> = Column<Record> & {
 };
 export type DatatableSearchTextColumn<Record> = DatatableTextColumn<Record> &
   SearchableColumn & {
-    regexp?: boolean;
+    regex?: boolean;
   };
 
 // NUMBER
@@ -107,7 +106,7 @@ export type DatatableSearchNumberColumn<Record> = DatatableNumberColumn<Record> 
 export type DatatableSelectColumn<Record> = Column<Record> & {
   type: 'select';
   isArrayValue?: boolean;
-  iconOnly?:boolean;
+  iconOnly?: boolean;
   options: Observable<DatatableSearchListOption[]> | DatatableSearchListOption[];
 };
 export type DatatableSearchSelectColumn<Record> = DatatableSelectColumn<Record> &
