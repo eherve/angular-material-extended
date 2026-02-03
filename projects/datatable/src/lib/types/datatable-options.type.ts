@@ -49,4 +49,6 @@ export type NgxMatDatatableOptions<Record> = {
   rowDisabled?: string | ((row: Record) => boolean);
 
   disableRowAnimation?: boolean;
+
+  expandedDetailContentId?: string;
 };

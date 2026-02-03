@@ -27,7 +27,8 @@
       </mat-select-trigger>
       @if (column.hasGroup) {
         @for (group of groups; track group) {
-          <mat-optgroup [label]="group.name">
+          <mat-optgroup>
+            <mat-label [innerHTML]="group.name | safeHtml"></mat-label>
             @for (option of group.options; track option) {
               <mat-option [value]="option.value">
                 <ng-container *ngTemplateOutlet="selectOption; context: { option }"></ng-container>
@@ -60,10 +61,13 @@
     @if (option.icon) {
       @switch (option.iconSrc) {
         @case ('svg') {
-          <mat-icon [svgIcon]="option.icon" [style.color]="option.iconColor" [style.margin-right.px]="8"></mat-icon>
+          <mat-icon
+            [svgIcon]="option.icon"
+            [style.color]="option.iconColor ?? option.color"
+            [style.margin-right.px]="8"></mat-icon>
         }
         @default {
-          <mat-icon [style.color]="option.iconColor" [style.margin-right.px]="8">
+          <mat-icon [style.color]="option.iconColor ?? option.color" [style.margin-right.px]="8">
             {{ option.icon }}
           </mat-icon>
         }

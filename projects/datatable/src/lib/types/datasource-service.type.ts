@@ -46,6 +46,7 @@ export type NgxMatDatasourceRequestFacet = {
   kind: 'indicator';
   property: string;
   operator: NgxMatDatasourceRequestFacetOperator;
+  info?: any;
 };
 
 export type NgxMatDatasourceRequestOptions = {
@@ -64,7 +65,7 @@ export type NgxMatDatasourceRequestOptions = {
   facets?: NgxMatDatasourceRequestFacet[];
 };
 
-export type NgxMatDatasourceResultFacet = { _id: any; value: number };
+export type NgxMatDatasourceResultFacet = { _id: any; value: number; info?: any };
 
 export type NgxMatDatasourceResult<T> = {
   draw: string;
@@ -79,5 +80,5 @@ export type NgxMatDatasourceResult<T> = {
 };
 
 export type NgxMatDatasourceService<Record> = (
-  options: NgxMatDatasourceRequestOptions
+  options: NgxMatDatasourceRequestOptions,
 ) => Promise<NgxMatDatasourceResult<Record>>;

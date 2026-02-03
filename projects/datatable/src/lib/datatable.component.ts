@@ -1,6 +1,6 @@
 /** @format */
 
-import { animate, style, transition, trigger } from '@angular/animations';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import {
@@ -74,7 +74,12 @@ import {
   NgxMatDatasourceRequestOrder,
   NgxMatDatasourceResultFacet,
 } from './types/datasource-service.type';
-import { DatatableColumn, DatatableDurationColumn, DatatableSelectColumn } from './types/datatable-column.type';
+import {
+  DatatableColumn,
+  DatatableDurationColumn,
+  DatatableSearchListOption,
+  DatatableSelectColumn,
+} from './types/datatable-column.type';
 import { NgxMatDatatableOptions } from './types/datatable-options.type';
 
 @Injectable()
@@ -157,6 +162,11 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
         animate('0.2s', style({ opacity: 0 })), // final
       ]),
     ]),
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
   ],
 })
 export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy {
@@ -187,6 +197,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   disabledRows: Record[] = [];
 
   dataSource!: DatagridDataSource<Record>;
+
+  expandedRow: any | null = null;
+
   loaded = false;
 
   searchFormGroup!: FormGroup;
@@ -244,7 +257,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       this.paginator?.page.subscribe(() => {
         this.updateConfig();
         this.loadPage();
-      })
+      }),
     );
     this.loadPage();
   }
@@ -285,8 +298,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       const data = (
         await Promise.all(
           chunks.map(c =>
-            this.options.service({ draw: Date.now().toString(), columns, order, start: c.start, length: c.length })
-          )
+            this.options.service({ draw: Date.now().toString(), columns, order, start: c.start, length: c.length }),
+          ),
         )
       ).reduce((pv, cv) => (pv.push(...cv.data), pv), [] as any[]);
       const rows: any[] = [];
@@ -323,12 +336,18 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     }
   }
 
-  private async buildExportSelectColumn(column: DatatableSelectColumn<Record>, row: any, value: any) {
+  private async buildExportSelectColumn(
+    column: DatatableSelectColumn<Record> & { __options?: DatatableSearchListOption[] },
+    row: any,
+    value: any,
+  ) {
     if (Array.isArray(column.options)) {
       row[column.header] = column.options.find(option => option.value === value)?.name ?? value;
+    } else if (column.__options) {
+      row[column.header] = column.__options.find(option => option.value === value)?.name ?? value;
     } else {
-      row[column.header] =
-        (await rxjs.lastValueFrom(column.options)).find(option => option.value === value)?.name ?? value;
+      const options = await rxjs.lastValueFrom(column.options);
+      row[column.header] = options.find(option => option.value === value)?.name ?? value;
     }
   }
 
@@ -423,7 +442,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   facetClick(
     column: DatatableColumn<Record> | undefined,
     result: NgxMatDatasourceResultFacet,
-    option: FacetOptionsOptions
+    option: FacetOptionsOptions,
   ) {
     if (!column) return;
     const control = this.searchFormGroup?.controls[column.columnDef];
@@ -501,21 +520,21 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
             controls[column.columnDef] = control;
             if (typeof column.searchUpdated === 'function') {
               this.subscriptions.add(
-                control.valueChanges.pipe(rxjs.debounceTime(500)).subscribe(value => column.searchUpdated!(value))
+                control.valueChanges.pipe(rxjs.debounceTime(500)).subscribe(value => column.searchUpdated!(value)),
               );
             }
           }
           return controls;
         },
-        {} as { [columnDef: string]: FormControl }
-      )
+        {} as { [columnDef: string]: FormControl },
+      ),
     );
     this.subscriptions.add(
       this.searchFormGroup.valueChanges.pipe(rxjs.debounceTime(500)).subscribe(value => {
         this.searchUpdated.next(value);
         this.paginator!.pageIndex = 0;
         this.loadPage();
-      })
+      }),
     );
   }
 
@@ -538,8 +557,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
         if (columnIndex == -1) return;
         if (columnIndex !== index) moveItemInArray(this.options.columns, columnIndex, index);
         const column = this.options.columns[index];
-        if (updated.sticky !== column.sticky) column.sticky = updated.sticky;
-        if (updated.hidden !== column.hidden) column.hidden = updated.hidden;
+        if (column && updated.sticky !== column.sticky) column.sticky = updated.sticky;
+        if (column && updated.hidden !== column.hidden) column.hidden = updated.hidden;
       });
       this.buildDisplayColumns();
     }

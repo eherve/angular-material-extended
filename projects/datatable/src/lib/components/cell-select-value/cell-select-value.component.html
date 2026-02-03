@@ -17,9 +17,16 @@
   @if (option) {
     <div class="option">
       @if (option.icon) {
-        <mat-icon [style.color]="option.iconColor" [style.margin-right.px]="8">
-          {{ option.icon }}
-        </mat-icon>
+        @switch (option.iconSrc) {
+          @case ('svg') {
+            <mat-icon [svgIcon]="option.icon" [style.color]="option.iconColor ?? option.color" [style.margin-right.px]="8"></mat-icon>
+          }
+          @default {
+            <mat-icon [style.color]="option.iconColor ?? option.color" [style.margin-right.px]="8">
+              {{ option.icon }}
+            </mat-icon>
+          }
+        }
       }
       <mat-label *ngIf="!column.iconOnly" [style.color]="option.color" [innerHTML]="option.name | safeHtml"></mat-label>
     </div>

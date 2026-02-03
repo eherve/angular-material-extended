@@ -293,6 +293,12 @@
   flex-direction: row;
 }
 
+.element-detail {
+  background: whitesmoke;
+  overflow: hidden;
+  display: flex;
+}
+
 #no-data {
   position: sticky;
   width: fit-content;
@@ -346,10 +352,12 @@
 
   .chip-facet {
     overflow: hidden;
+
     @include mat.chips-overrides(
       (
         label-text-color: var(--facet-color),
         outline-color: var(--facet-color),
+        elevated-container-color: var(--facet-color),
       )
     );
 

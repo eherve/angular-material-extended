@@ -27,13 +27,28 @@
           </ng-container>
         }
 
+        <ng-container *ngIf="options.expandedDetailContentId" matColumnDef="expandedDetail">
+          <td mat-cell *matCellDef="let row" [attr.colspan]="options.columns.length">
+            @let content = contentRefs | findContent: options.expandedDetailContentId;
+            <div *ngIf="content" class="element-detail" [@detailExpand]="row == expandedRow ? 'expanded' : 'collapsed'">
+              <ng-container *ngTemplateOutlet="content.templateRef; context: { row }"> </ng-container>
+            </div>
+          </td>
+        </ng-container>
+
         <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+
         <tr
           mat-row
           *matRowDef="let row; columns: displayedColumns"
           [class.has-click]="options.actions?.rowClick"
           [class.is-disabled]="row | includedIn: disabledRows"
           (click)="rowClick(row)"></tr>
+
+        <ng-container *ngIf="options.expandedDetailContentId">
+          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+        </ng-container>
+
         <tr class="mat-row" *matNoDataRow>
           <td [attr.colspan]="displayedColumns.length">
             <div id="no-data">
@@ -357,7 +372,7 @@
   @let data = (dataSource.facets ?? {})[facetOptions.id] | sortFacetEntries: facetOptions.options;
   @if (data) {
     @if (facetOptions.contentId) {
-      @let cell = contentRefs | findContent: facetOptions.contentId;>>>>>>>>>>>>>>>>>>>>>
+      @let cell = contentRefs | findContent: facetOptions.contentId;
       @if (cell) {
         <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, facetOptions, data }" />
       }

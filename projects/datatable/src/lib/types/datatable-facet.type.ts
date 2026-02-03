@@ -21,6 +21,7 @@ type IndicatorFacetOptions = BaseFacetOptions & {
   kind: 'indicator';
   property: string;
   operator: FacetOptionsOperator;
+  info?: any;
   columnDef?: string;
 };
 

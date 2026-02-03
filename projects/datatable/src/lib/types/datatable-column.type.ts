@@ -80,7 +80,7 @@ export type DatatableSearchListOption = {
   name: string;
   group?: string;
   color?: string;
-  iconSrc?: 'mat-icon' | 'svg';
+  iconSrc?: 'mat-icon' | 'svg' | string;
   icon?: string;
   iconColor?: string;
 };

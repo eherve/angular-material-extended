@@ -20,7 +20,7 @@ import { Subscription } from 'rxjs';
 })
 export class CellSelectValueComponent<Record> implements OnInit, OnDestroy {
   @Input()
-  column!: DatatableSelectColumn<Record>;
+  column!: DatatableSelectColumn<Record> & { __options?: DatatableSearchListOption[] };
 
   @Input()
   row: any;
@@ -32,7 +32,11 @@ export class CellSelectValueComponent<Record> implements OnInit, OnDestroy {
   ngOnInit(): void {
     if (Array.isArray(this.column.options)) this.options = this.column.options;
     else {
-      this.subsink.add(this.column.options.subscribe(options => (this.options = options)));
+      this.subsink.add(
+        this.column.options.subscribe(options => {
+          this.column.__options = this.options = options;
+        }),
+      );
     }
   }
 
