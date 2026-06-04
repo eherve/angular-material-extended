@@ -85,8 +85,8 @@
     min-width: 72px;
     padding: 0 8px;
     color: var(--datatable-color);
-    font-size: 13px;
-    line-height: 36px;
+    font-size: 14px;
+    line-height: 48px;
     text-align: right;
     white-space: nowrap;
   }
@@ -170,6 +170,10 @@
     .mat-mdc-footer-row.incremental-row {
       height: 44px;
 
+      &.is-hidden {
+        display: none;
+      }
+
       .mat-mdc-footer-cell {
         padding: 0;
         border-bottom-color: var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));
@@ -247,8 +251,9 @@
     }
   }
 
-  .incremental-load-row,
-  .incremental-sentinel {
+  .incremental-load-row {
+    position: sticky;
+    left: 0;
     display: flex;
     box-sizing: border-box;
     place-content: center center;
@@ -256,8 +261,25 @@
     flex-direction: row;
     gap: 8px;
     min-height: 44px;
-    width: 100%;
+    width: var(--datatable-container-width, 100%);
+    max-width: var(--datatable-container-width, 100%);
     color: var(--datatable-color);
+    pointer-events: none;
+  }
+
+  .incremental-sentinel,
+  .incremental-load-row button {
+    pointer-events: auto;
+  }
+
+  .incremental-sentinel {
+    display: inline-flex;
+    box-sizing: border-box;
+    place-content: center center;
+    align-items: center;
+    flex-direction: row;
+    gap: 8px;
+    min-height: 44px;
   }
 
   .incremental-load-row button {

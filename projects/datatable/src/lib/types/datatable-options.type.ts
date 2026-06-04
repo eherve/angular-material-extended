@@ -16,8 +16,6 @@ export type NgxMatDatatableIncrementalTrigger = 'inView' | 'button';
 export interface NgxMatDatatableIncrementalOptions {
   trigger?: NgxMatDatatableIncrementalTrigger;
   pageSize?: number;
-  loadingLabel?: string;
-  loadMoreLabel?: string;
 }
 
 export type NgxMatDatatableOptions<Record> = {
@@ -68,3 +66,30 @@ export type NgxMatDatatableOptions<Record> = {
 
   expandedDetailContentId?: string;
 };
+
+export interface NgxMatDatatableDefaultOptions<Record = any> {
+  loadMode?: NgxMatDatatableLoadMode;
+  incremental?: NgxMatDatatableIncrementalOptions;
+  showRecordsCount?: boolean;
+
+  pageSizeOptions?: number[];
+  pageSizeOptionsIndex?: number;
+  pageSize?: number;
+
+  columnMinWith?: number;
+  rowMaxHeight?: number;
+  disableRowAnimation?: boolean;
+
+  actions?: {
+    columns?: {
+      tooltip?: string;
+      hideAndShow?: boolean;
+      sticky?: boolean;
+      reorder?: boolean;
+    };
+    refresh?: boolean;
+    rowClick?: boolean | ((row: Record) => void);
+    export?: string | boolean;
+    user?: Action<Record>[];
+  };
+}

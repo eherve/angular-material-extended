@@ -3,7 +3,22 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ContentChildren, ElementRef, EventEmitter, HostBinding, inject, Injectable, Input, OnDestroy, OnInit, Output, QueryList, ViewChild } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ContentChildren,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  inject,
+  Injectable,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  QueryList,
+  ViewChild,
+} from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,6 +48,7 @@ import { HeaderSelectFilterComponent } from './components/header-select-filter/h
 import { HeaderTextFilterComponent } from './components/header-text-filter/header-text-filter.component';
 import { ProgressSpinnerComponent } from './components/progress-spinner/progress-spinner.component';
 import { DatagridDataSource } from './datasource';
+import { NGX_MAT_DATATABLE_DEFAULT_OPTIONS } from './datatable-default-options';
 import { NgxMatDatatableIntl } from './datatable.intl';
 import { NgxMatDatatableContentDirective } from './directives/datatable-cell.directive';
 import { BackgroundColorPipe } from './pipes/background-color.pipe';
@@ -52,10 +68,25 @@ import { TransformPipe } from './pipes/transform.pipe';
 import { duration } from './tools/duration.tool';
 import { get } from './tools/get.tool';
 import { DatatableConfig } from './types/config.type';
-import { NgxMatDatasourceRequestColumn, NgxMatDatasourceRequestOptions, NgxMatDatasourceRequestOrder, NgxMatDatasourceResultFacet } from './types/datasource-service.type';
-import { DatatableColumn, DatatableDurationColumn, DatatableSearchListOption, DatatableSelectColumn } from './types/datatable-column.type';
+import {
+  NgxMatDatasourceRequestColumn,
+  NgxMatDatasourceRequestOptions,
+  NgxMatDatasourceRequestOrder,
+  NgxMatDatasourceResultFacet,
+} from './types/datasource-service.type';
+import {
+  DatatableColumn,
+  DatatableDurationColumn,
+  DatatableSearchListOption,
+  DatatableSelectColumn,
+} from './types/datatable-column.type';
 import { FacetOptionsOptions } from './types/datatable-facet.type';
-import { NgxMatDatatableIncrementalTrigger, NgxMatDatatableLoadMode, NgxMatDatatableOptions } from './types/datatable-options.type';
+import {
+  NgxMatDatatableIncrementalOptions,
+  NgxMatDatatableIncrementalTrigger,
+  NgxMatDatatableLoadMode,
+  NgxMatDatatableOptions,
+} from './types/datatable-options.type';
 
 @Injectable()
 class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
@@ -75,16 +106,53 @@ class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
 
 type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header' | 'sticky' | 'hidden'>;
 
-type LocalizeFn = (messageParts: TemplateStringsArray, ...expressions: unknown[]) => string;
-
-const localizeLabel = (messageParts: TemplateStringsArray, ...expressions: unknown[]): string => {
-  const localize = (globalThis as { $localize?: LocalizeFn }).$localize;
-  if (localize) return localize(messageParts, ...expressions);
-  return String.raw({ raw: messageParts } as any, ...expressions.map((expression) => String(expression)));
-};
-
 @Component({
-  imports: [CellCheckboxValueComponent, CellDateValueComponent, CellDurationValueComponent, CellNumberValueComponent, CellSelectValueComponent, CellColorPipe, CommonModule, TransformPipe, DragDropModule, FindContentPipe, FormsModule, GetPipe, HeaderAutocompleteFilterComponent, HeaderCheckboxFilterComponent, HeaderDateFilterComponent, HeaderDurationFilterComponent, HeaderNumberFilterComponent, HeaderSelectFilterComponent, HeaderTextFilterComponent, IntersectionObserverModule, MatBadgeModule, MatButtonModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatPaginatorModule, MatProgressSpinnerModule, MatTableModule, MatChipsModule, ReactiveFormsModule, SafeHtmlPipe, MatTooltipModule, BackgroundColorPipe, FilterPipe, SumPipe, MatCardModule, CountUpModule, ProgressSpinnerComponent, FindPipe, OrderByPipe, SortFacetEntriesPipe, ValueFunctionPipe, IncludedInPipe, CellOpacityPipe],
+  imports: [
+    CellCheckboxValueComponent,
+    CellDateValueComponent,
+    CellDurationValueComponent,
+    CellNumberValueComponent,
+    CellSelectValueComponent,
+    CellColorPipe,
+    CommonModule,
+    TransformPipe,
+    DragDropModule,
+    FindContentPipe,
+    FormsModule,
+    GetPipe,
+    HeaderAutocompleteFilterComponent,
+    HeaderCheckboxFilterComponent,
+    HeaderDateFilterComponent,
+    HeaderDurationFilterComponent,
+    HeaderNumberFilterComponent,
+    HeaderSelectFilterComponent,
+    HeaderTextFilterComponent,
+    IntersectionObserverModule,
+    MatBadgeModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatMenuModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
+    MatTableModule,
+    MatChipsModule,
+    ReactiveFormsModule,
+    SafeHtmlPipe,
+    MatTooltipModule,
+    BackgroundColorPipe,
+    FilterPipe,
+    SumPipe,
+    MatCardModule,
+    CountUpModule,
+    ProgressSpinnerComponent,
+    FindPipe,
+    OrderByPipe,
+    SortFacetEntriesPipe,
+    ValueFunctionPipe,
+    IncludedInPipe,
+    CellOpacityPipe,
+  ],
   providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }],
   selector: 'ngx-mat-datatable',
   templateUrl: 'datatable.component.html',
@@ -100,7 +168,11 @@ const localizeLabel = (messageParts: TemplateStringsArray, ...expressions: unkno
         animate('0.2s', style({ opacity: 0 })), // final
       ]),
     ]),
-    trigger('detailExpand', [state('collapsed', style({ height: '0px', minHeight: '0' })), state('expanded', style({ height: '*' })), transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)'))]),
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
   ],
 })
 export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy {
@@ -137,6 +209,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   loaded = false;
 
+  datatableIntl = inject(NgxMatDatatableIntl);
+
   loadMode: NgxMatDatatableLoadMode = 'pagination';
   incrementalTrigger: NgxMatDatatableIncrementalTrigger = 'inView';
   incrementalPageSize = 30;
@@ -146,19 +220,20 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   hasMoreRecords = false;
   loadingNextRecords = false;
   showRecordsCount = true;
-  incrementalLoadingLabel = localizeLabel`Chargement...`;
-  incrementalLoadMoreLabel = localizeLabel`Charger plus`;
+  incrementalLoadingLabel = this.datatableIntl.incrementalLoadingLabel;
+  incrementalLoadMoreLabel = this.datatableIntl.incrementalLoadMoreLabel;
   incrementalRowColumns = ['_incrementalLoad'];
   showIncrementalRow = false;
   showIncrementalInViewTrigger = false;
   showIncrementalButtonTrigger = false;
+  paginationPageSizeOptions: number[] = [];
+  paginationPageSize = 30;
 
   searchFormGroup!: FormGroup;
 
-  datatableIntl = inject(NgxMatDatatableIntl);
-
   private subscriptions = new rxjs.Subscription();
   private changeDetectorRef = inject(ChangeDetectorRef);
+  private defaultOptions = inject(NGX_MAT_DATATABLE_DEFAULT_OPTIONS);
   private incrementalLoadToken = 0;
 
   get data(): Record[] | undefined {
@@ -171,8 +246,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   @ViewChild(MatTable) matTable?: MatTable<any> & {
     _elementRef: { nativeElement: any };
   };
-  observer = new ResizeObserver((entries) => {
-    entries.forEach((entry) => {
+
+  observer = new ResizeObserver(entries => {
+    entries.forEach(entry => {
       const containerHeight = this.container?.nativeElement.clientHeight ?? 0;
       const containerWidth = this.container?.nativeElement.clientWidth ?? 0;
       const headerHeight = this.head?.nativeElement.clientHeight ?? 0;
@@ -182,16 +258,25 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
       this.tableContainerOverflowY = containerHeight - headerHeight - contentHeight < 0 ? 'auto' : 'inherit';
       this.tableContainerOverflowX = containerWidth - headerWidth - contentWidth < 0 ? 'auto' : 'inherit';
+      this.tableContainerWidth = containerWidth;
+
+      this.changeDetectorRef.markForCheck();
     });
   });
+
   @HostBinding('style.--datatable-container-overflow-y')
   tableContainerOverflowY = 'inherit';
+
   @HostBinding('style.--datatable-container-overflow-x')
   tableContainerOverflowX = 'inherit';
+
+  @HostBinding('style.--datatable-container-width.px')
+  tableContainerWidth = 0;
 
   async ngOnInit(): Promise<void> {
     if (!this.options?.service) throw new Error(`missing mongoose datatable component service`);
     if (!this.options?.columns) throw new Error(`missing mongoose datatable component columns`);
+    this.options = this.resolveOptions(this.options);
     await this.applyConfig();
     this.prepareLoadModeOptions();
     this.buildDisplayColumns();
@@ -225,7 +310,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     if (column.sortable === false) return;
     if (!column.order)
       column.order = {
-        index: this.options.columns.filter((c) => !!c.order).length,
+        index: this.options.columns.filter(c => !!c.order).length,
         dir: 'asc',
       };
     else if (column.order.dir === 'asc') column.order.dir = 'desc';
@@ -308,16 +393,20 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     value: any,
   ): Promise<void> {
     if (Array.isArray(column.options)) {
-      row[column.header] = column.options.find((option) => option.value === value)?.name ?? value;
+      row[column.header] = column.options.find(option => option.value === value)?.name ?? value;
     } else if (column.__options) {
-      row[column.header] = column.__options.find((option) => option.value === value)?.name ?? value;
+      row[column.header] = column.__options.find(option => option.value === value)?.name ?? value;
     } else {
       const options = await rxjs.lastValueFrom(column.options);
-      row[column.header] = options.find((option) => option.value === value)?.name ?? value;
+      row[column.header] = options.find(option => option.value === value)?.name ?? value;
     }
   }
 
-  private async buildExportDurationColumn(column: DatatableDurationColumn<Record>, row: any, value: any): Promise<void> {
+  private async buildExportDurationColumn(
+    column: DatatableDurationColumn<Record>,
+    row: any,
+    value: any,
+  ): Promise<void> {
     row[`${column.header} ms`] = value;
     row[column.header] = duration(value, column);
   }
@@ -357,7 +446,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       const columns = this.buildRequestColumns();
       const order = this.buildOrder(columns);
       const nextPageIndex = this.incrementalPageIndex + 1;
-      await this.dataSource.loadData(this.buildRequestOptions(columns, order, nextPageIndex, this.incrementalPageSize), true);
+      await this.dataSource.loadData(
+        this.buildRequestOptions(columns, order, nextPageIndex, this.incrementalPageSize),
+        true,
+      );
       if (loadToken !== this.incrementalLoadToken) return;
       this.incrementalPageIndex = nextPageIndex;
       this.updateLoadedDataState();
@@ -378,7 +470,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private async loadPaginationPage(): Promise<void> {
     const columns = this.buildRequestColumns();
     const order = this.buildOrder(columns);
-    await this.dataSource.loadData(this.buildRequestOptions(columns, order, this.paginator!.pageIndex, this.paginator!.pageSize));
+    await this.dataSource.loadData(
+      this.buildRequestOptions(columns, order, this.paginator!.pageIndex, this.paginator!.pageSize),
+    );
     this.updateLoadedDataState();
   }
 
@@ -390,7 +484,12 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.updateLoadedDataState();
   }
 
-  private buildRequestOptions(columns: NgxMatDatasourceRequestColumn[], order: NgxMatDatasourceRequestOrder[], start: number, length: number): NgxMatDatasourceRequestOptions {
+  private buildRequestOptions(
+    columns: NgxMatDatasourceRequestColumn[],
+    order: NgxMatDatasourceRequestOrder[],
+    start: number,
+    length: number,
+  ): NgxMatDatasourceRequestOptions {
     return {
       draw: Date.now().toString(),
       columns,
@@ -416,7 +515,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private buildDisabledRows(): void {
     this.disabledRows = [];
     if (this.options.rowDisabled) {
-      this.dataSource.data?.forEach((d) => {
+      this.dataSource.data?.forEach(d => {
         if (typeof this.options.rowDisabled === 'string') {
           if (get(d, this.options.rowDisabled) === true) this.disabledRows.push(d);
         } else if (typeof this.options.rowDisabled === 'function') {
@@ -429,10 +528,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private buildOrder(columns: NgxMatDatasourceRequestColumn[]): NgxMatDatasourceRequestOrder[] {
     const order: NgxMatDatasourceRequestOrder[] = [];
     this.options.columns
-      .filter((c) => !!c.order)
+      .filter(c => !!c.order)
       .sort((c1, c2) => c1.order!.index - c2.order!.index)
-      .forEach((c) => {
-        const index = columns.findIndex((column) => column.data === (c.sortProperty || c.property));
+      .forEach(c => {
+        const index = columns.findIndex(column => column.data === (c.sortProperty || c.property));
         if (index !== -1) order.push({ column: index, dir: c.order!.dir });
       });
     return order;
@@ -440,7 +539,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   updateColumns: UpdateColumn<Record>[] = [];
   openUpdateColumnDisplay(): void {
-    this.updateColumns = this.options.columns.map((column) => ({
+    this.updateColumns = this.options.columns.map(column => ({
       columnDef: column.columnDef,
       header: column.header,
       sticky: column.sticky,
@@ -455,7 +554,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   closeUpdateColumnDisplay(): void {
     let reload = false;
     this.updateColumns.forEach((updated, index) => {
-      const columnIndex = this.options.columns.findIndex((c) => c.columnDef === updated.columnDef);
+      const columnIndex = this.options.columns.findIndex(c => c.columnDef === updated.columnDef);
       if (columnIndex == -1) return;
       if (columnIndex !== index) moveItemInArray(this.options.columns, columnIndex, index);
       const column = this.options.columns[index];
@@ -480,7 +579,11 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     }
   }
 
-  facetClick(column: DatatableColumn<Record> | undefined, result: NgxMatDatasourceResultFacet, option: FacetOptionsOptions): void {
+  facetClick(
+    column: DatatableColumn<Record> | undefined,
+    result: NgxMatDatasourceResultFacet,
+    option: FacetOptionsOptions,
+  ): void {
     if (!column) return;
     const control = this.searchFormGroup?.controls[column.columnDef];
     if (!control) return;
@@ -492,9 +595,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     const columns: NgxMatDatasourceRequestColumn[] = [];
     const additionalColumns: NgxMatDatasourceRequestColumn[] = [];
     if (this.options.additionalProperties) {
-      this.options.additionalProperties.forEach((property) => this.addAdditionalColumn(additionalColumns, property));
+      this.options.additionalProperties.forEach(property => this.addAdditionalColumn(additionalColumns, property));
     }
-    this.options.columns.forEach((c) => {
+    this.options.columns.forEach(c => {
       if (c.hidden) return;
       const column: NgxMatDatasourceRequestColumn = {
         data: c.property,
@@ -511,20 +614,24 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
         }
       }
       if (c.additionalProperties) {
-        c.additionalProperties.forEach((property) => this.addAdditionalColumn(additionalColumns, property));
+        c.additionalProperties.forEach(property => this.addAdditionalColumn(additionalColumns, property));
       }
       columns.push(column);
     });
     for (let additionalColumn of additionalColumns) {
-      const c = columns.find((c) => c.data === additionalColumn.data);
+      const c = columns.find(c => c.data === additionalColumn.data);
       if (!c) columns.push(additionalColumn);
       else if (additionalColumn.search && !c.search) c.search = additionalColumn.search;
     }
     return columns;
   }
 
-  private addAdditionalColumn(additionalColumns: NgxMatDatasourceRequestColumn[], data: string, search?: any): NgxMatDatasourceRequestColumn {
-    let column = additionalColumns.find((c) => c.data === data);
+  private addAdditionalColumn(
+    additionalColumns: NgxMatDatasourceRequestColumn[],
+    data: string,
+    search?: any,
+  ): NgxMatDatasourceRequestColumn {
+    let column = additionalColumns.find(c => c.data === data);
     if (!column) additionalColumns.push((column = { data }));
     if (search) {
       column.search = search;
@@ -535,7 +642,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   private buildDisplayColumns(): void {
     const displayedColumns: string[] = [];
-    this.options.columns.forEach((column) => {
+    this.options.columns.forEach(column => {
       if (column.hidden || column.disabled) return;
       displayedColumns.push(column.columnDef);
       if (column.type && ['number', 'date', 'duration'].includes(column.type)) {
@@ -549,16 +656,66 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private prepareLoadModeOptions(): void {
     this.loadMode = this.options.loadMode ?? 'pagination';
     this.incrementalTrigger = this.options.incremental?.trigger ?? 'inView';
+    this.preparePaginationOptions();
     this.incrementalPageSize = this.getDefaultIncrementalPageSize();
     this.showRecordsCount = this.options.showRecordsCount ?? true;
-    this.incrementalLoadingLabel = this.options.incremental?.loadingLabel ?? localizeLabel`Chargement...`;
-    this.incrementalLoadMoreLabel = this.options.incremental?.loadMoreLabel ?? localizeLabel`Charger plus`;
+    this.incrementalLoadingLabel = this.datatableIntl.incrementalLoadingLabel;
+    this.incrementalLoadMoreLabel = this.datatableIntl.incrementalLoadMoreLabel;
     this.updateRecordsCountState();
     this.updateHasMoreRecordsState();
   }
 
+  private preparePaginationOptions(): void {
+    this.paginationPageSizeOptions = this.options.pageSizeOptions || [20, 50, 100];
+    this.paginationPageSize =
+      this.options.pageSize || this.paginationPageSizeOptions[this.options.pageSizeOptionsIndex ?? 1] || 30;
+  }
+
   private getDefaultIncrementalPageSize(): number {
-    return this.options.incremental?.pageSize ?? this.options.pageSize ?? 30;
+    return this.options.incremental?.pageSize || this.options.pageSize || this.paginationPageSize || 30;
+  }
+
+  private resolveOptions(options: NgxMatDatatableOptions<Record>): NgxMatDatatableOptions<Record> {
+    const actions = this.resolveActions(options);
+    const incremental = this.resolveIncrementalOptions(options);
+    return {
+      ...this.defaultOptions,
+      ...options,
+      service: options.service,
+      columns: options.columns,
+      ...(actions ? { actions } : {}),
+      ...(incremental ? { incremental } : {}),
+    };
+  }
+
+  private resolveActions(options: NgxMatDatatableOptions<Record>): NgxMatDatatableOptions<Record>['actions'] {
+    if (!this.defaultOptions.actions && !options.actions) return undefined;
+    const columns = this.resolveActionColumns(options);
+    return {
+      ...this.defaultOptions.actions,
+      ...options.actions,
+      ...(columns ? { columns } : {}),
+    };
+  }
+
+  private resolveActionColumns(
+    options: NgxMatDatatableOptions<Record>,
+  ): NonNullable<NgxMatDatatableOptions<Record>['actions']>['columns'] {
+    if (!this.defaultOptions.actions?.columns && !options.actions?.columns) return undefined;
+    return {
+      ...this.defaultOptions.actions?.columns,
+      ...options.actions?.columns,
+    };
+  }
+
+  private resolveIncrementalOptions(
+    options: NgxMatDatatableOptions<Record>,
+  ): NgxMatDatatableIncrementalOptions | undefined {
+    if (!this.defaultOptions.incremental && !options.incremental) return undefined;
+    return {
+      ...this.defaultOptions.incremental,
+      ...options.incremental,
+    };
   }
 
   private resetIncrementalLoading(): void {
@@ -582,6 +739,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.showIncrementalRow = this.loadMode === 'incremental' && (this.hasMoreRecords || this.loadingNextRecords);
     this.showIncrementalInViewTrigger = this.showIncrementalRow && this.incrementalTrigger === 'inView';
     this.showIncrementalButtonTrigger = this.showIncrementalRow && this.incrementalTrigger === 'button';
+
+    this.changeDetectorRef.markForCheck();
+    queueMicrotask(() => this.matTable?.renderRows());
   }
 
   private buildSearchFormGroup(): void {
@@ -595,7 +755,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
             });
             controls[column.columnDef] = control;
             if (typeof column.searchUpdated === 'function') {
-              this.subscriptions.add(control.valueChanges.pipe(rxjs.debounceTime(500)).subscribe((value) => column.searchUpdated!(value)));
+              this.subscriptions.add(
+                control.valueChanges.pipe(rxjs.debounceTime(500)).subscribe(value => column.searchUpdated!(value)),
+              );
             }
           }
           return controls;
@@ -604,7 +766,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       ),
     );
     this.subscriptions.add(
-      this.searchFormGroup.valueChanges.pipe(rxjs.debounceTime(500)).subscribe((value) => {
+      this.searchFormGroup.valueChanges.pipe(rxjs.debounceTime(500)).subscribe(value => {
         this.searchUpdated.next(value);
         this.loadFirstPage();
       }),
@@ -614,9 +776,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private consolidateOrderIndex(): void {
     let index = 0;
     this.options.columns
-      .filter((c) => !!c.order)
+      .filter(c => !!c.order)
       .sort((c1, c2) => c1.order!.index - c2.order!.index)
-      .forEach((c) => (c.order!.index = index++));
+      .forEach(c => (c.order!.index = index++));
   }
 
   private async applyConfig(): Promise<void> {
@@ -626,7 +788,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     }
     if (this.options?.columns && this.config?.columns) {
       this.config.columns.forEach((updated, index) => {
-        const columnIndex = this.options.columns.findIndex((c) => c.columnDef === updated.columnDef);
+        const columnIndex = this.options.columns.findIndex(c => c.columnDef === updated.columnDef);
         if (columnIndex == -1) return;
         if (columnIndex !== index) moveItemInArray(this.options.columns, columnIndex, index);
         const column = this.options.columns[index];
@@ -641,10 +803,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   private updateConfig(): void {
-    const pageSizeOptions = this.options.pageSizeOptions ?? [5, 10, 20, 50, 100];
-    const fallbackPageSize = pageSizeOptions[this.options.pageSizeOptionsIndex ?? 0];
+    const pageSizeOptions = this.paginationPageSizeOptions;
+    const fallbackPageSize = this.paginationPageSize;
     const pageSizeOptionsIndex = pageSizeOptions.indexOf(this.paginator?.pageSize ?? fallbackPageSize);
-    const columns = this.options.columns.map((c) => ({
+    const columns = this.options.columns.map(c => ({
       columnDef: c.columnDef,
       sticky: c.sticky,
       hidden: c.hidden,

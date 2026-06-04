@@ -1,6 +1,6 @@
 /** @format */
 
-import { inject, Inject, Injectable, LOCALE_ID, OnInit } from '@angular/core';
+import { inject, Injectable, LOCALE_ID } from '@angular/core';
 
 type Labels = {
   noDateLabel: string;
@@ -10,6 +10,8 @@ type Labels = {
   previousPageLabel: string;
   firstPageLabel: string;
   onLabel: string;
+  incrementalLoadingLabel: string;
+  incrementalLoadMoreLabel: string;
 };
 
 const DEFAULT_LABELS: Labels = {
@@ -20,6 +22,8 @@ const DEFAULT_LABELS: Labels = {
   previousPageLabel: `Previous page`,
   firstPageLabel: `First page`,
   onLabel: `on`,
+  incrementalLoadingLabel: 'Loading...',
+  incrementalLoadMoreLabel: 'Load more',
 };
 
 const LABELS: { [locale: string]: Labels } = {
@@ -31,6 +35,8 @@ const LABELS: { [locale: string]: Labels } = {
     previousPageLabel: `Page précédente`,
     firstPageLabel: `Première page`,
     onLabel: `sur`,
+    incrementalLoadingLabel: 'Chargement...',
+    incrementalLoadMoreLabel: 'Charger plus',
   },
 };
 
@@ -42,6 +48,8 @@ type NumberOptions = {
 const DEFAULT_NUMBER_OPTIONS = {
   separator: ',',
   decimal: '.',
+  duration: 0.3,
+  useEasing: false,
 };
 
 const NUMBER_OPTIONS: { [locale: string]: NumberOptions } = {
@@ -61,6 +69,8 @@ export class NgxMatDatatableIntl {
   previousPageLabel!: string;
   firstPageLabel!: string;
   onLabel!: string;
+  incrementalLoadingLabel!: string;
+  incrementalLoadMoreLabel!: string;
 
   numberOptions!: NumberOptions;
 
@@ -77,7 +87,7 @@ export class NgxMatDatatableIntl {
     this.numberOptions = NUMBER_OPTIONS[this.locale] ?? DEFAULT_NUMBER_OPTIONS;
   }
 
-  private setLabels(labels: Labels) {
+  private setLabels(labels: Labels): void {
     this.noDateLabel = labels.noDateLabel;
     this.itemsPerPageLabel = labels.itemsPerPageLabel;
     this.nextPageLabel = labels.nextPageLabel;
@@ -85,5 +95,7 @@ export class NgxMatDatatableIntl {
     this.previousPageLabel = labels.previousPageLabel;
     this.firstPageLabel = labels.firstPageLabel;
     this.onLabel = labels.onLabel;
+    this.incrementalLoadingLabel = labels.incrementalLoadingLabel;
+    this.incrementalLoadMoreLabel = labels.incrementalLoadMoreLabel;
   }
 }
