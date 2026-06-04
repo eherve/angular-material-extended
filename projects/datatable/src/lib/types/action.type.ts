@@ -4,6 +4,8 @@ import { NgxMatDatatableComponent } from '../datatable.component';
 
 type BaseAction = {
   position: 'start' | 'center' | 'end';
+  isHidden?: boolean;
+  isDisabled?: boolean;
 };
 
 export type IconAction<Record> = BaseAction & {
