@@ -1,17 +1,20 @@
 <!-- @format -->
 
 @if (selectControl) {
-  <mat-form-field class="ngx-datatable-duration-filter" appearance="fill" [class.has-value]="selectControl.value">
+  <mat-form-field
+    class="ngx-datatable-duration-filter"
+    appearance="fill"
+    [class.has-value]="selectControl.value !== null && selectControl.value !== undefined">
     <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
 
     <lib-operator-select disableRange matPrefix [formControl]="operatorControl"></lib-operator-select>
 
-    <input matInput type="number" [formControl]="selectControl" [placeholder]="column.placeholder!" />
+    <input matInput type="number" [formControl]="selectControl" [placeholder]="column.placeholder!" (blur)="onTouched()" />
 
     <lib-time-unit-select [locale]="column.locale" matSuffix [formControl]="timeUnitControl"></lib-time-unit-select>
 
     <button
-      *ngIf="selectControl.value"
+      *ngIf="selectControl.value !== null && selectControl.value !== undefined"
       mat-icon-button
       matSuffix
       size="small"

@@ -12,7 +12,8 @@
       [formControl]="selectControl"
       [matAutocomplete]="auto"
       (input)="filter()"
-      (focus)="focus()" />
+      (focus)="focus()"
+      (blur)="onTouched()" />
     <mat-autocomplete #auto="matAutocomplete" requireSelection [displayWith]="displayWith">
       @if (column.hasGroup) {
         @for (group of groups; track group) {
@@ -46,7 +47,7 @@
     </mat-autocomplete>
 
     <button
-      *ngIf="selectControl.value"
+      *ngIf="selectControl.value !== null && selectControl.value !== undefined && selectControl.value !== ''"
       mat-icon-button
       matSuffix
       size="small"

@@ -64,30 +64,35 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
   control!: FormControl<any>;
   selectControl = new FormControl();
 
-  onChange = () => {};
+  onChange: (value: any) => void = () => {};
 
-  onTouched = () => {};
+  onTouched: () => void = () => {};
 
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);
 
   private subsink = new Subscription();
 
-  writeValue = (controlValue: any) => {
+  writeValue(controlValue: any): void {
     if (controlValue?.value !== this.selectControl.value) {
       const value = controlValue?.value;
-      if (value && !Array.isArray(value) && this.column.multiple) {
-        this.selectControl.setValue([value]);
-      } else this.selectControl.setValue(value);
+      if (!this.isEmptyValue(value) && !Array.isArray(value) && this.column.multiple) {
+        this.selectControl.setValue([value], { emitEvent: false });
+      } else this.selectControl.setValue(value, { emitEvent: false });
     }
-    this.changeDetectorRef.detectChanges();
-  };
+    this.changeDetectorRef.markForCheck();
+  }
 
-  registerOnChange(onChange: any): void {
+  setDisabledState(isDisabled: boolean): void {
+    if (isDisabled) this.selectControl.disable({ emitEvent: false });
+    else this.selectControl.enable({ emitEvent: false });
+  }
+
+  registerOnChange(onChange: (value: any) => void): void {
     this.onChange = onChange;
   }
 
-  registerOnTouched(onTouched: any): void {
+  registerOnTouched(onTouched: () => void): void {
     this.onTouched = onTouched;
   }
 
@@ -97,9 +102,9 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
-        if (value === undefined) this.control.setValue(undefined);
-        else this.control.setValue({ value, operator: this.column.multiple ? '$in' : undefined, regex: false });
-      })
+        if (this.isEmptyValue(value)) this.onChange(undefined);
+        else this.onChange({ value, operator: this.column.multiple ? '$in' : undefined, regex: false });
+      }),
     );
     if (Array.isArray(this.column.options)) this.buildOptions(this.column.options);
     else
@@ -108,7 +113,7 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
           this.options = [];
           this.groups = [];
           this.buildOptions(data);
-        })
+        }),
       );
     this.changeDetectorRef.detectChanges();
   }
@@ -117,7 +122,7 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
     this.subsink.unsubscribe();
   }
 
-  private buildOptions(data: DatatableSearchListOption[]) {
+  private buildOptions(data: DatatableSearchListOption[]): void {
     data.forEach(d => {
       this.options.push(d);
       const name = d.group ?? '';
@@ -125,5 +130,9 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
       if (!group) this.groups.push({ name, options: [d] });
       else group.options.push(d);
     });
+  }
+
+  private isEmptyValue(value: any): boolean {
+    return value === null || value === undefined || value === '' || (Array.isArray(value) && !value.length);
   }
 }

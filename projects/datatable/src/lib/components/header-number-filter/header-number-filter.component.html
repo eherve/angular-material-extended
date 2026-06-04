@@ -1,15 +1,18 @@
 <!-- @format -->
 
 @if (selectControl) {
-  <mat-form-field class="ngx-datatable-number-filter" appearance="fill" [class.has-value]="selectControl.value">
+  <mat-form-field
+    class="ngx-datatable-number-filter"
+    appearance="fill"
+    [class.has-value]="selectControl.value !== null && selectControl.value !== undefined && selectControl.value !== ''">
     <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
 
     <lib-operator-select disableRange matPrefix [formControl]="operatorControl"></lib-operator-select>
 
-    <input matInput [formControl]="selectControl" type="number" />
+    <input matInput [formControl]="selectControl" type="number" (blur)="onTouched()" />
 
     <button
-      *ngIf="selectControl.value"
+      *ngIf="selectControl.value !== null && selectControl.value !== undefined && selectControl.value !== ''"
       mat-icon-button
       matSuffix
       size="small"

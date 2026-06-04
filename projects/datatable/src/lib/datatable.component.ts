@@ -34,8 +34,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { CountUpModule } from 'ngx-countup';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
 import * as rxjs from 'rxjs';
-import * as XLSX from 'xlsx';
-import { FacetOptionsOptions } from '../public-api';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
 import { CellDateValueComponent } from './components/cell-date-value/cell-date-value.component';
 import { CellDurationValueComponent } from './components/cell-duration-value/cell-duration-value.component';
@@ -80,6 +78,7 @@ import {
   DatatableSearchListOption,
   DatatableSelectColumn,
 } from './types/datatable-column.type';
+import { FacetOptionsOptions } from './types/datatable-facet.type';
 import { NgxMatDatatableOptions } from './types/datatable-options.type';
 
 @Injectable()
@@ -249,7 +248,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.subscriptions.unsubscribe();
   }
 
-  load(intersect: boolean) {
+  load(intersect: boolean): void {
     if (!intersect || this.loaded) return;
     this.loaded = true;
     if (this.matTable) this.observer.observe(this.matTable?._elementRef.nativeElement);
@@ -262,7 +261,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.loadPage();
   }
 
-  sortColumn(column: DatatableColumn<Record>) {
+  sortColumn(column: DatatableColumn<Record>): void {
     if (column.sortable === false) return;
     if (!column.order) column.order = { index: this.options.columns.filter(c => !!c.order).length, dir: 'asc' };
     else if (column.order.dir === 'asc') column.order.dir = 'desc';
@@ -274,34 +273,36 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.loadPage();
   }
 
-  redraw(match?: (record: Record) => boolean) {
+  redraw(match?: (record: Record) => boolean): void {
     this.dataSource.redraw(match);
     this.changeDetectorRef.detectChanges();
   }
 
-  refreshColumns() {
+  refreshColumns(): void {
     this.buildDisplayColumns();
   }
 
   exporting = false;
-  async export() {
+  async export(): Promise<void> {
     this.exporting = true;
     try {
+      const XLSX = await import('xlsx');
       const columns = this.buildRequestColumns();
       const order = this.buildOrder(columns);
-      const max = Math.min(Math.floor(5 / this.dataSource.rowSize), this.dataSource.recordsFiltered);
-      const chunks = [];
-      for (let i = 0; i < Math.ceil(this.dataSource.recordsFiltered / max); ++i) {
-        chunks.push({ start: i, length: max });
-      }
+      const chunkLength = this.getExportChunkLength(this.dataSource.recordsFiltered);
+      const chunks = this.buildExportChunks(this.dataSource.recordsFiltered, chunkLength);
 
-      const data = (
-        await Promise.all(
-          chunks.map(c =>
-            this.options.service({ draw: Date.now().toString(), columns, order, start: c.start, length: c.length }),
-          ),
-        )
-      ).reduce((pv, cv) => (pv.push(...cv.data), pv), [] as any[]);
+      const data: any[] = [];
+      for (let chunk of chunks) {
+        const result = await this.options.service({
+          draw: Date.now().toString(),
+          columns,
+          order,
+          start: chunk.start,
+          length: chunk.length,
+        });
+        data.push(...result.data);
+      }
       const rows: any[] = [];
       for (let d of data) {
         const row: any = {};
@@ -313,10 +314,10 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
             if ((c as any).transform) value = (c as any).transform(value, d);
             switch (c.type) {
               case 'select':
-                this.buildExportSelectColumn(c as any, row, value);
+                await this.buildExportSelectColumn(c as any, row, value);
                 break;
               case 'duration':
-                this.buildExportDurationColumn(c as any, row, value);
+                await this.buildExportDurationColumn(c as any, row, value);
                 break;
               default:
                 row[c.header] = value;
@@ -340,7 +341,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     column: DatatableSelectColumn<Record> & { __options?: DatatableSearchListOption[] },
     row: any,
     value: any,
-  ) {
+  ): Promise<void> {
     if (Array.isArray(column.options)) {
       row[column.header] = column.options.find(option => option.value === value)?.name ?? value;
     } else if (column.__options) {
@@ -351,12 +352,27 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     }
   }
 
-  private async buildExportDurationColumn(column: DatatableDurationColumn<Record>, row: any, value: any) {
+  private async buildExportDurationColumn(column: DatatableDurationColumn<Record>, row: any, value: any): Promise<void> {
     row[`${column.header} ms`] = value;
     row[column.header] = duration(value, column);
   }
 
-  async loadPage() {
+  private getExportChunkLength(recordsFiltered: number): number {
+    if (recordsFiltered <= 0) return 0;
+    if (!Number.isFinite(this.dataSource.rowSize) || this.dataSource.rowSize <= 0) return recordsFiltered;
+    return Math.max(1, Math.min(Math.floor(5 / this.dataSource.rowSize), recordsFiltered));
+  }
+
+  private buildExportChunks(recordsFiltered: number, chunkLength: number): { start: number; length: number }[] {
+    if (recordsFiltered <= 0 || chunkLength <= 0) return [];
+    const chunks: { start: number; length: number }[] = [];
+    for (let i = 0; i < Math.ceil(recordsFiltered / chunkLength); ++i) {
+      chunks.push({ start: i, length: chunkLength });
+    }
+    return chunks;
+  }
+
+  async loadPage(): Promise<void> {
     if (!this.dataSource) return;
     const columns = this.buildRequestColumns();
     const order = this.buildOrder(columns);
@@ -372,7 +388,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.buildDisabledRows();
   }
 
-  private buildDisabledRows() {
+  private buildDisabledRows(): void {
     this.disabledRows = [];
     if (this.options.rowDisabled) {
       this.dataSource.data?.forEach(d => {
@@ -398,7 +414,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   updateColumns: UpdateColumn<Record>[] = [];
-  openUpdateColumnDisplay() {
+  openUpdateColumnDisplay(): void {
     this.updateColumns = this.options.columns.map(column => ({
       columnDef: column.columnDef,
       header: column.header,
@@ -407,11 +423,11 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     }));
   }
 
-  reorderColumns(event: CdkDragDrop<any[]>) {
+  reorderColumns(event: CdkDragDrop<any[]>): void {
     moveItemInArray(this.updateColumns, event.previousIndex, event.currentIndex);
   }
 
-  closeUpdateColumnDisplay() {
+  closeUpdateColumnDisplay(): void {
     let reload = false;
     this.updateColumns.forEach((updated, index) => {
       const columnIndex = this.options.columns.findIndex(c => c.columnDef === updated.columnDef);
@@ -429,7 +445,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     if (reload) this.loadPage();
   }
 
-  rowClick(row: Record) {
+  rowClick(row: Record): void {
     if (this.disabledRows.includes(row)) return;
     if (typeof this.options.actions?.rowClick === 'boolean') {
       this.rowClicked.emit(row);
@@ -443,7 +459,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     column: DatatableColumn<Record> | undefined,
     result: NgxMatDatasourceResultFacet,
     option: FacetOptionsOptions,
-  ) {
+  ): void {
     if (!column) return;
     const control = this.searchFormGroup?.controls[column.columnDef];
     if (!control) return;
@@ -486,7 +502,11 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     return columns;
   }
 
-  private addAdditionalColumn(additionalColumns: NgxMatDatasourceRequestColumn[], data: string, search?: any) {
+  private addAdditionalColumn(
+    additionalColumns: NgxMatDatasourceRequestColumn[],
+    data: string,
+    search?: any,
+  ): NgxMatDatasourceRequestColumn {
     let column = additionalColumns.find(c => c.data === data);
     if (!column) additionalColumns.push((column = { data }));
     if (search) {
@@ -496,7 +516,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     return column;
   }
 
-  private buildDisplayColumns() {
+  private buildDisplayColumns(): void {
     const displayedColumns: string[] = [];
     this.options.columns.forEach(column => {
       if (column.hidden || column.disabled) return;
@@ -508,7 +528,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.displayedColumns = displayedColumns;
   }
 
-  private buildSearchFormGroup() {
+  private buildSearchFormGroup(): void {
     this.searchFormGroup = new FormGroup(
       this.options.columns.reduce(
         (controls, column) => {
@@ -538,7 +558,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     );
   }
 
-  private consolidateOrderIndex() {
+  private consolidateOrderIndex(): void {
     let index = 0;
     this.options.columns
       .filter(c => !!c.order)
@@ -546,7 +566,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       .forEach(c => (c.order!.index = index++));
   }
 
-  private async applyConfig() {
+  private async applyConfig(): Promise<void> {
     if (this.options?.configService?.get) {
       const config = await this.options.configService.get();
       this.config = config ?? this.config;
@@ -567,7 +587,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     }
   }
 
-  private updateConfig() {
+  private updateConfig(): void {
     const pageSizeOptions = this.options.pageSizeOptions ?? [5, 10, 20, 50, 100];
     const pageSizeOptionsIndex = pageSizeOptions.indexOf(this.paginator?.pageSize ?? 0);
     const columns = this.options.columns.map(c => ({ columnDef: c.columnDef, sticky: c.sticky, hidden: c.hidden }));

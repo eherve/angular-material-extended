@@ -76,9 +76,9 @@ export class HeaderDateFilterComponent<Record> implements OnInit, AfterViewInit,
   });
   operatorControl = new FormControl<OPERATOR>('=');
 
-  onChange = () => {};
+  onChange: (value: any) => void = () => {};
 
-  onTouched = () => {};
+  onTouched: () => void = () => {};
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _intl = inject(MatDatepickerIntl);
@@ -88,20 +88,38 @@ export class HeaderDateFilterComponent<Record> implements OnInit, AfterViewInit,
 
   private subsink = new Subscription();
 
-  writeValue = (value: any) => {
-    // if (value?.operator && this.operatorControl.value !== value.operator) this.operatorControl.setValue(value.operator);
-    // if (['<>', '≤≥'].includes(this.operatorControl.value!)) {
-    //   if (value?.value?.from !== this.rangeGroup.value.from && value?.value?.to !== this.rangeGroup.value.to) {
-    //     this.rangeGroup.setValue({ from: value.value.from, to: value.value.to });
-    //   }
-    // } else if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
-  };
+  writeValue(value: any): void {
+    const operator = (value?.operator ?? '=') as OPERATOR;
+    this.operatorControl.setValue(operator, { emitEvent: false });
+    if (this.isRangeOperator(operator)) {
+      this.selectControl.setValue(undefined, { emitEvent: false });
+      this.rangeGroup.setValue(
+        {
+          from: value?.value?.from ?? undefined,
+          to: value?.value?.to ?? undefined,
+        },
+        { emitEvent: false },
+      );
+    } else {
+      this.rangeGroup.reset({ from: undefined, to: undefined }, { emitEvent: false });
+      this.selectControl.setValue(value?.value ?? undefined, { emitEvent: false });
+    }
+    this.changeDetectorRef.markForCheck();
+  }
 
-  registerOnChange(onChange: any): void {
+  setDisabledState(isDisabled: boolean): void {
+    const controls = [this.selectControl, this.rangeGroup, this.operatorControl];
+    controls.forEach(control => {
+      if (isDisabled) control.disable({ emitEvent: false });
+      else control.enable({ emitEvent: false });
+    });
+  }
+
+  registerOnChange(onChange: (value: any) => void): void {
     this.onChange = onChange;
   }
 
-  registerOnTouched(onTouched: any): void {
+  registerOnTouched(onTouched: () => void): void {
     this.onTouched = onTouched;
   }
 
@@ -120,27 +138,28 @@ export class HeaderDateFilterComponent<Record> implements OnInit, AfterViewInit,
     this.subsink.add(
       this.selectControl.valueChanges.pipe(debounceTime(500)).subscribe(value => {
         if (this.control.invalid) return;
-        else if (!value) this.control.setValue(undefined);
-        else this.control.setValue(this.buildValue(this.operatorControl.value!, value));
-      })
+        else if (this.isEmptyValue(value)) this.onChange(undefined);
+        else this.onChange(this.buildValue(this.operatorControl.value!, value));
+      }),
     );
     this.subsink.add(
       this.rangeGroup.valueChanges.pipe(debounceTime(500)).subscribe(value => {
-        if (this.rangeGroup.invalid) return;
-        if (!value) this.control.setValue(undefined);
-        else this.control.setValue(this.buildValue(this.operatorControl.value!, value));
-      })
+        if (!this.hasRangeValue(value)) this.onChange(undefined);
+        else if (this.rangeGroup.invalid) return;
+        else this.onChange(this.buildValue(this.operatorControl.value!, value));
+      }),
     );
     this.subsink.add(
       this.operatorControl.valueChanges.subscribe((value: any) => {
-        if (['<>', '≤≥'].includes(value!)) {
-          if (!this.rangeGroup.value || this.rangeGroup.invalid) return;
-          this.control.setValue(this.buildValue(value, this.rangeGroup.value));
+        if (this.isRangeOperator(value)) {
+          if (!this.hasRangeValue(this.rangeGroup.value)) this.onChange(undefined);
+          else if (!this.rangeGroup.invalid) this.onChange(this.buildValue(value, this.rangeGroup.value));
         } else {
-          if (!this.selectControl.value) return;
-          this.control.setValue(this.buildValue(value, this.selectControl.value));
+          if (this.isEmptyValue(this.selectControl.value)) this.onChange(undefined);
+          else this.onChange(this.buildValue(value, this.selectControl.value));
         }
-      })
+        this.changeDetectorRef.markForCheck();
+      }),
     );
     this.changeDetectorRef.detectChanges();
   }
@@ -149,7 +168,14 @@ export class HeaderDateFilterComponent<Record> implements OnInit, AfterViewInit,
     this.subsink.unsubscribe();
   }
 
-  private buildValue(operator: OPERATOR, value: any) {
+  clearRange(): void {
+    this.rangeGroup.reset();
+    this.onChange(undefined);
+    this.onTouched();
+    this.changeDetectorRef.markForCheck();
+  }
+
+  private buildValue(operator: OPERATOR, value: any): any {
     switch (operator) {
       case '=':
         return {
@@ -169,5 +195,17 @@ export class HeaderDateFilterComponent<Record> implements OnInit, AfterViewInit,
       case '≤≥':
         return { operator, value: { from: moment(value.from).startOf('day'), to: moment(value.to).endOf('day') } };
     }
+  }
+
+  private hasRangeValue(value: Partial<{ from: any; to: any }> | null | undefined): boolean {
+    return !this.isEmptyValue(value?.from) || !this.isEmptyValue(value?.to);
+  }
+
+  private isEmptyValue(value: any): boolean {
+    return value === null || value === undefined || value === '';
+  }
+
+  private isRangeOperator(operator: OPERATOR | null | undefined): boolean {
+    return operator === '<>' || operator === '≤≥';
   }
 }

@@ -62,24 +62,38 @@ export class HeaderNumberFilterComponent<Record> implements AfterViewInit, OnDes
   selectControl = new FormControl();
   operatorControl = new FormControl('=');
 
-  onChange = () => {};
+  onChange: (value: any) => void = () => {};
 
-  onTouched = () => {};
+  onTouched: () => void = () => {};
 
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);
 
   private subsink = new Subscription();
 
-  writeValue = (value: any) => {
-    if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
-  };
+  writeValue(value: any): void {
+    if (value?.operator && value.operator !== this.operatorControl.value) {
+      this.operatorControl.setValue(value.operator, { emitEvent: false });
+    }
+    if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value, { emitEvent: false });
+    this.changeDetectorRef.markForCheck();
+  }
 
-  registerOnChange(onChange: any): void {
+  setDisabledState(isDisabled: boolean): void {
+    if (isDisabled) {
+      this.selectControl.disable({ emitEvent: false });
+      this.operatorControl.disable({ emitEvent: false });
+    } else {
+      this.selectControl.enable({ emitEvent: false });
+      this.operatorControl.enable({ emitEvent: false });
+    }
+  }
+
+  registerOnChange(onChange: (value: any) => void): void {
     this.onChange = onChange;
   }
 
-  registerOnTouched(onTouched: any): void {
+  registerOnTouched(onTouched: () => void): void {
     this.onTouched = onTouched;
   }
 
@@ -90,20 +104,24 @@ export class HeaderNumberFilterComponent<Record> implements AfterViewInit, OnDes
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
         if (this.control.invalid) return;
-        else if (!value) this.control.setValue(undefined);
-        else this.control.setValue({ value, regex: false, operator: this.operatorControl.value });
-      })
+        else if (this.isEmptyValue(value)) this.onChange(undefined);
+        else this.onChange({ value, regex: false, operator: this.operatorControl.value });
+      }),
     );
     this.subsink.add(
       this.operatorControl.valueChanges.subscribe((value: any) => {
-        if (this.control.value === null || this.control.value === undefined) return;
-        this.control.setValue({ value: this.selectControl.value, regex: false, operator: value });
-      })
+        if (this.isEmptyValue(this.selectControl.value)) return;
+        this.onChange({ value: this.selectControl.value, regex: false, operator: value });
+      }),
     );
     this.changeDetectorRef.detectChanges();
   }
 
   ngOnDestroy(): void {
     this.subsink.unsubscribe();
+  }
+
+  private isEmptyValue(value: any): boolean {
+    return value === null || value === undefined || value === '';
   }
 }

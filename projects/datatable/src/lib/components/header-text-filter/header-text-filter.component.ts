@@ -57,29 +57,31 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
   control!: FormControl<any>;
   selectControl = new FormControl();
 
-  onChange = () => {};
+  onChange: (value: any) => void = () => {};
 
-  onTouched = () => {};
+  onTouched: () => void = () => {};
 
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);
 
   private subsink = new Subscription();
 
-  writeValue = (value: any) => {
-    if (this.column.regex) {
-      if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
-    } else {
-      const val = this.escapeRegExp(this.selectControl.value);
-      if (val !== (value?.value ?? '')) this.selectControl.setValue(val);
-    }
-  };
+  writeValue(value: any): void {
+    const nextValue = value?.value ?? '';
+    if (nextValue !== this.selectControl.value) this.selectControl.setValue(nextValue, { emitEvent: false });
+    this.changeDetectorRef.markForCheck();
+  }
 
-  registerOnChange(onChange: any): void {
+  setDisabledState(isDisabled: boolean): void {
+    if (isDisabled) this.selectControl.disable({ emitEvent: false });
+    else this.selectControl.enable({ emitEvent: false });
+  }
+
+  registerOnChange(onChange: (value: any) => void): void {
     this.onChange = onChange;
   }
 
-  registerOnTouched(onTouched: any): void {
+  registerOnTouched(onTouched: () => void): void {
     this.onTouched = onTouched;
   }
 
@@ -89,12 +91,12 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
-        if (!value) this.control.setValue(undefined);
+        if (this.isEmptyValue(value)) this.onChange(undefined);
         else {
-          if (this.column.regex) this.control.setValue({ value, regex: true });
-          else this.control.setValue({ value: this.escapeRegExp(value), regex: true });
+          if (this.column.regex) this.onChange({ value, regex: true });
+          else this.onChange({ value: this.escapeRegExp(value), regex: true });
         }
-      })
+      }),
     );
     this.changeDetectorRef.detectChanges();
   }
@@ -106,5 +108,9 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
   private escapeRegExp(value: string): string {
     if (!value) return '';
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  private isEmptyValue(value: any): boolean {
+    return value === null || value === undefined || value === '';
   }
 }

@@ -20,6 +20,8 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
   }
 
   private options?: NgxMatDatasourceRequestOptions;
+  private latestRequestId = 0;
+  private disconnected = false;
   protected dataStream = new BehaviorSubject<Record[]>([]);
 
   constructor(private service: NgxMatDatasourceService<Record>) {
@@ -30,21 +32,28 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
     return this.dataStream;
   }
 
-  disconnect() {}
+  disconnect(): void {
+    this.disconnected = true;
+    this.latestRequestId++;
+    this.loading$.complete();
+    this.dataStream.complete();
+  }
 
   async loadData(options: NgxMatDatasourceRequestOptions): Promise<void> {
+    if (this.disconnected) return;
+    const requestId = ++this.latestRequestId;
     this.options = options;
     this.loading$.next(true);
     try {
       const result = await this.service(options);
-      if (options.draw !== result.draw) return;
+      if (this.disconnected || requestId !== this.latestRequestId || options.draw !== result.draw) return;
       this.recordsTotal = result.recordsTotal;
       this.recordsFiltered = result.recordsFiltered;
       this.facets = result.facets;
       this.dataStream.next(result.data);
       this.calculateRowSize(result.data);
     } finally {
-      this.loading$.next(false);
+      if (!this.disconnected && requestId === this.latestRequestId) this.loading$.next(false);
     }
   }
 
@@ -52,7 +61,7 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
     if (this.options) this.loadData(this.options);
   }
 
-  redraw(match?: (record: Record) => boolean) {
+  redraw(match?: (record: Record) => boolean): void {
     const data: Record[] = [];
     this.dataStream.value.forEach(d => {
       if (match) {
@@ -63,7 +72,7 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
     this.dataStream.next(data);
   }
 
-  private calculateRowSize(data: Record[]) {
+  private calculateRowSize(data: Record[]): void {
     let total = 0;
     for (let row of data) {
       const size = new TextEncoder().encode(JSON.stringify(row)).length;

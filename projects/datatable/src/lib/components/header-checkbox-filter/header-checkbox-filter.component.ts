@@ -57,24 +57,32 @@ export class HeaderCheckboxFilterComponent<Record> implements AfterViewInit, OnD
   control!: FormControl<any>;
   selectControl = new FormControl();
 
-  onChange = () => {};
+  onChange: (value: any) => void = () => {};
 
-  onTouched = () => {};
+  onTouched: () => void = () => {};
 
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);
-
+  private previousValue: boolean | undefined;
   private subsink = new Subscription();
 
-  writeValue = (value: any) => {
-    if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value);
-  };
+  writeValue(value: any): void {
+    const nextValue = value?.value;
+    this.previousValue = nextValue;
+    if (nextValue !== this.selectControl.value) this.selectControl.setValue(nextValue, { emitEvent: false });
+    this.changeDetectorRef.markForCheck();
+  }
 
-  registerOnChange(onChange: any): void {
+  setDisabledState(isDisabled: boolean): void {
+    if (isDisabled) this.selectControl.disable({ emitEvent: false });
+    else this.selectControl.enable({ emitEvent: false });
+  }
+
+  registerOnChange(onChange: (value: any) => void): void {
     this.onChange = onChange;
   }
 
-  registerOnTouched(onTouched: any): void {
+  registerOnTouched(onTouched: () => void): void {
     this.onTouched = onTouched;
   }
 
@@ -82,23 +90,25 @@ export class HeaderCheckboxFilterComponent<Record> implements AfterViewInit, OnD
     const ngControl: NgControl | null = this.injector.get(NgControl, null);
     if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
     this.control = ngControl.control as UntypedFormControl;
-    let previousValue = this.control.value;
+    this.previousValue = this.control.value?.value;
     this.subsink.add(
       this.selectControl.valueChanges
         .pipe(
           filter(value => {
-            if (value === true && previousValue === false) {
-              this.selectControl.setValue(undefined);
+            if (value === true && this.previousValue === false) {
+              this.selectControl.setValue(undefined, { emitEvent: false });
+              this.previousValue = undefined;
+              this.onChange(undefined);
               return false;
             }
             return true;
           }),
-          tap(value => (previousValue = value))
+          tap(value => (this.previousValue = value)),
         )
         .subscribe((value: any) => {
-          if (value === undefined) this.control.setValue(undefined);
-          else this.control.setValue({ value, regex: false });
-        })
+          if (value === undefined) this.onChange(undefined);
+          else this.onChange({ value, regex: false });
+        }),
     );
     this.changeDetectorRef.detectChanges();
   }

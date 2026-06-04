@@ -72,9 +72,9 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   control!: FormControl<any>;
   selectControl = new FormControl();
 
-  onChange = () => {};
+  onChange: (value: any) => void = () => {};
 
-  onTouched = () => {};
+  onTouched: () => void = () => {};
 
   private filter$ = new BehaviorSubject<string | undefined>(undefined);
   private nextPage$ = new Subject<void>();
@@ -83,22 +83,28 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
 
   private subsink = new Subscription();
 
-  writeValue = (value: { value: any; name?: string }) => {
+  writeValue(value: { value: any; name?: string }): void {
     if (value?.value !== this.selectControl.value) {
       if (value?.name) {
         if (!this.options.find(o => o.value === value.value)) {
           this.options.push({ value: value.value, name: value.name });
         }
       }
-      this.selectControl.setValue(value?.value);
+      this.selectControl.setValue(value?.value, { emitEvent: false });
     }
-  };
+    this.changeDetectorRef.markForCheck();
+  }
 
-  registerOnChange(onChange: any): void {
+  setDisabledState(isDisabled: boolean): void {
+    if (isDisabled) this.selectControl.disable({ emitEvent: false });
+    else this.selectControl.enable({ emitEvent: false });
+  }
+
+  registerOnChange(onChange: (value: any) => void): void {
     this.onChange = onChange;
   }
 
-  registerOnTouched(onTouched: any): void {
+  registerOnTouched(onTouched: () => void): void {
     this.onTouched = onTouched;
   }
 
@@ -109,11 +115,11 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
         if (value === undefined) {
-          if (this.control.value !== undefined) this.control.setValue(undefined);
+          if (this.control.value !== undefined) this.onChange(undefined);
         } else if (value === null && !this.options.find(o => o.value === null)) {
-          if (this.control.value !== undefined) this.control.setValue(undefined);
-        } else if (this.control.value?.value !== value) this.control.setValue({ value, regex: false });
-      })
+          if (this.control.value !== undefined) this.onChange(undefined);
+        } else if (this.control.value?.value !== value) this.onChange({ value, regex: false });
+      }),
     );
     this.buildOptions();
     this.changeDetectorRef.detectChanges();
@@ -123,24 +129,24 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
     this.subsink.unsubscribe();
   }
 
-  loadMore(intersect: boolean) {
+  loadMore(intersect: boolean): void {
     if (!intersect) return;
     this.nextPage$.next();
   }
 
-  focus() {
-    if (this.column.loadOnFocus && !this.selectControl.value) {
+  focus(): void {
+    if (this.column.loadOnFocus && this.isEmptyValue(this.selectControl.value)) {
       const search = this.input.nativeElement.value;
       if (!search.length || this.filter$.value !== search) this.filter$.next(search);
     }
   }
 
-  filter() {
+  filter(): void {
     const search = this.input.nativeElement.value;
     this.filter$.next(search);
   }
 
-  displayWith = (value: any) => {
+  displayWith = (value: any): string => {
     let val;
     if (!this.options) val = value;
     else val = this.options.find(o => o.value === value)?.name ?? value;
@@ -154,7 +160,7 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
     return parent.value;
   }
 
-  private buildOptions() {
+  private buildOptions(): void {
     this.options = this.column.searchValue !== undefined ? (this.column.searchValueOptions ?? []) : [];
     this.subsink.add(
       this.filter$
@@ -170,7 +176,7 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
               startWith(skip),
               tap(() => (this.searching = true)),
               switchMap(async () =>
-                this.column.options(this.column.limit || 10, skip, search, this.getGlobalSearchValue())
+                this.column.options(this.column.limit || 10, skip, search, this.getGlobalSearchValue()),
               ),
               map(data => {
                 data.forEach(d => {
@@ -183,11 +189,15 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
                 skip += this.column.limit || 10;
                 this.hasMore = data?.length === (this.column.limit || 10);
                 this.searching = false;
-              })
+              }),
             );
-          })
+          }),
         )
-        .subscribe()
+        .subscribe(),
     );
+  }
+
+  private isEmptyValue(value: any): boolean {
+    return value === null || value === undefined || value === '';
   }
 }
