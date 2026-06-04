@@ -2,22 +2,15 @@
 
 import { DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, Observable } from 'rxjs';
-import {
-  NgxMatDatasourceRequestOptions,
-  NgxMatDatasourceResultFacet,
-  NgxMatDatasourceService,
-} from './types/datasource-service.type';
+import { NgxMatDatasourceRequestOptions, NgxMatDatasourceResultFacet, NgxMatDatasourceService } from './types/datasource-service.type';
 
 export class DatagridDataSource<Record> extends DataSource<Record> {
   loading$ = new BehaviorSubject<boolean>(true);
+  data: Record[] = [];
   recordsFiltered = 0;
   recordsTotal?: number;
   facets?: { [id: string]: NgxMatDatasourceResultFacet[] };
   rowSize: number = 0; // row size in kb
-
-  get data(): Record[] {
-    return this.dataStream.value;
-  }
 
   private options?: NgxMatDatasourceRequestOptions;
   private latestRequestId = 0;
@@ -39,37 +32,42 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
     this.dataStream.complete();
   }
 
-  async loadData(options: NgxMatDatasourceRequestOptions): Promise<void> {
+  async loadData(options: NgxMatDatasourceRequestOptions, append = false): Promise<void> {
     if (this.disconnected) return;
     const requestId = ++this.latestRequestId;
     this.options = options;
-    this.loading$.next(true);
+    if (!append) this.loading$.next(true);
     try {
       const result = await this.service(options);
       if (this.disconnected || requestId !== this.latestRequestId || options.draw !== result.draw) return;
       this.recordsTotal = result.recordsTotal;
       this.recordsFiltered = result.recordsFiltered;
       this.facets = result.facets;
-      this.dataStream.next(result.data);
-      this.calculateRowSize(result.data);
+      this.setData(result.data, append);
+      this.calculateRowSize(this.data);
     } finally {
-      if (!this.disconnected && requestId === this.latestRequestId) this.loading$.next(false);
+      if (!append && !this.disconnected && requestId === this.latestRequestId) this.loading$.next(false);
     }
   }
 
   refresh(): void {
-    if (this.options) this.loadData(this.options);
+    if (this.options) void this.loadData(this.options);
   }
 
   redraw(match?: (record: Record) => boolean): void {
     const data: Record[] = [];
-    this.dataStream.value.forEach(d => {
+    this.data.forEach((d) => {
       if (match) {
         if (match(d)) data.push({ ...d });
         else data.push(d);
       } else data.push({ ...d });
     });
-    this.dataStream.next(data);
+    this.setData(data, false);
+  }
+
+  private setData(data: Record[], append: boolean): void {
+    this.data = append ? [...this.data, ...data] : data;
+    this.dataStream.next(this.data);
   }
 
   private calculateRowSize(data: Record[]): void {

@@ -9,6 +9,17 @@ import { FacetOptions } from './datatable-facet.type';
 type Opacity<Record> = number | ((column: DatatableValueColumn<Record>, row: Record) => number | undefined);
 type Color<Record> = string | ((column: DatatableValueColumn<Record>, row: Record) => string | undefined);
 
+export type NgxMatDatatableLoadMode = 'pagination' | 'incremental';
+
+export type NgxMatDatatableIncrementalTrigger = 'inView' | 'button';
+
+export interface NgxMatDatatableIncrementalOptions {
+  trigger?: NgxMatDatatableIncrementalTrigger;
+  pageSize?: number;
+  loadingLabel?: string;
+  loadMoreLabel?: string;
+}
+
 export type NgxMatDatatableOptions<Record> = {
   title?: string;
 
@@ -25,6 +36,11 @@ export type NgxMatDatatableOptions<Record> = {
 
   pageSizeOptions?: number[];
   pageSizeOptionsIndex?: number;
+  pageSize?: number;
+
+  loadMode?: NgxMatDatatableLoadMode;
+  incremental?: NgxMatDatatableIncrementalOptions;
+  showRecordsCount?: boolean;
 
   additionalProperties?: string[];
 

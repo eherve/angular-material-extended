@@ -8,20 +8,10 @@
       <table id="table" #table mat-table [fixedLayout]="false" [dataSource]="dataSource" multiTemplateDataRows>
         @for (column of options.columns; track column) {
           <ng-container [matColumnDef]="column.columnDef" [sticky]="column.sticky">
-            <th
-              mat-header-cell
-              *matHeaderCellDef
-              [class.searchable]="column.searchable"
-              [style.min-width.px]="column.minWidth || options.columnMinWith">
+            <th mat-header-cell *matHeaderCellDef [class.searchable]="column.searchable" [style.min-width.px]="column.minWidth || options.columnMinWith">
               <ng-container *ngTemplateOutlet="headerTmpl; context: { column }"></ng-container>
             </th>
-            <td
-              mat-cell
-              *matCellDef="let row"
-              [style.min-width.px]="column.minWidth || options.columnMinWith"
-              [style.color]="row | cellColor: column : options"
-              [style.opacity]="row | cellOpacity: column : options"
-              [style.background-color]="row | backgroundColor: column : options">
+            <td mat-cell *matCellDef="let row" [style.min-width.px]="column.minWidth || options.columnMinWith" [style.color]="row | cellColor: column : options" [style.opacity]="row | cellOpacity: column : options" [style.background-color]="row | backgroundColor: column : options">
               <ng-container *ngTemplateOutlet="cellTmpl; context: { column, row }"></ng-container>
             </td>
           </ng-container>
@@ -36,18 +26,43 @@
           </td>
         </ng-container>
 
+        <ng-container matColumnDef="_incrementalLoad">
+          <td mat-footer-cell *matFooterCellDef [attr.colspan]="visibleColumnsColspan">
+            <div class="incremental-load-row">
+              @if (showIncrementalInViewTrigger) {
+                <div class="incremental-sentinel" intersectionObserver (intersection)="onIncrementalIntersection($event.intersect)">
+                  @if (loadingNextRecords) {
+                    <mat-spinner [diameter]="20"></mat-spinner>
+                    <span>{{ incrementalLoadingLabel }}</span>
+                  }
+                </div>
+              }
+
+              @if (showIncrementalButtonTrigger) {
+                <button mat-button color="primary" [disabled]="loadingNextRecords" (click)="loadNextIncrementalPage()">
+                  @if (loadingNextRecords) {
+                    <mat-spinner [diameter]="20"></mat-spinner>
+                    <span>{{ incrementalLoadingLabel }}</span>
+                  } @else {
+                    <span>{{ incrementalLoadMoreLabel }}</span>
+                  }
+                </button>
+              }
+            </div>
+          </td>
+        </ng-container>
+
         <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
 
-        <tr
-          mat-row
-          *matRowDef="let row; columns: displayedColumns"
-          [class.has-click]="options.actions?.rowClick"
-          [class.is-disabled]="row | includedIn: disabledRows"
-          (click)="rowClick(row)"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" [class.has-click]="options.actions?.rowClick" [class.is-disabled]="row | includedIn: disabledRows" (click)="rowClick(row)"></tr>
 
         <ng-container *ngIf="options.expandedDetailContentId">
           <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
         </ng-container>
+
+        @if (showIncrementalRow) {
+          <tr mat-footer-row *matFooterRowDef="incrementalRowColumns" class="incremental-row"></tr>
+        }
 
         <tr class="mat-row" *matNoDataRow>
           <td [attr.colspan]="displayedColumns.length">
@@ -59,13 +74,7 @@
       </table>
     </div>
 
-    <mat-paginator
-      id="paginator"
-      [length]="dataSource.recordsFiltered"
-      [pageSizeOptions]="options.pageSizeOptions || [5, 10, 20, 50, 100]"
-      [pageSize]="(options.pageSizeOptions ?? [5, 10, 20, 50, 100])[options.pageSizeOptionsIndex ?? 0]"
-      [showFirstLastButtons]="true">
-    </mat-paginator>
+    <mat-paginator *ngIf="loadMode === 'pagination'" id="paginator" [length]="dataSource.recordsFiltered" [pageSizeOptions]="options.pageSizeOptions || [5, 10, 20, 50, 100]" [pageSize]="(options.pageSizeOptions ?? [5, 10, 20, 50, 100])[options.pageSizeOptionsIndex ?? 0]" [showFirstLastButtons]="true"> </mat-paginator>
   </div>
 }
 
@@ -76,15 +85,8 @@
 </div>
 
 <ng-template #headTmpl>
-  @let hasColumnDisplay =
-    options.actions?.columns?.hideAndShow || options.actions?.columns?.sticky || options.actions?.columns?.reorder;
-  @let hasHead =
-    !!options.title ||
-    !!options.facets?.length ||
-    !!options.actions?.user?.length ||
-    hasColumnDisplay ||
-    options.actions?.export ||
-    options.actions?.refresh;
+  @let hasColumnDisplay = options.actions?.columns?.hideAndShow || options.actions?.columns?.sticky || options.actions?.columns?.reorder;
+  @let hasHead = !!options.title || !!options.facets?.length || !!options.actions?.user?.length || hasColumnDisplay || options.actions?.export || options.actions?.refresh || showRecordsCount;
   <div *ngIf="hasHead" id="head" #head>
     <div id="head-start">
       <span *ngIf="options.title" id="title" [innerHTML]="options.title"></span>
@@ -116,14 +118,7 @@
 
       @if (hasColumnDisplay) {
         <div class="action">
-          <button
-            mat-icon-button
-            color="primary"
-            class="icon-only action"
-            [matTooltip]="options.actions?.columns?.tooltip || 'Afficher / masquer des colonnes'"
-            [matMenuTriggerFor]="columnsMenu"
-            (menuOpened)="openUpdateColumnDisplay()"
-            (menuClosed)="closeUpdateColumnDisplay()">
+          <button mat-icon-button color="primary" class="icon-only action" [matTooltip]="options.actions?.columns?.tooltip || 'Afficher / masquer des colonnes'" [matMenuTriggerFor]="columnsMenu" (menuOpened)="openUpdateColumnDisplay()" (menuClosed)="closeUpdateColumnDisplay()">
             <mat-icon>view_column</mat-icon>
           </button>
         </div>
@@ -150,30 +145,22 @@
           </div>
         </div>
       }
+
+      @if (showRecordsCount) {
+        <div id="records-count">{{ displayedRecordsCount }} / {{ totalRecordsCount }}</div>
+      }
     </div>
   </div>
 </ng-template>
 
 <mat-menu #columnsMenu="matMenu" class="datatable-columns-menu">
-  <div
-    id="column-options"
-    cdkDropList
-    has-handle
-    [cdkDropListDisabled]="!options.actions?.columns?.reorder"
-    (cdkDropListDropped)="reorderColumns($event)">
+  <div id="column-options" cdkDropList has-handle [cdkDropListDisabled]="!options.actions?.columns?.reorder" (cdkDropListDropped)="reorderColumns($event)">
     @for (column of updateColumns; track column) {
       @if (['_select', '_rownumber'].includes(column.header)) {
         <div mat-list-item cdkDrag></div>
       } @else {
         <div class="column-options-item" mat-list-item cdkDrag (click)="$event.stopPropagation()">
-          <button
-            *ngIf="options.actions?.columns?.hideAndShow"
-            mat-icon-button
-            size="small"
-            color="primary"
-            [class]="column.hidden ? 'toggle-off' : 'toggle-on'"
-            (click)="column.hidden = !column.hidden"
-            [style.margin-right.px]="8">
+          <button *ngIf="options.actions?.columns?.hideAndShow" mat-icon-button size="small" color="primary" [class]="column.hidden ? 'toggle-off' : 'toggle-on'" (click)="column.hidden = !column.hidden" [style.margin-right.px]="8">
             <mat-icon>
               @if (!column.hidden) {
                 visibility
@@ -182,25 +169,11 @@
               }
             </mat-icon>
           </button>
-          <button
-            *ngIf="options.actions?.columns?.sticky"
-            mat-icon-button
-            size="small"
-            color="primary"
-            [class]="column.sticky ? 'toggle-on' : 'toggle-off'"
-            (click)="column.sticky = !column.sticky"
-            [style.margin-right.px]="8">
+          <button *ngIf="options.actions?.columns?.sticky" mat-icon-button size="small" color="primary" [class]="column.sticky ? 'toggle-on' : 'toggle-off'" (click)="column.sticky = !column.sticky" [style.margin-right.px]="8">
             <mat-icon>push_pin </mat-icon>
           </button>
           <span [style.margin-right.px]="8" [innerHTML]="column.header"></span>
-          <mat-icon
-            *ngIf="options.actions?.columns?.reorder"
-            size="small"
-            class="handle"
-            cdkDragHandle
-            [style.margin]="'0 8px 0 auto'">
-            open_with
-          </mat-icon>
+          <mat-icon *ngIf="options.actions?.columns?.reorder" size="small" class="handle" cdkDragHandle [style.margin]="'0 8px 0 auto'"> open_with </mat-icon>
         </div>
       }
     }
@@ -222,22 +195,16 @@
             <lib-header-select-filter [column]="column" [formControlName]="column.columnDef"></lib-header-select-filter>
           }
           @case ('autocomplete') {
-            <lib-header-autocomplete-filter
-              [column]="column"
-              [formControlName]="column.columnDef"></lib-header-autocomplete-filter>
+            <lib-header-autocomplete-filter [column]="column" [formControlName]="column.columnDef"></lib-header-autocomplete-filter>
           }
           @case ('checkbox') {
-            <lib-header-checkbox-filter
-              [column]="column"
-              [formControlName]="column.columnDef"></lib-header-checkbox-filter>
+            <lib-header-checkbox-filter [column]="column" [formControlName]="column.columnDef"></lib-header-checkbox-filter>
           }
           @case ('date') {
             <lib-header-date-filter [column]="column" [formControlName]="column.columnDef"></lib-header-date-filter>
           }
           @case ('duration') {
-            <lib-header-duration-filter
-              [column]="column"
-              [formControlName]="column.columnDef"></lib-header-duration-filter>
+            <lib-header-duration-filter [column]="column" [formControlName]="column.columnDef"></lib-header-duration-filter>
           }
           @default {
             <span>{{ column.header }}</span>
@@ -254,13 +221,7 @@
 <ng-template #headerActionsTmpl let-column="column">
   <div class="header-actions">
     <ng-container *ngIf="column.sortable">
-      <button
-        class="sort-btn"
-        mat-icon-button
-        size="small"
-        (click)="sortColumn(column)"
-        [matBadgeHidden]="!column.order"
-        [matBadge]="column.order?.index + 1">
+      <button class="sort-btn" mat-icon-button size="small" (click)="sortColumn(column)" [matBadgeHidden]="!column.order" [matBadge]="column.order?.index + 1">
         @switch (column.order?.dir) {
           @case ('asc') {
             <mat-icon size="small">arrow_upward</mat-icon>
@@ -279,12 +240,7 @@
 
 <ng-template #cellTmpl let-column="column" let-row="row">
   @defer (on viewport) {
-    <div
-      class="cell"
-      [@.disabled]="!!options.disableRowAnimation"
-      @fade
-      [style.place-content]="column.align"
-      [style.max-height.px]="options.rowMaxHeight">
+    <div class="cell" [@.disabled]="!!options.disableRowAnimation" @fade [style.place-content]="column.align" [style.max-height.px]="options.rowMaxHeight">
       @let value = row | get: column.property;
       @if (column.cellComponent) {
         <ng-container *ngComponentOutlet="column.cellComponent; inputs: { column, row, value }" />
@@ -352,11 +308,7 @@
     @switch (action.kind) {
       @case ('icon') {
         <div class="action user-action" [matTooltip]="action.tooltip">
-          <button
-            [style.--action-color]="action.color"
-            mat-icon-button
-            (click)="action.onclick(this)"
-            [disabled]="!!action.isDisabled">
+          <button [style.--action-color]="action.color" mat-icon-button (click)="action.onclick(this)" [disabled]="!!action.isDisabled">
             <mat-icon>{{ action.icon }}</mat-icon>
           </button>
         </div>
@@ -388,8 +340,7 @@
           <ng-container *ngTemplateOutlet="facetsChipsTmpl; context: { column, data, facetOptions }"></ng-container>
         }
         @default {
-          <ng-container
-            *ngTemplateOutlet="facetsProgressSpinnersTmpl; context: { column, data, facetOptions }"></ng-container>
+          <ng-container *ngTemplateOutlet="facetsProgressSpinnersTmpl; context: { column, data, facetOptions }"></ng-container>
         }
       }
     }
@@ -407,14 +358,7 @@
       @let color = option?.color ?? 'var(--mat-sys-primary)';
       @let labelColor = option?.labelColor;
       <!-- @let percent = (d.value / total) * 100; -->
-      <mat-chip
-        class="chip-facet"
-        [class.has-action]="column?.searchable !== false"
-        (click)="facetClick(column, d, option)"
-        [style.--facet-color]="color"
-        [style.--facet-label-color]="labelColor ?? 'var(--mat-sys-on-primary)'"
-        [style.--facet-value-color]="labelColor ?? color"
-        [style.width.px]="size">
+      <mat-chip class="chip-facet" [class.has-action]="column?.searchable !== false" (click)="facetClick(column, d, option)" [style.--facet-color]="color" [style.--facet-label-color]="labelColor ?? 'var(--mat-sys-on-primary)'" [style.--facet-value-color]="labelColor ?? color" [style.width.px]="size">
         <div class="chip-facet-content" [style.font-size.px]="fontSize">
           <div class="chip-facet-key">{{ name }}</div>
           <div class="chip-facet-value">{{ d.value | number: '0.0-2' }}</div>
@@ -440,19 +384,11 @@
         @let name = option?.name ?? d._id;
         @let color = option?.color ?? 'var(--mat-sys-primary)';
         @let percent = (d.value / total) * 100;
-        <div
-          class="facet-indicator"
-          [class.has-action]="column?.searchable !== false"
-          (click)="facetClick(column, d, option)">
+        <div class="facet-indicator" [class.has-action]="column?.searchable !== false" (click)="facetClick(column, d, option)">
           <lib-progress-spinner [diameter]="size" [color]="color" [fontSize]="fontSize" [value]="percent">
             <mat-label>{{ name }}</mat-label>
           </lib-progress-spinner>
-          <mat-label
-            class="facet-indicator-label"
-            [style.font-size]="fontSize"
-            [countUp]="d.value"
-            [options]="datatableIntl.numberOptions"
-            [reanimateOnClick]="false">
+          <mat-label class="facet-indicator-label" [style.font-size]="fontSize" [countUp]="d.value" [options]="datatableIntl.numberOptions" [reanimateOnClick]="false">
             {{ d.value | number: '0.0-2' }}
           </mat-label>
         </div>
