@@ -5,6 +5,7 @@ import { DatatableConfig } from './config.type';
 import { NgxMatDatasourceService } from './datasource-service.type';
 import { DatatableColumn, DatatableValueColumn } from './datatable-column.type';
 import { FacetOptions } from './datatable-facet.type';
+import { NgxMatDatatableStateService } from './datatable-state.type';
 
 type Opacity<Record> = number | ((column: DatatableValueColumn<Record>, row: Record) => number | undefined);
 type Color<Record> = string | ((column: DatatableValueColumn<Record>, row: Record) => string | undefined);
@@ -27,6 +28,8 @@ export type NgxMatDatatableOptions<Record> = {
     get?: () => Promise<DatatableConfig | undefined>;
     set?: (config: DatatableConfig) => Promise<void>;
   };
+
+  stateService?: NgxMatDatatableStateService;
 
   columns: DatatableColumn<Record>[];
   columnMinWith?: number;

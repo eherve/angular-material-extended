@@ -15,5 +15,6 @@ export * from './lib/types/datatable-column.type';
 export * from './lib/types/datatable-options.type';
 export * from './lib/types/action.type';
 export * from './lib/types/datatable-facet.type';
+export * from './lib/types/datatable-state.type';
 
 export * from './lib/datatable.intl';

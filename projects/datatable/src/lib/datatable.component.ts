@@ -33,6 +33,7 @@ import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CountUpModule } from 'ngx-countup';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
+import moment from 'moment';
 import * as rxjs from 'rxjs';
 import { CellCheckboxValueComponent } from './components/cell-checkbox-value/cell-checkbox-value.component';
 import { CellDateValueComponent } from './components/cell-date-value/cell-date-value.component';
@@ -87,6 +88,7 @@ import {
   NgxMatDatatableLoadMode,
   NgxMatDatatableOptions,
 } from './types/datatable-options.type';
+import { NgxMatDatatableState } from './types/datatable-state.type';
 
 @Injectable()
 class NgxMatDatatablePaginatorIntl extends MatPaginatorIntl {
@@ -228,6 +230,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   showIncrementalButtonTrigger = false;
   paginationPageSizeOptions: number[] = [];
   paginationPageSize = 30;
+  paginationPageIndex = 0;
 
   searchFormGroup!: FormGroup;
 
@@ -235,6 +238,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private changeDetectorRef = inject(ChangeDetectorRef);
   private defaultOptions = inject(NGX_MAT_DATATABLE_DEFAULT_OPTIONS);
   private incrementalLoadToken = 0;
+  private restoredState?: NgxMatDatatableState;
 
   get data(): Record[] | undefined {
     return this._data;
@@ -278,6 +282,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     if (!this.options?.columns) throw new Error(`missing mongoose datatable component columns`);
     this.options = this.resolveOptions(this.options);
     await this.applyConfig();
+    await this.applyState();
     this.prepareLoadModeOptions();
     this.buildDisplayColumns();
     this.buildSearchFormGroup();
@@ -299,6 +304,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       this.subscriptions.add(
         this.paginator?.page.subscribe(() => {
           this.updateConfig();
+          void this.updateState();
           void this.loadPage();
         }),
       );
@@ -501,7 +507,11 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   private loadFirstPage(): void {
-    if (this.loadMode === 'pagination' && this.paginator) this.paginator.pageIndex = 0;
+    if (this.loadMode === 'pagination') {
+      this.paginationPageIndex = 0;
+      if (this.paginator) this.paginator.pageIndex = 0;
+    }
+    void this.updateState();
     void this.loadPage();
   }
 
@@ -669,6 +679,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.paginationPageSizeOptions = this.options.pageSizeOptions || [20, 50, 100];
     this.paginationPageSize =
       this.options.pageSize || this.paginationPageSizeOptions[this.options.pageSizeOptionsIndex ?? 1] || 30;
+    this.paginationPageIndex = this.restoredState?.page?.index ?? 0;
   }
 
   private getDefaultIncrementalPageSize(): number {
@@ -749,8 +760,15 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       this.options.columns.reduce(
         (controls, column) => {
           if (column.searchable) {
+            const restoredValue = this.restoredState?.filters[column.columnDef];
+            const initialValue =
+              restoredValue !== undefined
+                ? this.restoreFilterValue(column, restoredValue)
+                : column.searchValue !== undefined
+                  ? { value: column.searchValue }
+                  : undefined;
             const control = new FormControl({
-              value: column.searchValue !== undefined ? { value: column.searchValue } : undefined,
+              value: initialValue,
               disabled: false,
             });
             controls[column.columnDef] = control;
@@ -800,6 +818,75 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     if (this.options && typeof this.config?.pageSizeOptionsIndex === 'number') {
       this.options.pageSizeOptionsIndex = this.config.pageSizeOptionsIndex;
     }
+  }
+
+  private async applyState(): Promise<void> {
+    if (!this.options.stateService?.get) return;
+    const state = await this.options.stateService.get();
+    if (!state || state.version !== 1) return;
+    this.restoredState = {
+      version: 1,
+      filters: state.filters ?? {},
+      order: Array.isArray(state.order) ? state.order : [],
+      ...(state.page ? { page: state.page } : {}),
+    };
+    this.applyStateOrder(this.restoredState);
+    if (this.restoredState.page?.size) this.options.pageSize = this.restoredState.page.size;
+  }
+
+  private applyStateOrder(state: NgxMatDatatableState): void {
+    this.options.columns.forEach(column => delete column.order);
+    state.order
+      .slice()
+      .sort((a, b) => a.index - b.index)
+      .forEach(order => {
+        const column = this.options.columns.find(item => item.columnDef === order.columnDef);
+        if (!column || column.sortable === false) return;
+        column.order = { index: order.index, dir: order.dir };
+      });
+    this.consolidateOrderIndex();
+  }
+
+  private restoreFilterValue(column: DatatableColumn<Record>, value: any): any {
+    if (column.type !== 'date' || !value?.value) return value;
+    if (typeof value.value === 'object' && ('from' in value.value || 'to' in value.value)) {
+      return {
+        ...value,
+        value: {
+          from: value.value.from ? moment(value.value.from) : undefined,
+          to: value.value.to ? moment(value.value.to) : undefined,
+        },
+      };
+    }
+    return { ...value, value: moment(value.value) };
+  }
+
+  private async updateState(): Promise<void> {
+    if (!this.options.stateService?.set || !this.searchFormGroup) return;
+    await this.options.stateService.set(this.buildState());
+  }
+
+  private buildState(): NgxMatDatatableState {
+    const order = this.options.columns
+      .filter(column => !!column.order)
+      .map(column => ({
+        columnDef: column.columnDef,
+        index: column.order!.index,
+        dir: column.order!.dir,
+      }));
+    const page =
+      this.loadMode === 'pagination'
+        ? {
+            index: this.paginator?.pageIndex ?? this.paginationPageIndex,
+            size: this.paginator?.pageSize ?? this.paginationPageSize,
+          }
+        : undefined;
+    return {
+      version: 1,
+      filters: this.searchFormGroup.getRawValue(),
+      order,
+      ...(page ? { page } : {}),
+    };
   }
 
   private updateConfig(): void {
