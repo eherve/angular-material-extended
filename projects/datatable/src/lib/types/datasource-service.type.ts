@@ -1,6 +1,7 @@
 /** @format */
 
 export type NgxMatDatasourceRequestSearchOperator =
+  | '='
   | '>'
   | '>='
   | '≥'
@@ -19,16 +20,20 @@ export type NgxMatDatasourceRequestSearch = {
   operator?: NgxMatDatasourceRequestSearchOperator;
 };
 
+export type NgxMatDatasourceRequestColumnType = 'string' | 'boolean' | 'number' | 'date' | 'objectid';
+
 export type NgxMatDatasourceRequestColumn = {
   data: string;
 
-  projection?: string;
+  projection?: any;
 
   name?: string;
 
   searchable?: boolean;
 
   orderable?: boolean;
+
+  type?: NgxMatDatasourceRequestColumnType;
 
   search?: NgxMatDatasourceRequestSearch;
 };
@@ -61,6 +66,8 @@ export type NgxMatDatasourceRequestOptions = {
   length?: number;
 
   search?: NgxMatDatasourceRequestSearch;
+
+  enableUnfilteredInfo?: boolean;
 
   facets?: NgxMatDatasourceRequestFacet[];
 };

@@ -12,6 +12,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:datatable": "ng test NgxMatDatatable --watch=false --browsers=ChromeHeadless",
     "build:datatable": "ng build NgxMatDatatable",
     "build:tooltip": "ng build NgxMatTooltip",
     "publish:datatable": "ng build NgxMatDatatable && cd dist/datatable && npm publish && cd -",

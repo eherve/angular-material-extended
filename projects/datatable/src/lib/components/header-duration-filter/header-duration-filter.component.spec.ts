@@ -1,19 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormControl, NgControl } from '@angular/forms';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
-import { HeaderDateFilterComponent } from './header-duration-filter.component';
+import { HeaderDurationFilterComponent } from './header-duration-filter.component';
 
-describe('HeaderSelectFilterComponent', () => {
-  let component: HeaderDateFilterComponent;
-  let fixture: ComponentFixture<HeaderDateFilterComponent>;
+describe('HeaderDurationFilterComponent', () => {
+  let component: HeaderDurationFilterComponent<any>;
+  let fixture: ComponentFixture<HeaderDurationFilterComponent<any>>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HeaderDateFilterComponent]
-    })
-    .compileComponents();
+      imports: [HeaderDurationFilterComponent],
+      providers: [{ provide: NgControl, useValue: { control: new FormControl() } }, provideNoopAnimations()],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(HeaderDateFilterComponent);
+    fixture = TestBed.createComponent(HeaderDurationFilterComponent<any>);
     component = fixture.componentInstance;
+    component.column = { type: 'duration', columnDef: 'duration', header: 'Duration', property: 'duration', searchable: true } as any;
     fixture.detectChanges();
   });
 

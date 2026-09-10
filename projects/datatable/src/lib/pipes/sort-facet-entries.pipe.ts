@@ -8,7 +8,7 @@ import { FacetOptionsOptions } from '../types/datatable-facet.type';
 export class SortFacetEntriesPipe implements PipeTransform {
   transform(entries: NgxMatDatasourceResultFacet[], options: FacetOptionsOptions[]): NgxMatDatasourceResultFacet[] {
     if (!entries || !options) return entries;
-    return entries.sort((e1, e2) => {
+    return [...entries].sort((e1, e2) => {
       const ie1 = options!.findIndex(o => o.value === e1._id);
       if (ie1 === -1) return 1;
       const ie2 = options!.findIndex(o => o.value === e2._id);

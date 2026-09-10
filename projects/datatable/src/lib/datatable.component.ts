@@ -66,21 +66,12 @@ import { SortFacetEntriesPipe } from './pipes/sort-facet-entries.pipe';
 import { ValueFunctionPipe } from './pipes/suffix-function.pipe';
 import { SumPipe } from './pipes/sum.pipe';
 import { TransformPipe } from './pipes/transform.pipe';
-import { duration } from './tools/duration.tool';
+import { buildDatasourceRequestOptions } from './tools/datasource-request.tool';
+import { exportDatatable } from './tools/datatable-export.tool';
 import { get } from './tools/get.tool';
 import { DatatableConfig } from './types/config.type';
-import {
-  NgxMatDatasourceRequestColumn,
-  NgxMatDatasourceRequestOptions,
-  NgxMatDatasourceRequestOrder,
-  NgxMatDatasourceResultFacet,
-} from './types/datasource-service.type';
-import {
-  DatatableColumn,
-  DatatableDurationColumn,
-  DatatableSearchListOption,
-  DatatableSelectColumn,
-} from './types/datatable-column.type';
+import { NgxMatDatasourceResultFacet } from './types/datasource-service.type';
+import { DatatableColumn } from './types/datatable-column.type';
 import { FacetOptionsOptions } from './types/datatable-facet.type';
 import {
   NgxMatDatatableIncrementalOptions,
@@ -247,9 +238,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   @ViewChild('container') container?: ElementRef<HTMLDivElement>;
   @ViewChild('head') head?: ElementRef;
-  @ViewChild(MatTable) matTable?: MatTable<any> & {
-    _elementRef: { nativeElement: any };
-  };
+  @ViewChild('table', { read: ElementRef }) tableElement?: ElementRef<HTMLTableElement>;
+  @ViewChild(MatTable) matTable?: MatTable<Record>;
 
   observer = new ResizeObserver(entries => {
     entries.forEach(entry => {
@@ -292,14 +282,14 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   ngOnDestroy(): void {
-    if (this.matTable) this.observer.unobserve(this.matTable._elementRef.nativeElement);
+    if (this.tableElement) this.observer.unobserve(this.tableElement.nativeElement);
     this.subscriptions.unsubscribe();
   }
 
   load(intersect: boolean): void {
     if (!intersect || this.loaded) return;
     this.loaded = true;
-    if (this.matTable) this.observer.observe(this.matTable?._elementRef.nativeElement);
+    if (this.tableElement) this.observer.observe(this.tableElement.nativeElement);
     if (this.loadMode === 'pagination') {
       this.subscriptions.add(
         this.paginator?.page.subscribe(() => {
@@ -329,6 +319,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   redraw(match?: (record: Record) => boolean): void {
     this.dataSource.redraw(match);
+    this._data = this.dataSource.data;
+    this.buildDisabledRows();
     this.changeDetectorRef.detectChanges();
   }
 
@@ -340,96 +332,15 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   async export(): Promise<void> {
     this.exporting = true;
     try {
-      const XLSX = await import('xlsx');
-      const columns = this.buildRequestColumns();
-      const order = this.buildOrder(columns);
-      const chunkLength = this.getExportChunkLength(this.dataSource.recordsFiltered);
-      const chunks = this.buildExportChunks(this.dataSource.recordsFiltered, chunkLength);
-
-      const data: any[] = [];
-      for (let chunk of chunks) {
-        const result = await this.options.service({
-          draw: Date.now().toString(),
-          columns,
-          order,
-          start: chunk.start,
-          length: chunk.length,
-        });
-        data.push(...result.data);
-      }
-      const rows: any[] = [];
-      for (let d of data) {
-        const row: any = {};
-        for (let c of this.options.columns) {
-          if (c.hidden || c.disabled) continue;
-          let value = get(d, c.property);
-          if (c.export) c.export(row, value, d);
-          else {
-            if ((c as any).transform) value = (c as any).transform(value, d);
-            switch (c.type) {
-              case 'select':
-                await this.buildExportSelectColumn(c as any, row, value);
-                break;
-              case 'duration':
-                await this.buildExportDurationColumn(c as any, row, value);
-                break;
-              default:
-                row[c.header] = value;
-            }
-          }
-        }
-        rows.push(row);
-      }
-
-      const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.json_to_sheet(rows);
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'export');
-      const filename = typeof this.options.actions?.export === 'string' ? this.options.actions.export : 'export';
-      await XLSX.writeFile(workbook, `${filename}-${Date.now()}.xlsx`);
+      await exportDatatable({
+        options: this.options,
+        searchValues: this.searchFormGroup?.getRawValue() ?? {},
+        recordsFiltered: this.dataSource.recordsFiltered,
+        rowSize: this.dataSource.rowSize,
+      });
     } finally {
       this.exporting = false;
     }
-  }
-
-  private async buildExportSelectColumn(
-    column: DatatableSelectColumn<Record> & {
-      __options?: DatatableSearchListOption[];
-    },
-    row: any,
-    value: any,
-  ): Promise<void> {
-    if (Array.isArray(column.options)) {
-      row[column.header] = column.options.find(option => option.value === value)?.name ?? value;
-    } else if (column.__options) {
-      row[column.header] = column.__options.find(option => option.value === value)?.name ?? value;
-    } else {
-      const options = await rxjs.lastValueFrom(column.options);
-      row[column.header] = options.find(option => option.value === value)?.name ?? value;
-    }
-  }
-
-  private async buildExportDurationColumn(
-    column: DatatableDurationColumn<Record>,
-    row: any,
-    value: any,
-  ): Promise<void> {
-    row[`${column.header} ms`] = value;
-    row[column.header] = duration(value, column);
-  }
-
-  private getExportChunkLength(recordsFiltered: number): number {
-    if (recordsFiltered <= 0) return 0;
-    if (!Number.isFinite(this.dataSource.rowSize) || this.dataSource.rowSize <= 0) return recordsFiltered;
-    return Math.max(1, Math.min(Math.floor(5 / this.dataSource.rowSize), recordsFiltered));
-  }
-
-  private buildExportChunks(recordsFiltered: number, chunkLength: number): { start: number; length: number }[] {
-    if (recordsFiltered <= 0 || chunkLength <= 0) return [];
-    const chunks: { start: number; length: number }[] = [];
-    for (let i = 0; i < Math.ceil(recordsFiltered / chunkLength); ++i) {
-      chunks.push({ start: i, length: chunkLength });
-    }
-    return chunks;
   }
 
   async loadPage(): Promise<void> {
@@ -449,11 +360,14 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     this.updateIncrementalRowState();
     const loadToken = this.incrementalLoadToken;
     try {
-      const columns = this.buildRequestColumns();
-      const order = this.buildOrder(columns);
       const nextPageIndex = this.incrementalPageIndex + 1;
       await this.dataSource.loadData(
-        this.buildRequestOptions(columns, order, nextPageIndex, this.incrementalPageSize),
+        buildDatasourceRequestOptions(
+          this.options,
+          this.searchFormGroup.getRawValue(),
+          nextPageIndex,
+          this.incrementalPageSize,
+        ),
         true,
       );
       if (loadToken !== this.incrementalLoadToken) return;
@@ -474,36 +388,23 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   private async loadPaginationPage(): Promise<void> {
-    const columns = this.buildRequestColumns();
-    const order = this.buildOrder(columns);
     await this.dataSource.loadData(
-      this.buildRequestOptions(columns, order, this.paginator!.pageIndex, this.paginator!.pageSize),
+      buildDatasourceRequestOptions(
+        this.options,
+        this.searchFormGroup.getRawValue(),
+        this.paginator!.pageIndex,
+        this.paginator!.pageSize,
+      ),
     );
     this.updateLoadedDataState();
   }
 
   private async loadInitialPage(): Promise<void> {
     this.resetIncrementalLoading();
-    const columns = this.buildRequestColumns();
-    const order = this.buildOrder(columns);
-    await this.dataSource.loadData(this.buildRequestOptions(columns, order, 0, this.incrementalPageSize));
+    await this.dataSource.loadData(
+      buildDatasourceRequestOptions(this.options, this.searchFormGroup.getRawValue(), 0, this.incrementalPageSize),
+    );
     this.updateLoadedDataState();
-  }
-
-  private buildRequestOptions(
-    columns: NgxMatDatasourceRequestColumn[],
-    order: NgxMatDatasourceRequestOrder[],
-    start: number,
-    length: number,
-  ): NgxMatDatasourceRequestOptions {
-    return {
-      draw: Date.now().toString(),
-      columns,
-      start,
-      length,
-      order,
-      facets: this.options.facets,
-    };
   }
 
   private loadFirstPage(): void {
@@ -533,18 +434,6 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
         }
       });
     }
-  }
-
-  private buildOrder(columns: NgxMatDatasourceRequestColumn[]): NgxMatDatasourceRequestOrder[] {
-    const order: NgxMatDatasourceRequestOrder[] = [];
-    this.options.columns
-      .filter(c => !!c.order)
-      .sort((c1, c2) => c1.order!.index - c2.order!.index)
-      .forEach(c => {
-        const index = columns.findIndex(column => column.data === (c.sortProperty || c.property));
-        if (index !== -1) order.push({ column: index, dir: c.order!.dir });
-      });
-    return order;
   }
 
   updateColumns: UpdateColumn<Record>[] = [];
@@ -581,7 +470,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   rowClick(row: Record): void {
     if (this.disabledRows.includes(row)) return;
-    if (typeof this.options.actions?.rowClick === 'boolean') {
+    if (this.options.actions?.rowClick === true) {
       this.rowClicked.emit(row);
     } else if (typeof this.options.actions?.rowClick === 'function') {
       this.options.actions.rowClick(row);
@@ -599,55 +488,6 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     if (!control) return;
     if (option && option.value !== control.value?.value) control.setValue({ value: option.value, name: option.name });
     else if (result._id !== control.value?.value) control.setValue({ value: result._id });
-  }
-
-  private buildRequestColumns(): NgxMatDatasourceRequestColumn[] {
-    const columns: NgxMatDatasourceRequestColumn[] = [];
-    const additionalColumns: NgxMatDatasourceRequestColumn[] = [];
-    if (this.options.additionalProperties) {
-      this.options.additionalProperties.forEach(property => this.addAdditionalColumn(additionalColumns, property));
-    }
-    this.options.columns.forEach(c => {
-      if (c.hidden) return;
-      const column: NgxMatDatasourceRequestColumn = {
-        data: c.property,
-        projection: c.projection,
-        name: c.columnDef,
-        searchable: c.searchable,
-      };
-      if (c.sortProperty && c.order) this.addAdditionalColumn(additionalColumns, c.sortProperty);
-      if (c.searchable) {
-        const control = this.searchFormGroup.controls[c.columnDef];
-        if (control.value) {
-          if (c.searchProperty) this.addAdditionalColumn(additionalColumns, c.searchProperty, control.value);
-          else column.search = control.value;
-        }
-      }
-      if (c.additionalProperties) {
-        c.additionalProperties.forEach(property => this.addAdditionalColumn(additionalColumns, property));
-      }
-      columns.push(column);
-    });
-    for (let additionalColumn of additionalColumns) {
-      const c = columns.find(c => c.data === additionalColumn.data);
-      if (!c) columns.push(additionalColumn);
-      else if (additionalColumn.search && !c.search) c.search = additionalColumn.search;
-    }
-    return columns;
-  }
-
-  private addAdditionalColumn(
-    additionalColumns: NgxMatDatasourceRequestColumn[],
-    data: string,
-    search?: any,
-  ): NgxMatDatasourceRequestColumn {
-    let column = additionalColumns.find(c => c.data === data);
-    if (!column) additionalColumns.push((column = { data }));
-    if (search) {
-      column.search = search;
-      column.searchable = true;
-    }
-    return column;
   }
 
   private buildDisplayColumns(): void {

@@ -1,63 +1,51 @@
-# Datatable
+# @eherve/angular-material-datatable
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.0.
+Angular Material datatable library with server-side filtering, sorting, pagination, facets, configurable columns and XLSX export.
 
-## Code scaffolding
+## Workspace
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The library lives in `projects/datatable` inside the `angular-material-extended` workspace. Build and test it from the workspace root.
 
 ```bash
-ng generate --help
+npm run test:datatable
+npm run build:datatable
 ```
 
-## Building
-
-To build the library, run:
+Publishing is intentionally separate and should only be run when a new package version is ready:
 
 ```bash
-ng build datatable
+npm run publish:datatable
 ```
 
-This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
+## Datasource contract
 
-### Publishing the Library
+A datatable receives a `NgxMatDatasourceService<Record>` and sends `NgxMatDatasourceRequestOptions` containing the visible/requested columns, ordering, pagination, search and optional facets.
 
-Once the project is built, you can publish your library by following these steps:
+The main request fields are:
 
-1. Navigate to the `dist` directory:
-   ```bash
-   cd dist/datatable
-   ```
+- `draw`: request identifier echoed by the datasource response;
+- `columns`: requested properties and optional projection/search metadata;
+- `order`: indexes into `columns` with `asc` / `desc` direction;
+- `start`: page index, not a row offset;
+- `length`: page size;
+- `search`: optional global search;
+- `facets`: optional indicator aggregations.
 
-2. Run the `npm publish` command to publish your library to the npm registry:
-   ```bash
-   npm publish
-   ```
+The companion `mongoose-datatable` backend converts pagination to a MongoDB offset using `start * length`.
 
-## Running unit tests
+A datasource response contains `draw`, `recordsFiltered`, `data`, optional `facets`, and may also provide unfiltered total information when supported by the datasource.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Projection expressions
 
-```bash
-ng test
+`projection` accepts datasource-specific projection values. With `mongoose-datatable`, MongoDB aggregation expressions are supported, for example:
+
+```ts
+{
+  data: 'itemCount',
+  projection: { $size: { $ifNull: ['$items', []] } },
+}
 ```
 
-## Running end-to-end tests
+## Runtime dependencies
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Angular framework packages and the external libraries used directly by this package are declared as peer dependencies so the consuming Angular application keeps a single compatible runtime instance.

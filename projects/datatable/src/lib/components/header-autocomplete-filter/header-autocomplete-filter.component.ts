@@ -29,7 +29,21 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { IntersectionObserverModule } from 'ngx-intersection-observer';
-import { BehaviorSubject, debounceTime, filter, map, startWith, Subject, Subscription, switchMap, tap } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  debounceTime,
+  defer,
+  filter,
+  finalize,
+  map,
+  of,
+  startWith,
+  Subject,
+  Subscription,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { stripHtml } from '../../tools/strip-html.tool';
 import { DatatableSearchAutocompleteColumn, DatatableSearchListOption } from '../../types/datatable-column.type';
@@ -175,9 +189,19 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
             return this.nextPage$.pipe(
               startWith(skip),
               tap(() => (this.searching = true)),
-              switchMap(async () =>
-                this.column.options(this.column.limit || 10, skip, search, this.getGlobalSearchValue()),
+              switchMap(() =>
+                defer(() => this.column.options(this.column.limit || 10, skip, search, this.getGlobalSearchValue())).pipe(
+                  catchError(() => {
+                    this.hasMore = false;
+                    return of(null);
+                  }),
+                  finalize(() => {
+                    this.searching = false;
+                    this.changeDetectorRef.markForCheck();
+                  }),
+                ),
               ),
+              filter((data): data is DatatableSearchListOption[] => Array.isArray(data)),
               map(data => {
                 data.forEach(d => {
                   this.options.push(d);
@@ -187,8 +211,7 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
                   else group.options.push(d);
                 });
                 skip += this.column.limit || 10;
-                this.hasMore = data?.length === (this.column.limit || 10);
-                this.searching = false;
+                this.hasMore = data.length === (this.column.limit || 10);
               }),
             );
           }),

@@ -1,5 +1,5 @@
 /**
- * Public API Surface of mongoose-datatable
+ * Public API Surface of @eherve/angular-material-datatable
  *
  * @format
  */

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { NgxMatDatatableIntl } from '../../datatable.intl';
 import { ProgressSpinnerComponent } from './progress-spinner.component';
 
 describe('ProgressSpinnerComponent', () => {
@@ -8,9 +9,9 @@ describe('ProgressSpinnerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProgressSpinnerComponent]
-    })
-    .compileComponents();
+      imports: [ProgressSpinnerComponent],
+      providers: [NgxMatDatatableIntl],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ProgressSpinnerComponent);
     component = fixture.componentInstance;

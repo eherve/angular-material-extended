@@ -59,7 +59,7 @@ const NUMBER_OPTIONS: { [locale: string]: NumberOptions } = {
   },
 };
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class NgxMatDatatableIntl {
   locale: string = inject(LOCALE_ID);
   noDateLabel!: string;
@@ -83,8 +83,9 @@ export class NgxMatDatatableIntl {
   };
 
   constructor() {
-    this.setLabels(LABELS[this.locale] ?? DEFAULT_LABELS);
-    this.numberOptions = NUMBER_OPTIONS[this.locale] ?? DEFAULT_NUMBER_OPTIONS;
+    const locale = this.locale.toLowerCase().split(/[-_]/)[0];
+    this.setLabels(LABELS[locale] ?? DEFAULT_LABELS);
+    this.numberOptions = NUMBER_OPTIONS[locale] ?? DEFAULT_NUMBER_OPTIONS;
   }
 
   private setLabels(labels: Labels): void {
