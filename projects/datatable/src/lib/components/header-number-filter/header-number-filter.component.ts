@@ -26,6 +26,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { Subscription } from 'rxjs';
+import { NgxMatDatatableIntl } from '../../datatable.intl';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { DatatableSearchNumberColumn } from '../../types/datatable-column.type';
 import { OperatorSelectComponent } from '../operator-select/operator-select.component';
@@ -65,6 +66,8 @@ export class HeaderNumberFilterComponent<Record> implements AfterViewInit, OnDes
   onChange: (value: any) => void = () => {};
 
   onTouched: () => void = () => {};
+
+  datatableIntl = inject(NgxMatDatatableIntl);
 
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);

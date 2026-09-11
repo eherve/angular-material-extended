@@ -33,7 +33,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import moment from 'moment';
-import { debounceTime, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { NgxMatDatatableIntl } from '../../datatable.intl';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { DatatableSearchDateColumn } from '../../types/datatable-column.type';
 import { OPERATOR, OperatorSelectComponent } from '../operator-select/operator-select.component';
@@ -83,6 +84,8 @@ export class HeaderDateFilterComponent<Record> implements OnInit, AfterViewInit,
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _intl = inject(MatDatepickerIntl);
   private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
+  datatableIntl = inject(NgxMatDatatableIntl);
+
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);
 
@@ -136,14 +139,14 @@ export class HeaderDateFilterComponent<Record> implements OnInit, AfterViewInit,
     if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
-      this.selectControl.valueChanges.pipe(debounceTime(500)).subscribe(value => {
+      this.selectControl.valueChanges.subscribe(value => {
         if (this.control.invalid) return;
         else if (this.isEmptyValue(value)) this.onChange(undefined);
         else this.onChange(this.buildValue(this.operatorControl.value!, value));
       }),
     );
     this.subsink.add(
-      this.rangeGroup.valueChanges.pipe(debounceTime(500)).subscribe(value => {
+      this.rangeGroup.valueChanges.subscribe(value => {
         if (!this.hasRangeValue(value)) this.onChange(undefined);
         else if (this.rangeGroup.invalid) return;
         else this.onChange(this.buildValue(this.operatorControl.value!, value));
@@ -169,7 +172,7 @@ export class HeaderDateFilterComponent<Record> implements OnInit, AfterViewInit,
   }
 
   clearRange(): void {
-    this.rangeGroup.reset();
+    this.rangeGroup.reset({ from: undefined, to: undefined }, { emitEvent: false });
     this.onChange(undefined);
     this.onTouched();
     this.changeDetectorRef.markForCheck();

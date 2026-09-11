@@ -1,10 +1,10 @@
 {
   "name": "@eherve/angular-material-datatable",
-  "version": "19.24.0",
+  "version": "19.25.0",
   "author": "Eric Herve <eric.herve.95@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/eherve/angular-material-extended.git"
+    "url": "git+https://github.com/eherve/angular-material-extended.git"
   },
   "private": false,
   "publishConfig": {

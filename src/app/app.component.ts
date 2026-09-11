@@ -21,14 +21,14 @@ import {
 import moment from 'moment';
 import { of } from 'rxjs';
 import {
+  DatatableColumn,
+  DatatableConfig,
   NgxMatDatasourceResult,
   NgxMatDatasourceResultFacet,
   NgxMatDatasourceService,
-  DatatableColumn,
-  NgxMatDatatableOptions,
   NgxMatDatatableComponent,
+  NgxMatDatatableOptions,
 } from '../../projects/datatable/src/public-api';
-import { DatatableConfig } from '../../projects/datatable/src/lib/types/config.type';
 
 moment.locale('fr');
 

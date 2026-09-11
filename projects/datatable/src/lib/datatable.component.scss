@@ -185,6 +185,12 @@
     .mat-mdc-row {
       &.has-click:not(.is-disabled) {
         cursor: pointer;
+
+        &:focus-visible {
+          outline: 2px solid currentColor;
+          outline-offset: -2px;
+        }
+
         &:hover {
           .mat-mdc-cell {
             --datatable-hover-color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary));
@@ -355,6 +361,10 @@
   flex-direction: row;
 }
 
+.detail-row {
+  height: 0;
+}
+
 .element-detail {
   background: whitesmoke;
   overflow: hidden;
@@ -396,6 +406,11 @@
 
     &.has-action {
       cursor: pointer;
+
+      &:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+      }
     }
 
     .facet-indicator-label {
@@ -425,6 +440,11 @@
 
     &.has-action {
       cursor: pointer;
+
+      &:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+      }
     }
 
     ::ng-deep {

@@ -27,7 +27,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { debounceTime, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
+import { NgxMatDatatableIntl } from '../../datatable.intl';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { DatatableSearchDurationColumn } from '../../types/datatable-column.type';
 import { OPERATOR, OperatorSelectComponent } from '../operator-select/operator-select.component';
@@ -74,6 +75,8 @@ export class HeaderDurationFilterComponent<Record> implements OnInit, AfterViewI
 
   onTouched: () => void = () => {};
 
+  datatableIntl = inject(NgxMatDatatableIntl);
+
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);
 
@@ -112,7 +115,7 @@ export class HeaderDurationFilterComponent<Record> implements OnInit, AfterViewI
     if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
-      this.selectControl.valueChanges.pipe(debounceTime(500)).subscribe(value => {
+      this.selectControl.valueChanges.subscribe(value => {
         if (this.control.invalid) return;
         else if (this.isEmptyValue(value)) this.onChange(undefined);
         else {

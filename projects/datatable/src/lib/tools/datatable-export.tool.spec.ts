@@ -15,6 +15,7 @@ import {
 
 type TestRecord = {
   name?: string;
+  secondaryName?: string;
   status?: string | string[];
   duration?: number;
 };
@@ -117,6 +118,34 @@ describe('datatable export tool', () => {
     expect(rows[0]['Custom export']).toBe('custom:test');
     expect(rows[0]['Duration ms']).toBe(60000);
     expect(rows[0]['Duration']).toBeTruthy();
+  });
+
+  it('should preserve columns with duplicate headers in the worksheet', async () => {
+    const service = jasmine.createSpy<NgxMatDatasourceService<TestRecord>>('service');
+    const options: NgxMatDatatableOptions<TestRecord> = {
+      service,
+      columns: [
+        { type: 'text', columnDef: 'name', header: 'Name', property: 'name' },
+        { type: 'text', columnDef: 'secondaryName', header: 'Name', property: 'secondaryName' },
+      ],
+    };
+
+    const rows = await buildExportRows(options, [{ name: 'Primary', secondaryName: 'Secondary' }]);
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    sanitizeExportHeaders(worksheet, XLSX);
+
+    expect(worksheet['A1'].v).toBe('Name');
+    expect(worksheet['B1'].v).toBe('Name');
+    expect(worksheet['A2'].v).toBe('Primary');
+    expect(worksheet['B2'].v).toBe('Secondary');
+  });
+
+  it('should decode HTML entities in worksheet headers', () => {
+    const worksheet = XLSX.utils.json_to_sheet([{ 'R&amp;D': 'value' }]);
+
+    sanitizeExportHeaders(worksheet, XLSX);
+
+    expect(worksheet['A1'].v).toBe('R&D');
   });
 
   it('should remove HTML tags from worksheet headers without adding spaces', () => {

@@ -13,6 +13,7 @@ export type IconAction<Record> = BaseAction & {
   icon: string;
   onclick: (datagrid: NgxMatDatatableComponent<Record>) => void;
   tooltip?: string;
+  ariaLabel?: string;
   color?: string;
 };
 

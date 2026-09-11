@@ -26,6 +26,7 @@ export function buildDatasourceRequestColumns<Record>(
       projection: columnOptions.projection,
       name: columnOptions.columnDef,
       searchable: columnOptions.searchable,
+      orderable: columnOptions.sortable,
     };
 
     if (columnOptions.sortProperty && columnOptions.order) {
@@ -60,7 +61,7 @@ export function buildDatasourceRequestOrder<Record>(
   const order: NgxMatDatasourceRequestOrder[] = [];
 
   options.columns
-    .filter(column => !!column.order)
+    .filter(column => !!column.order && column.sortable !== false)
     .sort((first, second) => first.order!.index - second.order!.index)
     .forEach(columnOptions => {
       const property = columnOptions.sortProperty || columnOptions.property;

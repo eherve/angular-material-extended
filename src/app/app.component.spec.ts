@@ -1,33 +1,38 @@
 /** @format */
 
-import { TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { CommonModule } from '@angular/common';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { NgxMatDatatableModule } from '../../projects/datatable/src/public-api';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
-  beforeEach(() =>
-    TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
+  let fixture: ComponentFixture<AppComponent>;
+  let component: AppComponent;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [AppComponent],
-    })
-  );
+      imports: [CommonModule, MatButtonModule, MatCardModule, MatProgressSpinnerModule, NgxMatDatatableModule],
+      providers: [provideNoopAnimations()],
+    }).compileComponents();
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
   });
 
-  it(`should have as title 'angular-material-extended'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    // expect(app.title).toEqual('angular-material-extended');
+  it('should create the demo application', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
+  it('should render the datatable demo', () => {
+    component.datatableOptions.configService = undefined;
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('angular-material-extended app is running!');
+
+    const datatable = fixture.nativeElement.querySelector('ngx-mat-datatable');
+    expect(datatable).not.toBeNull();
   });
 });

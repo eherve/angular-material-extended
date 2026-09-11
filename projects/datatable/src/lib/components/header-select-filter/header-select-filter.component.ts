@@ -26,9 +26,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { Subscription } from 'rxjs';
 import { IsArrayPipe } from '../../pipes/is-array.pipe';
+import { NgxMatDatatableIntl } from '../../datatable.intl';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { SelectOptionPipe } from '../../pipes/select-option.pipe';
 import { DatatableSearchListOption, DatatableSearchSelectColumn } from '../../types/datatable-column.type';
+import { SelectOptionsCacheService } from '../../select-options-cache.service';
 
 @Component({
   selector: 'lib-header-select-filter',
@@ -68,8 +70,11 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
 
   onTouched: () => void = () => {};
 
+  datatableIntl = inject(NgxMatDatatableIntl);
+
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);
+  private selectOptionsCache = inject(SelectOptionsCacheService);
 
   private subsink = new Subscription();
 
@@ -109,7 +114,7 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
     if (Array.isArray(this.column.options)) this.buildOptions(this.column.options);
     else
       this.subsink.add(
-        this.column.options.subscribe(data => {
+        this.selectOptionsCache.resolve(this.column.options).subscribe(data => {
           this.options = [];
           this.groups = [];
           this.buildOptions(data);

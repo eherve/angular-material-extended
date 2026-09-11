@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { NgxMatDatatableComponent } from './datatable.component';
 import { NgxMatDatasourceService } from './types/datasource-service.type';
@@ -21,6 +21,7 @@ describe('NgxMatDatatableComponent', () => {
     await TestBed.configureTestingModule({
       imports: [NgxMatDatatableComponent],
       providers: [provideNoopAnimations()],
+      deferBlockBehavior: DeferBlockBehavior.Manual,
     }).compileComponents();
 
     fixture = TestBed.createComponent(NgxMatDatatableComponent<TestRecord>);
@@ -92,9 +93,99 @@ describe('NgxMatDatatableComponent', () => {
     expect(emitSpy).toHaveBeenCalledOnceWith(row);
   });
 
+  it('should toggle the expanded detail independently from the row click action', () => {
+    const firstRow = { name: 'First' };
+    const secondRow = { name: 'Second' };
+    component.options.expandedDetailContentId = 'detail';
+    const emitSpy = spyOn(component.rowClicked, 'emit');
+
+    component.rowClick(firstRow);
+    expect(component.expandedRow).toBe(firstRow);
+
+    component.rowClick(secondRow);
+    expect(component.expandedRow).toBe(secondRow);
+
+    component.rowClick(secondRow);
+    expect(component.expandedRow).toBeNull();
+    expect(emitSpy).not.toHaveBeenCalled();
+  });
+
+  it('should activate an interactive row from the keyboard', () => {
+    const row = { name: 'Keyboard row' };
+    component.options.actions = { rowClick: true };
+    const emitSpy = spyOn(component.rowClicked, 'emit');
+    const preventDefault = jasmine.createSpy('preventDefault');
+
+    component.rowKeydown({ key: 'Enter', preventDefault } as unknown as KeyboardEvent, row);
+
+    expect(preventDefault).toHaveBeenCalled();
+    expect(emitSpy).toHaveBeenCalledOnceWith(row);
+  });
+
+  it('should ignore keyboard activation when the row has no action', () => {
+    const row = { name: 'Static row' };
+    const emitSpy = spyOn(component.rowClicked, 'emit');
+    const preventDefault = jasmine.createSpy('preventDefault');
+
+    component.rowKeydown({ key: 'Enter', preventDefault } as unknown as KeyboardEvent, row);
+
+    expect(preventDefault).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
+  });
+
+  it('should keep sanitized HTML cell bindings attached when content changes', async () => {
+    const column = component.options.columns[0];
+    Object.assign(column, { prefix: '<strong class="test-prefix">Before</strong>' });
+    service.and.callFake(async request => ({
+      draw: request.draw,
+      recordsFiltered: 1,
+      recordsTotal: 1,
+      data: [{ name: 'Row' }],
+    }));
+
+    await component.loadPage();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const deferBlocks = await fixture.getDeferBlocks();
+    expect(deferBlocks.length).toBe(1);
+    await deferBlocks[0].render(DeferBlockState.Complete);
+    fixture.detectChanges();
+
+    const getPrefix = (): HTMLElement | null => fixture.nativeElement.querySelector('.test-prefix');
+    expect(getPrefix()?.textContent).toBe('Before');
+
+    Object.assign(column, { prefix: '<strong class="test-prefix">After</strong>' });
+    fixture.detectChanges();
+
+    expect(getPrefix()?.textContent).toBe('After');
+  });
+
+
+  it('should reload the first page when a column visibility changes', () => {
+    component.openUpdateColumnDisplay();
+    component.updateColumns[0].hidden = true;
+    const loadFirstPageSpy = spyOn<any>(component, 'loadFirstPage');
+
+    component.closeUpdateColumnDisplay();
+
+    expect(component.options.columns[0].hidden).toBeTrue();
+    expect(loadFirstPageSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should render HTML headers for non-searchable columns', () => {
+    component.options.columns[0].header = 'Compte sési<strong class="header-html">O</strong>';
+
+    fixture.detectChanges();
+
+    const headerHtml: HTMLElement | null = fixture.nativeElement.querySelector('.header-html');
+    expect(headerHtml?.textContent).toBe('O');
+  });
+
   it('should preserve disabled row state after redraw', () => {
     const row: TestRecord = { name: 'Disabled', disabled: true };
     component.options.rowDisabled = record => record.disabled === true;
+    component.options.expandedDetailContentId = 'detail';
     component.dataSource.data = [row];
     component.disabledRows = [row];
 
@@ -106,6 +197,7 @@ describe('NgxMatDatatableComponent', () => {
     const emitSpy = spyOn(component.rowClicked, 'emit');
     component.options.actions = { rowClick: true };
     component.rowClick(redrawnRow);
+    expect(component.expandedRow).toBeNull();
     expect(emitSpy).not.toHaveBeenCalled();
   });
 

@@ -12,6 +12,15 @@ type Labels = {
   onLabel: string;
   incrementalLoadingLabel: string;
   incrementalLoadMoreLabel: string;
+  columnsActionLabel: string;
+  exportActionLabel: string;
+  refreshActionLabel: string;
+  showColumnActionLabel: string;
+  hideColumnActionLabel: string;
+  pinColumnActionLabel: string;
+  unpinColumnActionLabel: string;
+  sortColumnActionLabel: string;
+  clearFilterLabel: string;
 };
 
 const DEFAULT_LABELS: Labels = {
@@ -24,6 +33,15 @@ const DEFAULT_LABELS: Labels = {
   onLabel: `on`,
   incrementalLoadingLabel: 'Loading...',
   incrementalLoadMoreLabel: 'Load more',
+  columnsActionLabel: 'Configure columns',
+  exportActionLabel: 'Export data',
+  refreshActionLabel: 'Refresh data',
+  showColumnActionLabel: 'Show column',
+  hideColumnActionLabel: 'Hide column',
+  pinColumnActionLabel: 'Pin column',
+  unpinColumnActionLabel: 'Unpin column',
+  sortColumnActionLabel: 'Sort column',
+  clearFilterLabel: 'Clear filter',
 };
 
 const LABELS: { [locale: string]: Labels } = {
@@ -37,12 +55,23 @@ const LABELS: { [locale: string]: Labels } = {
     onLabel: `sur`,
     incrementalLoadingLabel: 'Chargement...',
     incrementalLoadMoreLabel: 'Charger plus',
+    columnsActionLabel: 'Configurer les colonnes',
+    exportActionLabel: 'Exporter les données',
+    refreshActionLabel: 'Actualiser les données',
+    showColumnActionLabel: 'Afficher la colonne',
+    hideColumnActionLabel: 'Masquer la colonne',
+    pinColumnActionLabel: 'Épingler la colonne',
+    unpinColumnActionLabel: 'Désépingler la colonne',
+    sortColumnActionLabel: 'Trier la colonne',
+    clearFilterLabel: 'Effacer le filtre',
   },
 };
 
 type NumberOptions = {
   separator: string;
   decimal: string;
+  duration: number;
+  useEasing: boolean;
 };
 
 const DEFAULT_NUMBER_OPTIONS = {
@@ -52,7 +81,7 @@ const DEFAULT_NUMBER_OPTIONS = {
   useEasing: false,
 };
 
-const NUMBER_OPTIONS: { [locale: string]: NumberOptions } = {
+const NUMBER_OPTIONS: { [locale: string]: Partial<NumberOptions> } = {
   fr: {
     separator: ' ',
     decimal: ',',
@@ -71,6 +100,15 @@ export class NgxMatDatatableIntl {
   onLabel!: string;
   incrementalLoadingLabel!: string;
   incrementalLoadMoreLabel!: string;
+  columnsActionLabel!: string;
+  exportActionLabel!: string;
+  refreshActionLabel!: string;
+  showColumnActionLabel!: string;
+  hideColumnActionLabel!: string;
+  pinColumnActionLabel!: string;
+  unpinColumnActionLabel!: string;
+  sortColumnActionLabel!: string;
+  clearFilterLabel!: string;
 
   numberOptions!: NumberOptions;
 
@@ -85,7 +123,7 @@ export class NgxMatDatatableIntl {
   constructor() {
     const locale = this.locale.toLowerCase().split(/[-_]/)[0];
     this.setLabels(LABELS[locale] ?? DEFAULT_LABELS);
-    this.numberOptions = NUMBER_OPTIONS[locale] ?? DEFAULT_NUMBER_OPTIONS;
+    this.numberOptions = { ...DEFAULT_NUMBER_OPTIONS, ...(NUMBER_OPTIONS[locale] ?? {}) };
   }
 
   private setLabels(labels: Labels): void {
@@ -98,5 +136,14 @@ export class NgxMatDatatableIntl {
     this.onLabel = labels.onLabel;
     this.incrementalLoadingLabel = labels.incrementalLoadingLabel;
     this.incrementalLoadMoreLabel = labels.incrementalLoadMoreLabel;
+    this.columnsActionLabel = labels.columnsActionLabel;
+    this.exportActionLabel = labels.exportActionLabel;
+    this.refreshActionLabel = labels.refreshActionLabel;
+    this.showColumnActionLabel = labels.showColumnActionLabel;
+    this.hideColumnActionLabel = labels.hideColumnActionLabel;
+    this.pinColumnActionLabel = labels.pinColumnActionLabel;
+    this.unpinColumnActionLabel = labels.unpinColumnActionLabel;
+    this.sortColumnActionLabel = labels.sortColumnActionLabel;
+    this.clearFilterLabel = labels.clearFilterLabel;
   }
 }

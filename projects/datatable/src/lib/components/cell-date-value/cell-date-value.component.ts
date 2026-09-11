@@ -3,6 +3,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { Subscription } from 'rxjs';
+import { DateRefreshService } from '../../date-refresh.service';
 import { MomentFormatPipe } from '../../pipes/moment-format.pipe';
 import { duration } from '../../tools/duration.tool';
 import { get } from '../../tools/get.tool';
@@ -16,6 +18,7 @@ import { DatatableDateColumn, DatatableValueColumn } from '../../types/datatable
 })
 export class CellDateValueComponent<Record> implements OnInit, OnDestroy {
   private changeDetectorRef = inject(ChangeDetectorRef);
+  private dateRefreshService = inject(DateRefreshService);
 
   @Input()
   column!: DatatableDateColumn<Record>;
@@ -34,17 +37,17 @@ export class CellDateValueComponent<Record> implements OnInit, OnDestroy {
   value?: any;
   duration?: string | null;
 
-  private refreshInterval: any;
+  private refreshSubscription?: Subscription;
+
   ngOnInit(): void {
-    if (this.column.durationRefreshTime) {
-      this.refreshInterval = setInterval(() => {
-        this.duration = duration(this.value, this.column);
-        this.changeDetectorRef.detectChanges();
-      }, this.column.durationRefreshTime);
-    }
+    if (!this.column.withDuration || !this.column.durationRefreshTime) return;
+    this.refreshSubscription = this.dateRefreshService.forInterval(this.column.durationRefreshTime).subscribe(() => {
+      this.duration = duration(this.value, this.column);
+      this.changeDetectorRef.detectChanges();
+    });
   }
 
   ngOnDestroy(): void {
-    if (this.refreshInterval) clearInterval(this.refreshInterval);
+    this.refreshSubscription?.unsubscribe();
   }
 }

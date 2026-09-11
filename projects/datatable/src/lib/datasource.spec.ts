@@ -70,4 +70,47 @@ describe('DatagridDataSource', () => {
 
     expect(datasource.data).toEqual([{ id: 1 }, { id: 2 }]);
   });
+
+  it('should update row size from appended rows without reserializing existing rows', async () => {
+    let firstRowSerializations = 0;
+    const firstRow = {
+      id: 1,
+      toJSON: () => {
+        firstRowSerializations++;
+        return { id: 1 };
+      },
+    };
+    const service = async (options: NgxMatDatasourceRequestOptions): Promise<NgxMatDatasourceResult<TestRecord>> => ({
+      draw: options.draw,
+      recordsFiltered: 2,
+      recordsTotal: 2,
+      data: options.draw === '1' ? [firstRow] : [{ id: 2 }],
+    });
+    const datasource = new DatagridDataSource(service);
+
+    await datasource.loadData(request('1'));
+    const initialRowSize = datasource.rowSize;
+    await datasource.loadData(request('2'), true);
+
+    expect(firstRowSerializations).toBe(1);
+    expect(initialRowSize).toBeGreaterThan(0);
+    expect(datasource.rowSize).toBeGreaterThan(0);
+  });
+
+  it('should not fail data loading when row size estimation cannot serialize a row', async () => {
+    const circular: any = { id: 1 };
+    circular.self = circular;
+    const service = async (options: NgxMatDatasourceRequestOptions): Promise<NgxMatDatasourceResult<TestRecord>> => ({
+      draw: options.draw,
+      recordsFiltered: 1,
+      recordsTotal: 1,
+      data: [circular],
+    });
+    const datasource = new DatagridDataSource(service);
+
+    await expectAsync(datasource.loadData(request('1'))).toBeResolved();
+
+    expect(datasource.data).toEqual([circular]);
+    expect(datasource.rowSize).toBe(0);
+  });
 });

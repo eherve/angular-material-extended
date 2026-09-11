@@ -7,7 +7,6 @@
       #input
       type="text"
       [placeholder]="column.placeholder!"
-      aria-label="Number"
       matInput
       [formControl]="selectControl"
       [matAutocomplete]="auto"
@@ -51,6 +50,7 @@
       mat-icon-button
       matSuffix
       size="small"
+      [attr.aria-label]="datatableIntl.clearFilterLabel"
       (click)="selectControl.setValue(undefined)">
       <mat-icon>close</mat-icon>
     </button>

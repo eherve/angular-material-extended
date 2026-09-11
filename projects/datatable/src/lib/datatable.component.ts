@@ -62,6 +62,7 @@ import { GetPipe } from './pipes/get.pipe';
 import { IncludedInPipe } from './pipes/included-in.pipe';
 import { OrderByPipe } from './pipes/order-by.pipe';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
+import { SelectOptionsCacheService } from './select-options-cache.service';
 import { SortFacetEntriesPipe } from './pipes/sort-facet-entries.pipe';
 import { ValueFunctionPipe } from './pipes/suffix-function.pipe';
 import { SumPipe } from './pipes/sum.pipe';
@@ -146,7 +147,7 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     IncludedInPipe,
     CellOpacityPipe,
   ],
-  providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }],
+  providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }, SelectOptionsCacheService],
   selector: 'ngx-mat-datatable',
   templateUrl: 'datatable.component.html',
   styleUrl: 'datatable.component.scss',
@@ -460,22 +461,30 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       if (updated.sticky !== column.sticky) column.sticky = updated.sticky;
       if (updated.hidden !== column.hidden) {
         column.hidden = updated.hidden;
-        reload = reload || !updated.hidden;
+        reload = true;
       }
     });
     this.buildDisplayColumns();
     this.updateConfig();
-    if (reload) void this.loadPage();
+    if (reload) this.loadFirstPage();
   }
 
   rowClick(row: Record): void {
     if (this.disabledRows.includes(row)) return;
+    if (this.options.expandedDetailContentId) this.expandedRow = this.expandedRow === row ? null : row;
     if (this.options.actions?.rowClick === true) {
       this.rowClicked.emit(row);
     } else if (typeof this.options.actions?.rowClick === 'function') {
       this.options.actions.rowClick(row);
       this.rowClicked.emit(row);
     }
+  }
+
+  rowKeydown(event: KeyboardEvent, row: Record): void {
+    if (!this.options.actions?.rowClick && !this.options.expandedDetailContentId) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    this.rowClick(row);
   }
 
   facetClick(

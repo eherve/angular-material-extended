@@ -23,4 +23,15 @@ describe('HeaderDurationFilterComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should propagate duration changes without a local debounce', () => {
+    const onChange = jasmine.createSpy('onChange');
+    component.registerOnChange(onChange);
+
+    component.selectControl.setValue(5);
+
+    expect(onChange).toHaveBeenCalledWith(
+      jasmine.objectContaining({ unitOfTimeValue: 5, unitOfTime: 'second', value: 5000 }),
+    );
+  });
 });

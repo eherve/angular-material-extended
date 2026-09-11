@@ -6,12 +6,21 @@
 
     <div id="table-container" intersectionObserver (intersection)="load($event.intersect)">
       <table id="table" #table mat-table [fixedLayout]="false" [dataSource]="dataSource" multiTemplateDataRows>
-        @for (column of options.columns; track column) {
+        @for (column of options.columns; track column.columnDef) {
           <ng-container [matColumnDef]="column.columnDef" [sticky]="column.sticky">
             <th
               mat-header-cell
               *matHeaderCellDef
               [class.searchable]="column.searchable"
+              [attr.aria-sort]="
+                column.sortable
+                  ? column.order?.dir === 'asc'
+                    ? 'ascending'
+                    : column.order?.dir === 'desc'
+                      ? 'descending'
+                      : 'none'
+                  : null
+              "
               [style.min-width.px]="column.minWidth || options.columnMinWith">
               <ng-container *ngTemplateOutlet="headerTmpl; context: { column }"></ng-container>
             </th>
@@ -28,9 +37,9 @@
         }
 
         <ng-container *ngIf="options.expandedDetailContentId" matColumnDef="expandedDetail">
-          <td mat-cell *matCellDef="let row" [attr.colspan]="options.columns.length">
+          <td mat-cell *matCellDef="let row" [attr.colspan]="visibleColumnsColspan">
             @let content = contentRefs | findContent: options.expandedDetailContentId;
-            <div *ngIf="content" class="element-detail" [@detailExpand]="row == expandedRow ? 'expanded' : 'collapsed'">
+            <div *ngIf="content" class="element-detail" [@detailExpand]="row === expandedRow ? 'expanded' : 'collapsed'">
               <ng-container *ngTemplateOutlet="content.templateRef; context: { row }"> </ng-container>
             </div>
           </td>
@@ -70,9 +79,15 @@
         <tr
           mat-row
           *matRowDef="let row; columns: displayedColumns"
-          [class.has-click]="options.actions?.rowClick"
+          [class.has-click]="!!options.actions?.rowClick || !!options.expandedDetailContentId"
           [class.is-disabled]="row | includedIn: disabledRows"
-          (click)="rowClick(row)"></tr>
+          [attr.aria-disabled]="(row | includedIn: disabledRows) ? 'true' : null"
+          [attr.aria-expanded]="options.expandedDetailContentId ? row === expandedRow : null"
+          [attr.tabindex]="
+            (!!options.actions?.rowClick || !!options.expandedDetailContentId) && !(row | includedIn: disabledRows) ? 0 : null
+          "
+          (click)="rowClick(row)"
+          (keydown)="rowKeydown($event, row)"></tr>
 
         <ng-container *ngIf="options.expandedDetailContentId">
           <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
@@ -158,7 +173,8 @@
             mat-icon-button
             color="primary"
             class="icon-only action"
-            [matTooltip]="options.actions?.columns?.tooltip || 'Afficher / masquer des colonnes'"
+            [matTooltip]="options.actions?.columns?.tooltip || datatableIntl.columnsActionLabel"
+            [attr.aria-label]="options.actions?.columns?.tooltip || datatableIntl.columnsActionLabel"
             [matMenuTriggerFor]="columnsMenu"
             (menuOpened)="openUpdateColumnDisplay()"
             (menuClosed)="closeUpdateColumnDisplay()">
@@ -169,7 +185,12 @@
 
       @if (options.actions?.export) {
         <div class="action">
-          <button mat-icon-button color="primary" [disabled]="exporting" (click)="export()">
+          <button
+            mat-icon-button
+            color="primary"
+            [attr.aria-label]="datatableIntl.exportActionLabel"
+            [disabled]="exporting"
+            (click)="export()">
             <mat-icon>download</mat-icon>
           </button>
           <div class="action-loader" *ngIf="exporting" @fade>
@@ -180,7 +201,12 @@
 
       @if (options.actions?.refresh) {
         <div class="action">
-          <button mat-icon-button color="primary" [disabled]="dataSource.loading$ | async" (click)="loadPage()">
+          <button
+            mat-icon-button
+            color="primary"
+            [attr.aria-label]="datatableIntl.refreshActionLabel"
+            [disabled]="dataSource.loading$ | async"
+            (click)="loadPage()">
             <mat-icon>sync</mat-icon>
           </button>
           <div class="action-loader" *ngIf="dataSource.loading$ | async" @fade>
@@ -209,7 +235,7 @@
     has-handle
     [cdkDropListDisabled]="!options.actions?.columns?.reorder"
     (cdkDropListDropped)="reorderColumns($event)">
-    @for (column of updateColumns; track column) {
+    @for (column of updateColumns; track column.columnDef) {
       @if (['_select', '_rownumber'].includes(column.header)) {
         <div mat-list-item cdkDrag></div>
       } @else {
@@ -220,6 +246,7 @@
             size="small"
             color="primary"
             [class]="column.hidden ? 'toggle-off' : 'toggle-on'"
+            [attr.aria-label]="column.hidden ? datatableIntl.showColumnActionLabel : datatableIntl.hideColumnActionLabel"
             (click)="column.hidden = !column.hidden"
             [style.margin-right.px]="8">
             <mat-icon>
@@ -236,6 +263,7 @@
             size="small"
             color="primary"
             [class]="column.sticky ? 'toggle-on' : 'toggle-off'"
+            [attr.aria-label]="column.sticky ? datatableIntl.unpinColumnActionLabel : datatableIntl.pinColumnActionLabel"
             (click)="column.sticky = !column.sticky"
             [style.margin-right.px]="8">
             <mat-icon>push_pin </mat-icon>
@@ -288,11 +316,11 @@
               [formControlName]="column.columnDef"></lib-header-duration-filter>
           }
           @default {
-            <span>{{ column.header }}</span>
+            <span [innerHTML]="column.header | safeHtml"></span>
           }
         }
       } @else {
-        <span>{{ column.header }}</span>
+        <span [innerHTML]="column.header | safeHtml"></span>
       }
       <ng-container *ngTemplateOutlet="headerActionsTmpl; context: { column }"></ng-container>
     </div>
@@ -307,6 +335,7 @@
         mat-icon-button
         size="small"
         (click)="sortColumn(column)"
+        [attr.aria-label]="datatableIntl.sortColumnActionLabel"
         [matBadgeHidden]="!column.order"
         [matBadge]="column.order?.index + 1">
         @switch (column.order?.dir) {
@@ -350,9 +379,9 @@
         } @else if (column.prefixComponent) {
           <ng-container *ngComponentOutlet="column.prefixComponent; inputs: { column, row, value }" />
         } @else if (column.prefixFunction) {
-          <span [outerHTML]="value | valueFunction: column.prefixFunction : row : column | safeHtml"></span>
+          <span [innerHTML]="value | valueFunction: column.prefixFunction : row : column | safeHtml"></span>
         } @else if (column.prefix) {
-          <span [outerHTML]="column.prefix | safeHtml"></span>
+          <span [innerHTML]="column.prefix | safeHtml"></span>
         }
 
         @switch (column.type) {
@@ -372,7 +401,7 @@
             <lib-cell-duration-value [column]="column" [row]="row"></lib-cell-duration-value>
           }
           @default {
-            <span [outerHTML]="(value | transform: row : column) ?? '' | safeHtml"></span>
+            <span [innerHTML]="(value | transform: row : column) ?? '' | safeHtml"></span>
           }
         }
 
@@ -384,9 +413,9 @@
         } @else if (column.suffixComponent) {
           <ng-container *ngComponentOutlet="column.suffixComponent; inputs: { column, row, value }" />
         } @else if (column.suffixFunction) {
-          <span [outerHTML]="value | valueFunction: column.suffixFunction : row : column | safeHtml"></span>
+          <span [innerHTML]="value | valueFunction: column.suffixFunction : row : column | safeHtml"></span>
         } @else if (column.suffix) {
-          <span [outerHTML]="column.suffix | safeHtml"></span>
+          <span [innerHTML]="column.suffix | safeHtml"></span>
         }
       }
     </div>
@@ -403,6 +432,7 @@
           <button
             [style.--action-color]="action.color"
             mat-icon-button
+            [attr.aria-label]="action.ariaLabel || action.tooltip || action.icon"
             (click)="action.onclick(this)"
             [disabled]="!!action.isDisabled">
             <mat-icon>{{ action.icon }}</mat-icon>
@@ -457,13 +487,16 @@
       <!-- @let percent = (d.value / total) * 100; -->
       <mat-chip
         class="chip-facet"
-        [class.has-action]="column?.searchable !== false"
-        (click)="facetClick(column, d, option)"
+        [class.has-action]="column?.searchable === true"
+        [attr.tabindex]="column?.searchable === true ? 0 : null"
+        (click)="column?.searchable === true && facetClick(column, d, option)"
+        (keydown.enter)="column?.searchable === true && facetClick(column, d, option)"
+        (keydown.space)="column?.searchable === true && facetClick(column, d, option); $event.preventDefault()"
         [style.--facet-color]="color"
         [style.--facet-label-color]="labelColor ?? 'var(--mat-sys-on-primary)'"
         [style.--facet-value-color]="labelColor ?? color"
         [style.width.px]="size">
-        <div class="chip-facet-content" [style.font-size.px]="fontSize">
+        <div class="chip-facet-content" [style.font-size]="fontSize">
           <div class="chip-facet-key">{{ name }}</div>
           <div class="chip-facet-value">{{ d.value | number: '0.0-2' }}</div>
         </div>
@@ -490,8 +523,12 @@
         @let percent = (d.value / total) * 100;
         <div
           class="facet-indicator"
-          [class.has-action]="column?.searchable !== false"
-          (click)="facetClick(column, d, option)">
+          [class.has-action]="column?.searchable === true"
+          [attr.role]="column?.searchable === true ? 'button' : null"
+          [attr.tabindex]="column?.searchable === true ? 0 : null"
+          (click)="column?.searchable === true && facetClick(column, d, option)"
+          (keydown.enter)="column?.searchable === true && facetClick(column, d, option)"
+          (keydown.space)="column?.searchable === true && facetClick(column, d, option); $event.preventDefault()">
           <lib-progress-spinner [diameter]="size" [color]="color" [fontSize]="fontSize" [value]="percent">
             <mat-label>{{ name }}</mat-label>
           </lib-progress-spinner>

@@ -25,6 +25,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Subscription } from 'rxjs';
+import { NgxMatDatatableIntl } from '../../datatable.intl';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { DatatableSearchTextColumn } from '../../types/datatable-column.type';
 
@@ -60,6 +61,8 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
   onChange: (value: any) => void = () => {};
 
   onTouched: () => void = () => {};
+
+  datatableIntl = inject(NgxMatDatatableIntl);
 
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);

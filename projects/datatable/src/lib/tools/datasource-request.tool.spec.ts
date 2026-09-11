@@ -65,6 +65,29 @@ describe('Datasource request tools', () => {
     expect(order).toEqual([{ column: columns.findIndex(column => column.data === 'normalizedName'), dir: 'asc' }]);
   });
 
+
+  it('should propagate non-sortable columns and ignore their configured order', () => {
+    const options: NgxMatDatatableOptions<TestRecord> = {
+      service,
+      columns: [
+        {
+          type: 'text',
+          columnDef: 'name',
+          header: 'Name',
+          property: 'name',
+          sortable: false,
+          order: { index: 0, dir: 'asc' },
+        },
+      ],
+    };
+
+    const columns = buildDatasourceRequestColumns(options, {});
+    const order = buildDatasourceRequestOrder(options, columns);
+
+    expect(columns[0].orderable).toBeFalse();
+    expect(order).toEqual([]);
+  });
+
   it('should exclude hidden columns while keeping disabled columns in the datasource request', () => {
     const options: NgxMatDatatableOptions<TestRecord> = {
       service,

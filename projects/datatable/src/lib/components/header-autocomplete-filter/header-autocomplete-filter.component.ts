@@ -44,6 +44,7 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
+import { NgxMatDatatableIntl } from '../../datatable.intl';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 import { stripHtml } from '../../tools/strip-html.tool';
 import { DatatableSearchAutocompleteColumn, DatatableSearchListOption } from '../../types/datatable-column.type';
@@ -92,6 +93,8 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
 
   private filter$ = new BehaviorSubject<string | undefined>(undefined);
   private nextPage$ = new Subject<void>();
+  datatableIntl = inject(NgxMatDatatableIntl);
+
   private injector = inject(Injector);
   private changeDetectorRef = inject(ChangeDetectorRef);
 

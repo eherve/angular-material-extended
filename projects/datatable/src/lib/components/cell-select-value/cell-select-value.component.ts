@@ -1,7 +1,7 @@
 /** @format */
 
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatLabel } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { GetPipe } from '../../pipes/get.pipe';
@@ -11,6 +11,7 @@ import { TransformPipe } from '../../pipes/transform.pipe';
 import { DatatableSearchListOption, DatatableSelectColumn } from '../../types/datatable-column.type';
 import { IsArrayPipe } from '../../pipes/is-array.pipe';
 import { Subscription } from 'rxjs';
+import { SelectOptionsCacheService } from '../../select-options-cache.service';
 
 @Component({
   selector: 'lib-cell-select-value',
@@ -20,21 +21,22 @@ import { Subscription } from 'rxjs';
 })
 export class CellSelectValueComponent<Record> implements OnInit, OnDestroy {
   @Input()
-  column!: DatatableSelectColumn<Record> & { __options?: DatatableSearchListOption[] };
+  column!: DatatableSelectColumn<Record>;
 
   @Input()
   row: any;
 
   options: DatatableSearchListOption[] = [];
 
+  private selectOptionsCache = inject(SelectOptionsCacheService);
   private subsink = new Subscription();
 
   ngOnInit(): void {
     if (Array.isArray(this.column.options)) this.options = this.column.options;
     else {
       this.subsink.add(
-        this.column.options.subscribe(options => {
-          this.column.__options = this.options = options;
+        this.selectOptionsCache.resolve(this.column.options).subscribe(options => {
+          this.options = options;
         }),
       );
     }

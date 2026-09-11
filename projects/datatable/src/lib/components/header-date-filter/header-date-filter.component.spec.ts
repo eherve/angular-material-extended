@@ -23,4 +23,13 @@ describe('HeaderDateFilterComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should propagate date changes without a local debounce', () => {
+    const onChange = jasmine.createSpy('onChange');
+    component.registerOnChange(onChange);
+
+    component.selectControl.setValue(new Date('2026-09-10T00:00:00.000Z'));
+
+    expect(onChange).toHaveBeenCalled();
+  });
 });

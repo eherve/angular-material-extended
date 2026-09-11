@@ -29,6 +29,13 @@ export interface DatatableExportChunk {
   length: number;
 }
 
+type ExportColumnKeys = {
+  value: string;
+  raw?: string;
+};
+
+const DUPLICATE_HEADER_SEPARATOR = '\u2063ngx-mat-datatable:';
+
 export async function exportDatatable<T>(context: DatatableExportContext<T>): Promise<void> {
   const xlsx = await import('xlsx');
   const data = await loadExportData(context);
@@ -67,6 +74,7 @@ export async function buildExportRows<T>(
   data: T[],
 ): Promise<{ [key: string]: unknown }[]> {
   const selectOptionsCache = new Map<DatatableSelectColumn<T>, DatatableSearchListOption[]>();
+  const exportKeys = buildExportColumnKeys(options.columns);
   const rows: { [key: string]: unknown }[] = [];
 
   for (const record of data) {
@@ -79,12 +87,13 @@ export async function buildExportRows<T>(
         continue;
       }
       value = transformExportValue(column, value, record);
+      const keys = exportKeys.get(column)!;
       if (column.type === 'select') {
-        await buildSelectExportValue(column as DatatableSelectColumn<T>, row, value, selectOptionsCache);
+        await buildSelectExportValue(column as DatatableSelectColumn<T>, row, keys.value, value, selectOptionsCache);
       } else if (column.type === 'duration') {
-        buildDurationExportValue(column as DatatableDurationColumn<T>, row, value);
+        buildDurationExportValue(column as DatatableDurationColumn<T>, row, keys, value);
       } else {
-        row[column.header] = value;
+        row[keys.value] = value;
       }
     }
     rows.push(row);
@@ -116,7 +125,7 @@ export function sanitizeExportHeaders(worksheet: import('xlsx').WorkSheet, xlsx:
     const address = xlsx.utils.encode_cell({ r: range.s.r, c: columnIndex });
     const cell = worksheet[address];
     if (!cell || typeof cell.v !== 'string') continue;
-    cell.v = stripHtml(cell.v, '');
+    cell.v = stripHtml(removeDuplicateHeaderSuffix(cell.v), '');
     delete cell.w;
   }
 }
@@ -129,12 +138,13 @@ function transformExportValue<T>(column: DatatableColumn<T>, value: any, record:
 async function buildSelectExportValue<T>(
   column: DatatableSelectColumn<T>,
   row: { [key: string]: unknown },
+  exportKey: string,
   value: any,
   cache: Map<DatatableSelectColumn<T>, DatatableSearchListOption[]>,
 ): Promise<void> {
   const options = await resolveSelectOptions(column, cache);
   const getLabel = (optionValue: any): any => options.find(option => option.value === optionValue)?.name ?? optionValue;
-  row[column.header] = column.isArrayValue && Array.isArray(value) ? value.map(getLabel).join(', ') : getLabel(value);
+  row[exportKey] = column.isArrayValue && Array.isArray(value) ? value.map(getLabel).join(', ') : getLabel(value);
 }
 
 async function resolveSelectOptions<T>(
@@ -152,8 +162,39 @@ async function resolveSelectOptions<T>(
 function buildDurationExportValue<T>(
   column: DatatableDurationColumn<T>,
   row: { [key: string]: unknown },
+  keys: ExportColumnKeys,
   value: any,
 ): void {
-  row[`${column.header} ms`] = value;
-  row[column.header] = duration(value, column);
+  row[keys.raw!] = value;
+  row[keys.value] = duration(value, column);
+}
+
+function buildExportColumnKeys<T>(columns: DatatableColumn<T>[]): Map<DatatableColumn<T>, ExportColumnKeys> {
+  const usedKeys = new Map<string, number>();
+  const result = new Map<DatatableColumn<T>, ExportColumnKeys>();
+
+  for (const column of columns) {
+    if (column.hidden || column.disabled || column.export) continue;
+    if (column.type === 'duration') {
+      result.set(column, {
+        raw: createUniqueExportKey(`${column.header} ms`, usedKeys),
+        value: createUniqueExportKey(column.header, usedKeys),
+      });
+    } else {
+      result.set(column, { value: createUniqueExportKey(column.header, usedKeys) });
+    }
+  }
+
+  return result;
+}
+
+function createUniqueExportKey(header: string, usedKeys: Map<string, number>): string {
+  const occurrence = usedKeys.get(header) ?? 0;
+  usedKeys.set(header, occurrence + 1);
+  return occurrence === 0 ? header : `${header}${DUPLICATE_HEADER_SEPARATOR}${occurrence}`;
+}
+
+function removeDuplicateHeaderSuffix(value: string): string {
+  const separatorIndex = value.lastIndexOf(DUPLICATE_HEADER_SEPARATOR);
+  return separatorIndex === -1 ? value : value.slice(0, separatorIndex);
 }

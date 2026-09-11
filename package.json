@@ -4,7 +4,7 @@
   "author": "Eric Herve <eric.herve.95@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/eherve/angular-material-extended.git"
+    "url": "git+https://github.com/eherve/angular-material-extended.git"
   },
   "scripts": {
     "ng": "ng",
@@ -13,7 +13,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:datatable": "ng test NgxMatDatatable --watch=false --browsers=ChromeHeadless",
+    "test:demo": "ng test angular-material-extended --watch=false --browsers=ChromeHeadless",
     "build:datatable": "ng build NgxMatDatatable",
+    "build:demo": "ng build angular-material-extended",
+    "check:datatable": "npm run test:datatable && npm run build:datatable && npm run test:demo && npm run build:demo",
     "build:tooltip": "ng build NgxMatTooltip",
     "publish:datatable": "ng build NgxMatDatatable && cd dist/datatable && npm publish && cd -",
     "publish:tooltip": "ng build NgxMatTooltip && cd dist/tooltip && npm publish && cd -"

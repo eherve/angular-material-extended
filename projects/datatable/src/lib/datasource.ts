@@ -10,11 +10,14 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
   recordsFiltered = 0;
   recordsTotal?: number;
   facets?: { [id: string]: NgxMatDatasourceResultFacet[] };
-  rowSize: number = 0; // row size in kb
+  rowSize: number = 0; // average row size in MB
 
   private options?: NgxMatDatasourceRequestOptions;
   private latestRequestId = 0;
   private disconnected = false;
+  private measuredRowSize = 0;
+  private measuredRowCount = 0;
+  private readonly textEncoder = new TextEncoder();
   protected dataStream = new BehaviorSubject<Record[]>([]);
 
   constructor(private service: NgxMatDatasourceService<Record>) {
@@ -43,8 +46,8 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
       this.recordsTotal = result.recordsTotal;
       this.recordsFiltered = result.recordsFiltered;
       this.facets = result.facets;
+      this.updateRowSize(result.data, append);
       this.setData(result.data, append);
-      this.calculateRowSize(this.data);
     } finally {
       if (!append && !this.disconnected && requestId === this.latestRequestId) this.loading$.next(false);
     }
@@ -70,13 +73,23 @@ export class DatagridDataSource<Record> extends DataSource<Record> {
     this.dataStream.next(this.data);
   }
 
-  private calculateRowSize(data: Record[]): void {
-    let total = 0;
-    for (let row of data) {
-      const size = new TextEncoder().encode(JSON.stringify(row)).length;
-      const kiloBytes = size / 1024;
-      total += kiloBytes / 1024;
+  private updateRowSize(data: Record[], append: boolean): void {
+    if (!append) {
+      this.measuredRowSize = 0;
+      this.measuredRowCount = 0;
     }
-    this.rowSize = total && data.length ? total / data.length : 0;
+
+    for (const row of data) {
+      try {
+        const serialized = JSON.stringify(row);
+        if (serialized === undefined) continue;
+        this.measuredRowSize += this.textEncoder.encode(serialized).length / 1024 / 1024;
+        this.measuredRowCount++;
+      } catch {
+        // Row size is only an export chunking hint; unserializable rows must not fail data loading.
+      }
+    }
+
+    this.rowSize = this.measuredRowCount ? this.measuredRowSize / this.measuredRowCount : 0;
   }
 }
