@@ -1,6 +1,10 @@
+import { SecurityContext } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DomSanitizer } from '@angular/platform-browser';
+import type { SafeHtml } from '@angular/platform-browser';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { NgxMatDatatableComponent } from './datatable.component';
+import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { NgxMatDatasourceService } from './types/datasource-service.type';
 
 type TestRecord = { name: string; disabled?: boolean; status?: string | string[] };
@@ -130,6 +134,19 @@ describe('NgxMatDatatableComponent', () => {
 
     expect(preventDefault).not.toHaveBeenCalled();
     expect(emitSpy).not.toHaveBeenCalled();
+  });
+
+  it('should sanitize HTML before marking it as trusted', () => {
+    const sanitizer = jasmine.createSpyObj<DomSanitizer>('DomSanitizer', ['sanitize', 'bypassSecurityTrustHtml']);
+    const trustedHtml = {} as SafeHtml;
+    const html = '<strong>Safe</strong><script>alert("xss")</script>';
+    sanitizer.sanitize.and.returnValue('<strong>Safe</strong>');
+    sanitizer.bypassSecurityTrustHtml.and.returnValue(trustedHtml);
+    const pipe = new SafeHtmlPipe(sanitizer);
+
+    expect(pipe.transform(html)).toBe(trustedHtml);
+    expect(sanitizer.sanitize).toHaveBeenCalledOnceWith(SecurityContext.HTML, html);
+    expect(sanitizer.bypassSecurityTrustHtml).toHaveBeenCalledOnceWith('<strong>Safe</strong>');
   });
 
   it('should keep sanitized HTML cell bindings attached when content changes', async () => {
