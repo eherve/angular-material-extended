@@ -2,9 +2,11 @@
 
 import {
   NgxMatDatasourceRequestColumn,
+  NgxMatDatasourceRequestColumnType,
   NgxMatDatasourceRequestOptions,
   NgxMatDatasourceRequestOrder,
 } from '../types/datasource-service.type';
+import { DatatableColumn } from '../types/datatable-column.type';
 import { NgxMatDatatableOptions } from '../types/datatable-options.type';
 
 export type DatatableSearchValues = { [columnDef: string]: any };
@@ -21,12 +23,15 @@ export function buildDatasourceRequestColumns<Record>(
   options.columns.forEach(columnOptions => {
     if (columnOptions.hidden) return;
 
+    const inferredType = columnOptions.searchable ? inferDatasourceRequestColumnType(columnOptions) : undefined;
+    const searchType = columnOptions.searchType ?? inferredType;
     const column: NgxMatDatasourceRequestColumn = {
       data: columnOptions.property,
       projection: columnOptions.projection,
       name: columnOptions.columnDef,
       searchable: columnOptions.searchable,
       orderable: columnOptions.sortable,
+      type: columnOptions.searchProperty ? inferredType : searchType,
     };
 
     if (columnOptions.sortProperty && columnOptions.order) {
@@ -36,8 +41,9 @@ export function buildDatasourceRequestColumns<Record>(
     if (columnOptions.searchable) {
       const search = searchValues[columnOptions.columnDef];
       if (search) {
-        if (columnOptions.searchProperty) addAdditionalColumn(additionalColumns, columnOptions.searchProperty, search);
-        else column.search = search;
+        if (columnOptions.searchProperty) {
+          addAdditionalColumn(additionalColumns, columnOptions.searchProperty, search, searchType);
+        } else column.search = search;
       }
     }
 
@@ -48,7 +54,10 @@ export function buildDatasourceRequestColumns<Record>(
   additionalColumns.forEach(additionalColumn => {
     const column = columns.find(item => item.data === additionalColumn.data);
     if (!column) columns.push(additionalColumn);
-    else if (additionalColumn.search && !column.search) column.search = additionalColumn.search;
+    else {
+      if (additionalColumn.search && !column.search) column.search = additionalColumn.search;
+      if (additionalColumn.type && !column.type) column.type = additionalColumn.type;
+    }
   });
 
   return columns;
@@ -90,10 +99,29 @@ export function buildDatasourceRequestOptions<Record>(
   };
 }
 
+function inferDatasourceRequestColumnType<Record>(
+  column: DatatableColumn<Record>,
+): NgxMatDatasourceRequestColumnType | undefined {
+  switch (column.type) {
+    case 'text':
+      return 'string';
+    case 'number':
+    case 'duration':
+      return 'number';
+    case 'checkbox':
+      return 'boolean';
+    case 'date':
+      return 'date';
+    default:
+      return;
+  }
+}
+
 function addAdditionalColumn(
   additionalColumns: NgxMatDatasourceRequestColumn[],
   data: string,
   search?: any,
+  type?: NgxMatDatasourceRequestColumnType,
 ): NgxMatDatasourceRequestColumn {
   let column = additionalColumns.find(item => item.data === data);
   if (!column) {
@@ -104,5 +132,6 @@ function addAdditionalColumn(
     column.search = search;
     column.searchable = true;
   }
+  if (type && !column.type) column.type = type;
   return column;
 }

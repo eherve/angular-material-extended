@@ -79,6 +79,8 @@
         <tr
           mat-row
           *matRowDef="let row; columns: displayedColumns"
+          [datatableRowViewport]="row"
+          (datatableRowVisible)="renderRow($event)"
           [class.has-click]="!!options.actions?.rowClick || !!options.expandedDetailContentId"
           [class.is-disabled]="row | includedIn: disabledRows"
           [attr.aria-disabled]="(row | includedIn: disabledRows) ? 'true' : null"
@@ -355,7 +357,7 @@
 </ng-template>
 
 <ng-template #cellTmpl let-column="column" let-row="row">
-  @defer (on viewport) {
+  @if (renderedRows.has(row)) {
     <div
       class="cell"
       [@.disabled]="!!options.disableRowAnimation"
@@ -419,7 +421,7 @@
         }
       }
     </div>
-  } @placeholder {
+  } @else {
     <div class="cell"></div>
   }
 </ng-template>

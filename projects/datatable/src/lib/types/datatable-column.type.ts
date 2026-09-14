@@ -3,7 +3,7 @@
 import { ComponentType } from '@angular/cdk/portal';
 import { Observable } from 'rxjs';
 import { PipeFunction } from '../pipes/suffix-function.pipe';
-import { NgxMatDatasourceRequestOrderDir } from './datasource-service.type';
+import { NgxMatDatasourceRequestColumnType, NgxMatDatasourceRequestOrderDir } from './datasource-service.type';
 
 type Color<Record> = string | ((row: Record) => string | undefined);
 
@@ -25,6 +25,7 @@ type BaseColumn = {
 
   searchable?: boolean;
   searchProperty?: string;
+  searchType?: NgxMatDatasourceRequestColumnType;
   searchValue?: any;
 
   sortable?: boolean;

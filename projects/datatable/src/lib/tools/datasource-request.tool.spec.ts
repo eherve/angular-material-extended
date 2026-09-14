@@ -66,6 +66,102 @@ describe('Datasource request tools', () => {
   });
 
 
+  it('should infer backend search types from unambiguous column types', () => {
+    const options: NgxMatDatatableOptions<TestRecord> = {
+      service,
+      columns: [
+        { type: 'text', columnDef: 'name', header: 'Name', property: 'name', searchable: true },
+        { type: 'number', columnDef: 'amount', header: 'Amount', property: 'amount', searchable: true },
+        { type: 'checkbox', columnDef: 'active', header: 'Active', property: 'active', searchable: true },
+        { type: 'date', columnDef: 'createdAt', header: 'Created', property: 'createdAt', searchable: true },
+        { type: 'duration', columnDef: 'duration', header: 'Duration', property: 'duration', searchable: true },
+      ],
+    };
+
+    const columns = buildDatasourceRequestColumns(options, {});
+
+    expect(columns.map(column => column.type)).toEqual(['string', 'number', 'boolean', 'date', 'number']);
+  });
+
+  it('should apply an explicit search type to the effective search property', () => {
+    const options: NgxMatDatatableOptions<TestRecord> = {
+      service,
+      columns: [
+        {
+          type: 'text',
+          columnDef: 'owner',
+          header: 'Owner',
+          property: 'owner.name',
+          searchable: true,
+          searchProperty: 'owner._id',
+          searchType: 'objectid',
+        },
+      ],
+    };
+    const search = { value: '507f1f77bcf86cd799439011' };
+
+    const columns = buildDatasourceRequestColumns(options, { owner: search });
+    const displayColumn = columns.find(column => column.data === 'owner.name');
+    const searchColumn = columns.find(column => column.data === 'owner._id');
+
+    expect(displayColumn?.type).toBe('string');
+    expect(searchColumn?.type).toBe('objectid');
+    expect(searchColumn?.search).toEqual(search);
+  });
+
+  it('should merge a search property type into an existing requested column', () => {
+    const options: NgxMatDatatableOptions<TestRecord> = {
+      service,
+      columns: [
+        {
+          type: 'select',
+          columnDef: 'ownerId',
+          header: 'Owner id',
+          property: 'owner._id',
+          options: [],
+        },
+        {
+          type: 'text',
+          columnDef: 'ownerName',
+          header: 'Owner',
+          property: 'owner.name',
+          searchable: true,
+          searchProperty: 'owner._id',
+          searchType: 'objectid',
+        },
+      ],
+    };
+    const search = { value: '507f1f77bcf86cd799439011' };
+
+    const columns = buildDatasourceRequestColumns(options, { ownerName: search });
+    const searchColumn = columns.find(column => column.data === 'owner._id');
+
+    expect(columns.filter(column => column.data === 'owner._id').length).toBe(1);
+    expect(searchColumn?.type).toBe('objectid');
+    expect(searchColumn?.search).toEqual(search);
+  });
+
+  it('should allow explicit search types for ambiguous column types', () => {
+    const options: NgxMatDatatableOptions<TestRecord> = {
+      service,
+      columns: [
+        {
+          type: 'select',
+          columnDef: 'amount',
+          header: 'Amount',
+          property: 'amount',
+          searchable: true,
+          searchType: 'number',
+          options: [],
+        },
+      ],
+    };
+
+    const columns = buildDatasourceRequestColumns(options, {});
+
+    expect(columns[0].type).toBe('number');
+  });
+
   it('should propagate non-sortable columns and ignore their configured order', () => {
     const options: NgxMatDatatableOptions<TestRecord> = {
       service,

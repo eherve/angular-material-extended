@@ -33,6 +33,8 @@ The main request fields are:
 
 The companion `mongoose-datatable` backend converts pagination to a MongoDB offset using `start * length`.
 
+Searchable columns may expose a backend search type through `columns[].type`. The library infers it for unambiguous column types: `text` -> `string`, `number` / `duration` -> `number`, `checkbox` -> `boolean`, and `date` -> `date`. Use the public `searchType` column option for ambiguous searchable types such as `select` or `autocomplete`, or when a `searchProperty` needs an explicit backend type such as `objectid`. When `searchProperty` differs from the displayed `property`, the displayed column keeps its own inferred type and `searchType` is applied only to the effective search column.
+
 A datasource response contains `draw`, `recordsFiltered`, `data`, optional `facets`, and may also provide unfiltered total information when supported by the datasource.
 
 ## Projection expressions

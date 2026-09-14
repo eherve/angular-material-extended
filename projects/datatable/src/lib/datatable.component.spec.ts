@@ -1,4 +1,4 @@
-import { ComponentFixture, DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { NgxMatDatatableComponent } from './datatable.component';
 import { NgxMatDatasourceService } from './types/datasource-service.type';
@@ -21,7 +21,6 @@ describe('NgxMatDatatableComponent', () => {
     await TestBed.configureTestingModule({
       imports: [NgxMatDatatableComponent],
       providers: [provideNoopAnimations()],
-      deferBlockBehavior: DeferBlockBehavior.Manual,
     }).compileComponents();
 
     fixture = TestBed.createComponent(NgxMatDatatableComponent<TestRecord>);
@@ -147,9 +146,7 @@ describe('NgxMatDatatableComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const deferBlocks = await fixture.getDeferBlocks();
-    expect(deferBlocks.length).toBe(1);
-    await deferBlocks[0].render(DeferBlockState.Complete);
+    (component as any).renderRow(component.dataSource.data[0]);
     fixture.detectChanges();
 
     const getPrefix = (): HTMLElement | null => fixture.nativeElement.querySelector('.test-prefix');
@@ -159,6 +156,36 @@ describe('NgxMatDatatableComponent', () => {
     fixture.detectChanges();
 
     expect(getPrefix()?.textContent).toBe('After');
+  });
+
+  it('should render every cell in a row together after the row becomes visible', async () => {
+    component.options.columns.push({
+      type: 'text',
+      columnDef: 'status',
+      header: 'Status',
+      property: 'status',
+    });
+    (component as any).buildDisplayColumns();
+    const row: TestRecord = { name: 'Row', status: 'Active' };
+    service.and.callFake(async request => ({
+      draw: request.draw,
+      recordsFiltered: 1,
+      recordsTotal: 1,
+      data: [row],
+    }));
+
+    await component.loadPage();
+    expect((component as any).renderedRows.has(row)).toBeFalse();
+
+    (component as any).renderRow(row);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect((await fixture.getDeferBlocks()).length).toBe(0);
+    const cellsAfterRender = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('td.mat-mdc-cell'));
+    expect(cellsAfterRender[0].textContent).toContain('Row');
+    expect(cellsAfterRender[1].textContent).toContain('Active');
   });
 
 

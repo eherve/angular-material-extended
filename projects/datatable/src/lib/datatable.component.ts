@@ -52,6 +52,10 @@ import { DatagridDataSource } from './datasource';
 import { NGX_MAT_DATATABLE_DEFAULT_OPTIONS } from './datatable-default-options';
 import { NgxMatDatatableIntl } from './datatable.intl';
 import { NgxMatDatatableContentDirective } from './directives/datatable-cell.directive';
+import {
+  DatatableRowViewportDirective,
+  DatatableRowViewportObserverService,
+} from './directives/datatable-row-viewport.directive';
 import { BackgroundColorPipe } from './pipes/background-color.pipe';
 import { CellColorPipe } from './pipes/cell-color.pipe';
 import { CellOpacityPipe } from './pipes/cell-opacity.pipe';
@@ -146,8 +150,13 @@ type UpdateColumn<Record> = Pick<DatatableColumn<Record>, 'columnDef' | 'header'
     ValueFunctionPipe,
     IncludedInPipe,
     CellOpacityPipe,
+    DatatableRowViewportDirective,
   ],
-  providers: [{ provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl }, SelectOptionsCacheService],
+  providers: [
+    { provide: MatPaginatorIntl, useClass: NgxMatDatatablePaginatorIntl },
+    SelectOptionsCacheService,
+    DatatableRowViewportObserverService,
+  ],
   selector: 'ngx-mat-datatable',
   templateUrl: 'datatable.component.html',
   styleUrl: 'datatable.component.scss',
@@ -196,6 +205,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   displayedColumns: string[] = [];
   visibleColumnsColspan = 1;
   disabledRows: Record[] = [];
+  protected renderedRows = new Set<Record>();
 
   dataSource!: DatagridDataSource<Record>;
 
@@ -231,6 +241,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private defaultOptions = inject(NGX_MAT_DATATABLE_DEFAULT_OPTIONS);
   private incrementalLoadToken = 0;
   private restoredState?: NgxMatDatatableState;
+  private rowRenderChangeScheduled = false;
+  private destroyed = false;
 
   get data(): Record[] | undefined {
     return this._data;
@@ -283,6 +295,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
     if (this.tableElement) this.observer.unobserve(this.tableElement.nativeElement);
     this.subscriptions.unsubscribe();
   }
@@ -321,6 +334,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   redraw(match?: (record: Record) => boolean): void {
     this.dataSource.redraw(match);
     this._data = this.dataSource.data;
+    this.pruneRenderedRows();
     this.buildDisabledRows();
     this.changeDetectorRef.detectChanges();
   }
@@ -419,9 +433,14 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
 
   private updateLoadedDataState(): void {
     this._data = this.dataSource.data;
+    this.pruneRenderedRows();
     this.buildDisabledRows();
     this.updateRecordsCountState();
     this.updateHasMoreRecordsState();
+  }
+
+  private pruneRenderedRows(): void {
+    this.renderedRows = new Set(this.dataSource.data.filter(row => this.renderedRows.has(row)));
   }
 
   private buildDisabledRows(): void {
@@ -485,6 +504,17 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
     this.rowClick(row);
+  }
+
+  protected renderRow(row: Record): void {
+    if (this.renderedRows.has(row)) return;
+    this.renderedRows.add(row);
+    if (this.rowRenderChangeScheduled) return;
+    this.rowRenderChangeScheduled = true;
+    queueMicrotask(() => {
+      this.rowRenderChangeScheduled = false;
+      if (!this.destroyed) this.changeDetectorRef.detectChanges();
+    });
   }
 
   facetClick(
