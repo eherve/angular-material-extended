@@ -144,7 +144,7 @@
     <div id="head-start">
       <span *ngIf="options.title" id="title" [innerHTML]="options.title"></span>
 
-      @for (facetOptions of options.facets | filter: { position: 'start' }; track facetOptions) {
+      @for (facetOptions of options.facets | filter: { position: 'start' }; track facetOptions.id) {
         <ng-container *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"></ng-container>
       }
       @for (action of options.actions?.user | filter: { position: 'start' }; track action) {
@@ -153,7 +153,7 @@
     </div>
 
     <div id="head-center">
-      @for (facetOptions of options.facets | filter: { position: 'center' }; track facetOptions) {
+      @for (facetOptions of options.facets | filter: { position: 'center' }; track facetOptions.id) {
         <ng-container *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"></ng-container>
       }
       @for (action of options.actions?.user | filter: { position: 'center' }; track action) {
@@ -162,7 +162,7 @@
     </div>
 
     <div id="head-end">
-      @for (facetOptions of options.facets | filter: { position: 'end' }; track facetOptions) {
+      @for (facetOptions of options.facets | filter: { position: 'end' }; track facetOptions.id) {
         <ng-container *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"></ng-container>
       }
       @for (action of options.actions?.user | filter: { position: 'end' }; track action) {
@@ -291,31 +291,39 @@
       @if (column.searchable) {
         @switch (column.type) {
           @case ('text') {
-            <lib-header-text-filter [column]="column" [formControlName]="column.columnDef"></lib-header-text-filter>
+            <lib-header-text-filter
+              [column]="column"
+              [formControlName]="searchControlNames[column.columnDef]"></lib-header-text-filter>
           }
           @case ('number') {
-            <lib-header-number-filter [column]="column" [formControlName]="column.columnDef"></lib-header-number-filter>
+            <lib-header-number-filter
+              [column]="column"
+              [formControlName]="searchControlNames[column.columnDef]"></lib-header-number-filter>
           }
           @case ('select') {
-            <lib-header-select-filter [column]="column" [formControlName]="column.columnDef"></lib-header-select-filter>
+            <lib-header-select-filter
+              [column]="column"
+              [formControlName]="searchControlNames[column.columnDef]"></lib-header-select-filter>
           }
           @case ('autocomplete') {
             <lib-header-autocomplete-filter
               [column]="column"
-              [formControlName]="column.columnDef"></lib-header-autocomplete-filter>
+              [formControlName]="searchControlNames[column.columnDef]"></lib-header-autocomplete-filter>
           }
           @case ('checkbox') {
             <lib-header-checkbox-filter
               [column]="column"
-              [formControlName]="column.columnDef"></lib-header-checkbox-filter>
+              [formControlName]="searchControlNames[column.columnDef]"></lib-header-checkbox-filter>
           }
           @case ('date') {
-            <lib-header-date-filter [column]="column" [formControlName]="column.columnDef"></lib-header-date-filter>
+            <lib-header-date-filter
+              [column]="column"
+              [formControlName]="searchControlNames[column.columnDef]"></lib-header-date-filter>
           }
           @case ('duration') {
             <lib-header-duration-filter
               [column]="column"
-              [formControlName]="column.columnDef"></lib-header-duration-filter>
+              [formControlName]="searchControlNames[column.columnDef]"></lib-header-duration-filter>
           }
           @default {
             <span [innerHTML]="column.header | safeHtml"></span>
@@ -481,7 +489,7 @@
   @let fontSize = facetOptions.fontSize ?? '1em';
   <!-- @let total = (data | sum: 'value') || 1; -->
   <mat-chip-set class="chips-facet">
-    @for (d of data | orderBy: '_id'; track d) {
+    @for (d of data | orderBy: '_id'; track d._id) {
       @let option = facetOptions?.option ? facetOptions.option(d) : (facetOptions.options | find: { value: d._id });
       @let name = option?.name ?? d._id;
       @let color = option?.color ?? 'var(--mat-sys-primary)';
@@ -518,7 +526,7 @@
       </mat-card-header>
     }
     <mat-card-content>
-      @for (d of data; track d) {
+      @for (d of data; track d._id) {
         @let option = facetOptions?.option ? facetOptions.option(d) : (facetOptions.options | find: { value: d._id });
         @let name = option?.name ?? d._id;
         @let color = option?.color ?? 'var(--mat-sys-primary)';

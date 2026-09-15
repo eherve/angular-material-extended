@@ -76,6 +76,35 @@ describe('NgxMatDatatableComponent', () => {
     expect(request.length).toBe(25);
   });
 
+  it('should keep dotted columnDefs out of FormGroup control names while preserving search paths', async () => {
+    const columnDef = 'externalReferences.reference';
+    component.options.columns = [
+      {
+        type: 'text',
+        columnDef,
+        header: 'External reference',
+        property: columnDef,
+        searchable: true,
+      },
+    ];
+
+    (component as any).buildSearchFormGroup();
+
+    const controlName = (component as any).searchControlNames[columnDef] as string;
+    expect(controlName).toBe('externalReferences%2Ereference');
+    expect(Object.keys(component.searchFormGroup.controls)).toEqual(['externalReferences%2Ereference']);
+
+    component.searchFormGroup.controls[controlName].setValue({ value: 'EXT-001' });
+    expect((component as any).getSearchValues()).toEqual({ [columnDef]: { value: 'EXT-001' } });
+
+    await component.loadPage();
+
+    const request = service.calls.mostRecent().args[0];
+    expect(request.columns[0].name).toBe(columnDef);
+    expect(request.columns[0].data).toBe(columnDef);
+    expect(request.columns[0].search).toEqual({ value: 'EXT-001' });
+  });
+
   it('should not emit rowClicked when rowClick is false', () => {
     const row = { name: 'Test' };
     component.options.actions = { rowClick: false };

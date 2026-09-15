@@ -235,6 +235,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   paginationPageIndex = 0;
 
   searchFormGroup!: FormGroup;
+  protected searchControlNames: { [columnDef: string]: string } = {};
 
   private subscriptions = new rxjs.Subscription();
   private changeDetectorRef = inject(ChangeDetectorRef);
@@ -349,7 +350,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     try {
       await exportDatatable({
         options: this.options,
-        searchValues: this.searchFormGroup?.getRawValue() ?? {},
+        searchValues: this.getSearchValues(),
         recordsFiltered: this.dataSource.recordsFiltered,
         rowSize: this.dataSource.rowSize,
       });
@@ -379,7 +380,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
       await this.dataSource.loadData(
         buildDatasourceRequestOptions(
           this.options,
-          this.searchFormGroup.getRawValue(),
+          this.getSearchValues(),
           nextPageIndex,
           this.incrementalPageSize,
         ),
@@ -406,7 +407,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     await this.dataSource.loadData(
       buildDatasourceRequestOptions(
         this.options,
-        this.searchFormGroup.getRawValue(),
+        this.getSearchValues(),
         this.paginator!.pageIndex,
         this.paginator!.pageSize,
       ),
@@ -417,7 +418,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   private async loadInitialPage(): Promise<void> {
     this.resetIncrementalLoading();
     await this.dataSource.loadData(
-      buildDatasourceRequestOptions(this.options, this.searchFormGroup.getRawValue(), 0, this.incrementalPageSize),
+      buildDatasourceRequestOptions(this.options, this.getSearchValues(), 0, this.incrementalPageSize),
     );
     this.updateLoadedDataState();
   }
@@ -523,7 +524,8 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
     option: FacetOptionsOptions,
   ): void {
     if (!column) return;
-    const control = this.searchFormGroup?.controls[column.columnDef];
+    const controlName = this.searchControlNames[column.columnDef];
+    const control = controlName ? this.searchFormGroup?.controls[controlName] : undefined;
     if (!control) return;
     if (option && option.value !== control.value?.value) control.setValue({ value: option.value, name: option.name });
     else if (result._id !== control.value?.value) control.setValue({ value: result._id });
@@ -635,6 +637,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
   }
 
   private buildSearchFormGroup(): void {
+    this.searchControlNames = {};
     this.searchFormGroup = new FormGroup(
       this.options.columns.reduce(
         (controls, column) => {
@@ -650,7 +653,9 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
               value: initialValue,
               disabled: false,
             });
-            controls[column.columnDef] = control;
+            const controlName = this.getSearchControlName(column.columnDef);
+            this.searchControlNames[column.columnDef] = controlName;
+            controls[controlName] = control;
             if (typeof column.searchUpdated === 'function') {
               this.subscriptions.add(
                 control.valueChanges.pipe(rxjs.debounceTime(500)).subscribe(value => column.searchUpdated!(value)),
@@ -659,15 +664,31 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
           }
           return controls;
         },
-        {} as { [columnDef: string]: FormControl },
+        {} as { [controlName: string]: FormControl },
       ),
     );
     this.subscriptions.add(
-      this.searchFormGroup.valueChanges.pipe(rxjs.debounceTime(500)).subscribe(value => {
-        this.searchUpdated.next(value);
+      this.searchFormGroup.valueChanges.pipe(rxjs.debounceTime(500)).subscribe(() => {
+        this.searchUpdated.next(this.getSearchValues());
         this.loadFirstPage();
       }),
     );
+  }
+
+  private getSearchValues(): { [columnDef: string]: any } {
+    return this.options.columns.reduce(
+      (values, column) => {
+        if (!column.searchable) return values;
+        const controlName = this.searchControlNames[column.columnDef];
+        if (controlName) values[column.columnDef] = this.searchFormGroup?.controls[controlName]?.value;
+        return values;
+      },
+      {} as { [columnDef: string]: any },
+    );
+  }
+
+  private getSearchControlName(columnDef: string): string {
+    return columnDef.replace(/%/g, '%25').replace(/\./g, '%2E');
   }
 
   private consolidateOrderIndex(): void {
@@ -762,7 +783,7 @@ export class NgxMatDatatableComponent<Record = any> implements OnInit, OnDestroy
         : undefined;
     return {
       version: 1,
-      filters: this.searchFormGroup.getRawValue(),
+      filters: this.getSearchValues(),
       order,
       ...(page ? { page } : {}),
     };
