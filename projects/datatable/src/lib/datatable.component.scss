@@ -165,6 +165,9 @@
 
     .mat-mdc-cell {
       padding: 0 8px;
+      color: var(--datatable-cell-color);
+      opacity: var(--datatable-cell-opacity);
+      background-color: var(--datatable-cell-background-color);
     }
 
     .mat-mdc-footer-row.incremental-row {
