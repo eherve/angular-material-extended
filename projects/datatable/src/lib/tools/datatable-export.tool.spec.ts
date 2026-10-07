@@ -84,7 +84,7 @@ describe('datatable export tool', () => {
     expect(subscriptionCount).toBe(1);
   });
 
-  it('should preserve transforms, custom exports and duration raw values', async () => {
+  it('should await custom exports while preserving transforms and duration raw values', async () => {
     const service = jasmine.createSpy<NgxMatDatasourceService<TestRecord>>('service');
     const options: NgxMatDatatableOptions<TestRecord> = {
       service,
@@ -101,7 +101,10 @@ describe('datatable export tool', () => {
           columnDef: 'custom',
           header: 'Custom',
           property: 'name',
-          export: (row, value) => (row['Custom export'] = `custom:${value}`),
+          export: async (row, value) => {
+            await Promise.resolve();
+            row['Custom export'] = `custom:${value}`;
+          },
         },
         {
           type: 'duration',

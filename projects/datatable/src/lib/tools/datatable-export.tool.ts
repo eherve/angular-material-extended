@@ -83,7 +83,7 @@ export async function buildExportRows<T>(
       if (column.hidden || column.disabled) continue;
       let value = get(record, column.property);
       if (column.export) {
-        column.export(row, value, record);
+        await column.export(row, value, record);
         continue;
       }
       value = transformExportValue(column, value, record);

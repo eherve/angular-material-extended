@@ -38,7 +38,11 @@ type BaseColumn = {
   tooltip?: string;
   align?: 'start' | 'center' | 'end';
 
-  export?: (exportRow: any, value: any, row: any) => void;
+  /**
+   * Adds one or more values to an export row. It may resolve asynchronous data
+   * before the next column or row is processed.
+   */
+  export?: (exportRow: any, value: any, row: any) => void | Promise<void>;
   searchUpdated?: (value: any) => void;
 };
 
