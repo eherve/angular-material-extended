@@ -1,20 +1,32 @@
 /** @format */
 
-import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { Subscription } from 'rxjs';
-import { DateRefreshService } from '../../date-refresh.service';
-import { MomentFormatPipe } from '../../pipes/moment-format.pipe';
-import { duration } from '../../tools/duration.tool';
-import { get } from '../../tools/get.tool';
-import { DatatableDateColumn, DatatableValueColumn } from '../../types/datatable-column.type';
+import { CommonModule } from "@angular/common";
+import {
+  ChangeDetectorRef,
+  Component,
+  inject,
+  Input,
+  OnDestroy,
+  OnInit,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { MatIconModule } from "@angular/material/icon";
+import { Subscription } from "rxjs";
+import { DateRefreshService } from "../../date-refresh.service";
+import { MomentFormatPipe } from "../../pipes/moment-format.pipe";
+import { duration } from "../../tools/duration.tool";
+import { get } from "../../tools/get.tool";
+import {
+  DatatableDateColumn,
+  DatatableValueColumn,
+} from "../../types/datatable-column.type";
 
 @Component({
-  selector: 'lib-cell-date-value',
-  imports: [CommonModule, MatIconModule, MomentFormatPipe],
-  templateUrl: './cell-date-value.component.html',
-  styleUrl: './cell-date-value.component.scss',
+  selector: "lib-cell-date-value",
+  imports: [MatIconModule, MomentFormatPipe],
+  templateUrl: "./cell-date-value.component.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: "./cell-date-value.component.scss",
 })
 export class CellDateValueComponent<Record> implements OnInit, OnDestroy {
   private changeDetectorRef = inject(ChangeDetectorRef);
@@ -23,12 +35,18 @@ export class CellDateValueComponent<Record> implements OnInit, OnDestroy {
   @Input()
   column!: DatatableDateColumn<Record>;
 
-  @Input('row')
+  @Input("row")
   set setRow(row: any) {
     this.row = row;
     this.value = get(this.row, this.column.property);
-    if (typeof (this.column as DatatableValueColumn<Record>).transform === 'function') {
-      this.value = (this.column as DatatableValueColumn<Record>).transform!(this.value, this.row);
+    if (
+      typeof (this.column as DatatableValueColumn<Record>).transform ===
+      "function"
+    ) {
+      this.value = (this.column as DatatableValueColumn<Record>).transform!(
+        this.value,
+        this.row,
+      );
     }
     this.duration = duration(this.value, this.column);
   }
@@ -41,10 +59,12 @@ export class CellDateValueComponent<Record> implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (!this.column.withDuration || !this.column.durationRefreshTime) return;
-    this.refreshSubscription = this.dateRefreshService.forInterval(this.column.durationRefreshTime).subscribe(() => {
-      this.duration = duration(this.value, this.column);
-      this.changeDetectorRef.detectChanges();
-    });
+    this.refreshSubscription = this.dateRefreshService
+      .forInterval(this.column.durationRefreshTime)
+      .subscribe(() => {
+        this.duration = duration(this.value, this.column);
+        this.changeDetectorRef.detectChanges();
+      });
   }
 
   ngOnDestroy(): void {

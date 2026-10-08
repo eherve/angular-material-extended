@@ -1,18 +1,30 @@
 /** @format */
 
-import { CommonModule } from '@angular/common';
-import { Component, HostBinding, inject, Input } from '@angular/core';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { CountUpModule } from 'ngx-countup';
-import { IntersectionObserverModule } from 'ngx-intersection-observer';
-import { NgxMatDatatableIntl } from '../../datatable.intl';
-import { MergePipe } from '../../pipes/merge.pipe';
+import { CommonModule } from "@angular/common";
+import {
+  Component,
+  HostBinding,
+  inject,
+  Input,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { CountUpModule } from "ngx-countup";
+import { IntersectionObserverModule } from "ngx-intersection-observer";
+import { NgxMatDatatableIntl } from "../../datatable.intl";
+import { MergePipe } from "../../pipes/merge.pipe";
 
 @Component({
-  selector: 'lib-progress-spinner',
-  imports: [CommonModule, MatProgressSpinnerModule, IntersectionObserverModule, CountUpModule, MergePipe],
-  templateUrl: './progress-spinner.component.html',
-  styleUrl: './progress-spinner.component.scss',
+  selector: "lib-progress-spinner",
+  imports: [
+    MatProgressSpinnerModule,
+    IntersectionObserverModule,
+    CountUpModule,
+    MergePipe,
+  ],
+  templateUrl: "./progress-spinner.component.html",
+  changeDetection: ChangeDetectionStrategy.Eager,
+  styleUrl: "./progress-spinner.component.scss",
 })
 export class ProgressSpinnerComponent {
   datatableIntl = inject(NgxMatDatatableIntl);
@@ -20,9 +32,9 @@ export class ProgressSpinnerComponent {
   @Input()
   diameter: number = 100;
 
-  @Input('value')
+  @Input("value")
   set setValue(value: number | string) {
-    if (typeof value === 'string') this._value = parseFloat(value);
+    if (typeof value === "string") this._value = parseFloat(value);
     else this._value = value;
     if (this.animateInView) this.load(this.isInView);
   }
@@ -32,28 +44,28 @@ export class ProgressSpinnerComponent {
   @Input()
   color?: string;
 
-  @Input('displayValue')
+  @Input("displayValue")
   set setDisplayValue(displayValue: any) {
     this.displayValue = displayValue !== false;
   }
   displayValue = true;
 
-  @HostBinding('style.--progress-spinner-color') get getColor() {
+  @HostBinding("style.--progress-spinner-color") get getColor() {
     return this.color;
   }
 
   @Input()
   fontSize: string = `${this.diameter / 5}px`;
 
-  @Input('animateInView')
+  @Input("animateInView")
   set setAnimateInView(animateInView: any) {
     this.animateInView = animateInView !== false;
   }
   animateInView = true;
 
-  @Input('delay')
+  @Input("delay")
   set setDelay(delay: number | string) {
-    if (typeof delay === 'string') this.delay = parseInt(delay);
+    if (typeof delay === "string") this.delay = parseInt(delay);
     else this.delay = delay;
   }
   delay?: number;

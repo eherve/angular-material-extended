@@ -5,11 +5,15 @@
 @if (column.isArrayValue && value | isArray) {
   <div class="options">
     @for (v of value; track v) {
-      <ng-container *ngTemplateOutlet="optionTmpl; context: { value: v }"></ng-container>
+      <ng-container
+        *ngTemplateOutlet="optionTmpl; context: { value: v }"
+      ></ng-container>
     }
   </div>
 } @else {
-  <ng-container *ngTemplateOutlet="optionTmpl; context: { value }"></ng-container>
+  <ng-container
+    *ngTemplateOutlet="optionTmpl; context: { value }"
+  ></ng-container>
 }
 
 <ng-template #optionTmpl let-value="value">
@@ -18,17 +22,29 @@
     <div class="option">
       @if (option.icon) {
         @switch (option.iconSrc) {
-          @case ('svg') {
-            <mat-icon [svgIcon]="option.icon" [style.color]="option.iconColor ?? option.color" [style.margin-right.px]="8"></mat-icon>
+          @case ("svg") {
+            <mat-icon
+              [svgIcon]="option.icon"
+              [style.color]="option.iconColor ?? option.color"
+              [style.margin-right.px]="8"
+            ></mat-icon>
           }
           @default {
-            <mat-icon [style.color]="option.iconColor ?? option.color" [style.margin-right.px]="8">
+            <mat-icon
+              [style.color]="option.iconColor ?? option.color"
+              [style.margin-right.px]="8"
+            >
               {{ option.icon }}
             </mat-icon>
           }
         }
       }
-      <mat-label *ngIf="!column.iconOnly" [style.color]="option.color" [innerHTML]="option.name | safeHtml"></mat-label>
+      @if (!column.iconOnly) {
+        <mat-label
+          [style.color]="option.color"
+          [innerHTML]="option.name | safeHtml"
+        ></mat-label>
+      }
     </div>
   } @else {
     {{ value }}

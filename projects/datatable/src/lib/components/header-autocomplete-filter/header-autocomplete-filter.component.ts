@@ -1,6 +1,6 @@
 /** @format */
 
-import { CommonModule } from '@angular/common';
+import { CommonModule } from "@angular/common";
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -12,7 +12,8 @@ import {
   Input,
   OnDestroy,
   ViewChild,
-} from '@angular/core';
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   ControlValueAccessor,
   FormControl,
@@ -21,14 +22,17 @@ import {
   NgControl,
   ReactiveFormsModule,
   UntypedFormControl,
-} from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { IntersectionObserverModule } from 'ngx-intersection-observer';
+} from "@angular/forms";
+import {
+  MatAutocomplete,
+  MatAutocompleteModule,
+} from "@angular/material/autocomplete";
+import { MatButtonModule } from "@angular/material/button";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
+import { IntersectionObserverModule } from "ngx-intersection-observer";
 import {
   BehaviorSubject,
   catchError,
@@ -43,14 +47,17 @@ import {
   Subscription,
   switchMap,
   tap,
-} from 'rxjs';
-import { NgxMatDatatableIntl } from '../../datatable.intl';
-import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
-import { stripHtml } from '../../tools/strip-html.tool';
-import { DatatableSearchAutocompleteColumn, DatatableSearchListOption } from '../../types/datatable-column.type';
+} from "rxjs";
+import { NgxMatDatatableIntl } from "../../datatable.intl";
+import { SafeHtmlPipe } from "../../pipes/safe-html.pipe";
+import { stripHtml } from "../../tools/strip-html.tool";
+import {
+  DatatableSearchAutocompleteColumn,
+  DatatableSearchListOption,
+} from "../../types/datatable-column.type";
 
 @Component({
-  selector: 'lib-header-autocomplete-filter',
+  selector: "lib-header-autocomplete-filter",
   imports: [
     CommonModule,
     FormsModule,
@@ -64,8 +71,9 @@ import { DatatableSearchAutocompleteColumn, DatatableSearchListOption } from '..
     ReactiveFormsModule,
     SafeHtmlPipe,
   ],
-  templateUrl: './header-autocomplete-filter.component.html',
-  styleUrl: './header-autocomplete-filter.component.scss',
+  templateUrl: "./header-autocomplete-filter.component.html",
+  styleUrl: "./header-autocomplete-filter.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -74,7 +82,9 @@ import { DatatableSearchAutocompleteColumn, DatatableSearchListOption } from '..
     },
   ],
 })
-export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderAutocompleteFilterComponent<Record>
+  implements AfterViewInit, OnDestroy, ControlValueAccessor
+{
   @Input()
   column!: DatatableSearchAutocompleteColumn<Record>;
 
@@ -82,7 +92,7 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   groups: { name: string; options: DatatableSearchListOption[] }[] = [];
   hasMore = false;
   searching = false;
-  @ViewChild('input') input!: ElementRef<HTMLInputElement>;
+  @ViewChild("input") input!: ElementRef<HTMLInputElement>;
   @ViewChild(MatAutocomplete) auto!: MatAutocomplete;
   control!: FormControl<any>;
   selectControl = new FormControl();
@@ -103,7 +113,7 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   writeValue(value: { value: any; name?: string }): void {
     if (value?.value !== this.selectControl.value) {
       if (value?.name) {
-        if (!this.options.find(o => o.value === value.value)) {
+        if (!this.options.find((o) => o.value === value.value)) {
           this.options.push({ value: value.value, name: value.name });
         }
       }
@@ -127,15 +137,22 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
 
   async ngAfterViewInit(): Promise<void> {
     const ngControl: NgControl | null = this.injector.get(NgControl, null);
-    if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
+    if (!ngControl)
+      throw new Error(
+        `${this.constructor.name} missing control [column:${this.column.columnDef}]`,
+      );
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
         if (value === undefined) {
           if (this.control.value !== undefined) this.onChange(undefined);
-        } else if (value === null && !this.options.find(o => o.value === null)) {
+        } else if (
+          value === null &&
+          !this.options.find((o) => o.value === null)
+        ) {
           if (this.control.value !== undefined) this.onChange(undefined);
-        } else if (this.control.value?.value !== value) this.onChange({ value, regex: false });
+        } else if (this.control.value?.value !== value)
+          this.onChange({ value, regex: false });
       }),
     );
     this.buildOptions();
@@ -152,9 +169,13 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   }
 
   focus(): void {
-    if (this.column.loadOnFocus && this.isEmptyValue(this.selectControl.value)) {
+    if (
+      this.column.loadOnFocus &&
+      this.isEmptyValue(this.selectControl.value)
+    ) {
       const search = this.input.nativeElement.value;
-      if (!search.length || this.filter$.value !== search) this.filter$.next(search);
+      if (!search.length || this.filter$.value !== search)
+        this.filter$.next(search);
     }
   }
 
@@ -166,7 +187,7 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   displayWith = (value: any): string => {
     let val;
     if (!this.options) val = value;
-    else val = this.options.find(o => o.value === value)?.name ?? value;
+    else val = this.options.find((o) => o.value === value)?.name ?? value;
     return stripHtml(val);
   };
 
@@ -178,11 +199,14 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   }
 
   private buildOptions(): void {
-    this.options = this.column.searchValue !== undefined ? (this.column.searchValueOptions ?? []) : [];
+    this.options =
+      this.column.searchValue !== undefined
+        ? (this.column.searchValueOptions ?? [])
+        : [];
     this.subsink.add(
       this.filter$
         .pipe(
-          filter(value => typeof value === 'string'),
+          filter((value) => typeof value === "string"),
           debounceTime(300),
           switchMap((search: string) => {
             this.auto.panel;
@@ -193,7 +217,14 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
               startWith(skip),
               tap(() => (this.searching = true)),
               switchMap(() =>
-                defer(() => this.column.options(this.column.limit || 10, skip, search, this.getGlobalSearchValue())).pipe(
+                defer(() =>
+                  this.column.options(
+                    this.column.limit || 10,
+                    skip,
+                    search,
+                    this.getGlobalSearchValue(),
+                  ),
+                ).pipe(
                   catchError(() => {
                     this.hasMore = false;
                     return of(null);
@@ -204,12 +235,14 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
                   }),
                 ),
               ),
-              filter((data): data is DatatableSearchListOption[] => Array.isArray(data)),
-              map(data => {
-                data.forEach(d => {
+              filter((data): data is DatatableSearchListOption[] =>
+                Array.isArray(data),
+              ),
+              map((data) => {
+                data.forEach((d) => {
                   this.options.push(d);
-                  const name = d.group ?? '';
-                  const group = this.groups.find(g => g.name === name);
+                  const name = d.group ?? "";
+                  const group = this.groups.find((g) => g.name === name);
                   if (!group) this.groups.push({ name, options: [d] });
                   else group.options.push(d);
                 });
@@ -224,6 +257,6 @@ export class HeaderAutocompleteFilterComponent<Record> implements AfterViewInit,
   }
 
   private isEmptyValue(value: any): boolean {
-    return value === null || value === undefined || value === '';
+    return value === null || value === undefined || value === "";
   }
 }

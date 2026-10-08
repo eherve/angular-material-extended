@@ -1,6 +1,6 @@
 /** @format */
 
-import { CommonModule } from '@angular/common';
+import { CommonModule } from "@angular/common";
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -10,7 +10,8 @@ import {
   Injector,
   Input,
   OnDestroy,
-} from '@angular/core';
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   ControlValueAccessor,
   FormControl,
@@ -19,20 +20,19 @@ import {
   NgControl,
   ReactiveFormsModule,
   UntypedFormControl,
-} from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { Subscription } from 'rxjs';
-import { NgxMatDatatableIntl } from '../../datatable.intl';
-import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
-import { DatatableSearchTextColumn } from '../../types/datatable-column.type';
+} from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { Subscription } from "rxjs";
+import { NgxMatDatatableIntl } from "../../datatable.intl";
+import { SafeHtmlPipe } from "../../pipes/safe-html.pipe";
+import { DatatableSearchTextColumn } from "../../types/datatable-column.type";
 
 @Component({
-  selector: 'lib-header-text-filter',
+  selector: "lib-header-text-filter",
   imports: [
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -41,8 +41,9 @@ import { DatatableSearchTextColumn } from '../../types/datatable-column.type';
     ReactiveFormsModule,
     SafeHtmlPipe,
   ],
-  templateUrl: './header-text-filter.component.html',
-  styleUrl: './header-text-filter.component.scss',
+  templateUrl: "./header-text-filter.component.html",
+  styleUrl: "./header-text-filter.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -51,7 +52,9 @@ import { DatatableSearchTextColumn } from '../../types/datatable-column.type';
     },
   ],
 })
-export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderTextFilterComponent<Record>
+  implements AfterViewInit, OnDestroy, ControlValueAccessor
+{
   @Input()
   column!: DatatableSearchTextColumn<Record>;
 
@@ -70,8 +73,9 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
   private subsink = new Subscription();
 
   writeValue(value: any): void {
-    const nextValue = value?.value ?? '';
-    if (nextValue !== this.selectControl.value) this.selectControl.setValue(nextValue, { emitEvent: false });
+    const nextValue = value?.value ?? "";
+    if (nextValue !== this.selectControl.value)
+      this.selectControl.setValue(nextValue, { emitEvent: false });
     this.changeDetectorRef.markForCheck();
   }
 
@@ -90,7 +94,10 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
 
   async ngAfterViewInit(): Promise<void> {
     const ngControl: NgControl | null = this.injector.get(NgControl, null);
-    if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
+    if (!ngControl)
+      throw new Error(
+        `${this.constructor.name} missing control [column:${this.column.columnDef}]`,
+      );
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
@@ -109,11 +116,11 @@ export class HeaderTextFilterComponent<Record> implements AfterViewInit, OnDestr
   }
 
   private escapeRegExp(value: string): string {
-    if (!value) return '';
-    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (!value) return "";
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
   private isEmptyValue(value: any): boolean {
-    return value === null || value === undefined || value === '';
+    return value === null || value === undefined || value === "";
   }
 }

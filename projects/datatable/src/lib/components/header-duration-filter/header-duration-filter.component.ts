@@ -1,6 +1,6 @@
 /** @format */
 
-import { CommonModule } from '@angular/common';
+import { CommonModule } from "@angular/common";
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -11,7 +11,8 @@ import {
   Input,
   OnDestroy,
   OnInit,
-} from '@angular/core';
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   ControlValueAccessor,
   FormControl,
@@ -22,22 +23,27 @@ import {
   ReactiveFormsModule,
   UntypedFormControl,
   Validators,
-} from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { Subscription } from 'rxjs';
-import { NgxMatDatatableIntl } from '../../datatable.intl';
-import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
-import { DatatableSearchDurationColumn } from '../../types/datatable-column.type';
-import { OPERATOR, OperatorSelectComponent } from '../operator-select/operator-select.component';
-import { TIME_UNIT, TimeUnitSelectComponent } from '../time-unit-select/time-unit-select.component';
+} from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { Subscription } from "rxjs";
+import { NgxMatDatatableIntl } from "../../datatable.intl";
+import { SafeHtmlPipe } from "../../pipes/safe-html.pipe";
+import { DatatableSearchDurationColumn } from "../../types/datatable-column.type";
+import {
+  OPERATOR,
+  OperatorSelectComponent,
+} from "../operator-select/operator-select.component";
+import {
+  TIME_UNIT,
+  TimeUnitSelectComponent,
+} from "../time-unit-select/time-unit-select.component";
 
 @Component({
-  selector: 'lib-header-duration-filter',
+  selector: "lib-header-duration-filter",
   imports: [
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -48,8 +54,9 @@ import { TIME_UNIT, TimeUnitSelectComponent } from '../time-unit-select/time-uni
     TimeUnitSelectComponent,
     SafeHtmlPipe,
   ],
-  templateUrl: './header-duration-filter.component.html',
-  styleUrl: './header-duration-filter.component.scss',
+  templateUrl: "./header-duration-filter.component.html",
+  styleUrl: "./header-duration-filter.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -58,7 +65,9 @@ import { TIME_UNIT, TimeUnitSelectComponent } from '../time-unit-select/time-uni
     },
   ],
 })
-export class HeaderDurationFilterComponent<Record> implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderDurationFilterComponent<Record>
+  implements OnInit, AfterViewInit, OnDestroy, ControlValueAccessor
+{
   @Input()
   column!: DatatableSearchDurationColumn<Record>;
 
@@ -68,8 +77,8 @@ export class HeaderDurationFilterComponent<Record> implements OnInit, AfterViewI
     start: new FormControl<number | undefined>(undefined, Validators.required),
     end: new FormControl<number | undefined>(undefined, Validators.required),
   });
-  operatorControl = new FormControl<OPERATOR>('=');
-  timeUnitControl = new FormControl<TIME_UNIT>('second');
+  operatorControl = new FormControl<OPERATOR>("=");
+  timeUnitControl = new FormControl<TIME_UNIT>("second");
 
   onChange: (value: any) => void = () => {};
 
@@ -83,18 +92,28 @@ export class HeaderDurationFilterComponent<Record> implements OnInit, AfterViewI
   private subsink = new Subscription();
 
   writeValue(value: any): void {
-    if (value?.unitOfTime) this.timeUnitControl.setValue(value.unitOfTime, { emitEvent: false });
-    if (value?.operator) this.operatorControl.setValue(value.operator, { emitEvent: false });
+    if (value?.unitOfTime)
+      this.timeUnitControl.setValue(value.unitOfTime, { emitEvent: false });
+    if (value?.operator)
+      this.operatorControl.setValue(value.operator, { emitEvent: false });
     if (value?.value !== null && value?.value !== undefined) {
-      let selectValue = TimeUnitSelectComponent.convert(value.value, this.timeUnitControl.value!);
-      if (this.selectControl.value !== selectValue) this.selectControl.setValue(selectValue, { emitEvent: false });
+      let selectValue = TimeUnitSelectComponent.convert(
+        value.value,
+        this.timeUnitControl.value!,
+      );
+      if (this.selectControl.value !== selectValue)
+        this.selectControl.setValue(selectValue, { emitEvent: false });
     } else this.selectControl.setValue(null, { emitEvent: false });
     this.changeDetectorRef.markForCheck();
   }
 
   setDisabledState(isDisabled: boolean): void {
-    const controls = [this.selectControl, this.operatorControl, this.timeUnitControl];
-    controls.forEach(control => {
+    const controls = [
+      this.selectControl,
+      this.operatorControl,
+      this.timeUnitControl,
+    ];
+    controls.forEach((control) => {
       if (isDisabled) control.disable({ emitEvent: false });
       else control.enable({ emitEvent: false });
     });
@@ -112,17 +131,23 @@ export class HeaderDurationFilterComponent<Record> implements OnInit, AfterViewI
 
   async ngAfterViewInit(): Promise<void> {
     const ngControl: NgControl | null = this.injector.get(NgControl, null);
-    if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
+    if (!ngControl)
+      throw new Error(
+        `${this.constructor.name} missing control [column:${this.column.columnDef}]`,
+      );
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
-      this.selectControl.valueChanges.subscribe(value => {
+      this.selectControl.valueChanges.subscribe((value) => {
         if (this.control.invalid) return;
         else if (this.isEmptyValue(value)) this.onChange(undefined);
         else {
           const unitOfTimeValue = value as number;
           this.onChange({
             unitOfTimeValue,
-            value: TimeUnitSelectComponent.toMilliseconds(unitOfTimeValue, this.timeUnitControl.value!),
+            value: TimeUnitSelectComponent.toMilliseconds(
+              unitOfTimeValue,
+              this.timeUnitControl.value!,
+            ),
             regex: false,
             operator: this.operatorControl.value,
             unitOfTime: this.timeUnitControl.value,
@@ -136,7 +161,10 @@ export class HeaderDurationFilterComponent<Record> implements OnInit, AfterViewI
         const unitOfTimeValue = this.selectControl.value as number;
         this.onChange({
           unitOfTimeValue,
-          value: TimeUnitSelectComponent.toMilliseconds(unitOfTimeValue, this.timeUnitControl.value!),
+          value: TimeUnitSelectComponent.toMilliseconds(
+            unitOfTimeValue,
+            this.timeUnitControl.value!,
+          ),
           regex: false,
           operator: value,
           unitOfTime: this.timeUnitControl.value,
@@ -145,7 +173,11 @@ export class HeaderDurationFilterComponent<Record> implements OnInit, AfterViewI
     );
     this.subsink.add(
       this.timeUnitControl.valueChanges.subscribe((value: any) => {
-        if (this.isEmptyValue(this.selectControl.value) || !this.control.value?.unitOfTime) return;
+        if (
+          this.isEmptyValue(this.selectControl.value) ||
+          !this.control.value?.unitOfTime
+        )
+          return;
         const unitOfTimeValue = TimeUnitSelectComponent.convert(
           this.selectControl.value as number,
           this.control.value.unitOfTime,
@@ -169,6 +201,6 @@ export class HeaderDurationFilterComponent<Record> implements OnInit, AfterViewI
   }
 
   private isEmptyValue(value: any): boolean {
-    return value === null || value === undefined || value === '';
+    return value === null || value === undefined || value === "";
   }
 }

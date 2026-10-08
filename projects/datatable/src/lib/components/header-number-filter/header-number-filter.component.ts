@@ -1,6 +1,6 @@
 /** @format */
 
-import { CommonModule } from '@angular/common';
+import { CommonModule } from "@angular/common";
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -10,7 +10,8 @@ import {
   Injector,
   Input,
   OnDestroy,
-} from '@angular/core';
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   ControlValueAccessor,
   FormControl,
@@ -19,22 +20,21 @@ import {
   NgControl,
   ReactiveFormsModule,
   UntypedFormControl,
-} from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
-import { Subscription } from 'rxjs';
-import { NgxMatDatatableIntl } from '../../datatable.intl';
-import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
-import { DatatableSearchNumberColumn } from '../../types/datatable-column.type';
-import { OperatorSelectComponent } from '../operator-select/operator-select.component';
+} from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatMenuModule } from "@angular/material/menu";
+import { Subscription } from "rxjs";
+import { NgxMatDatatableIntl } from "../../datatable.intl";
+import { SafeHtmlPipe } from "../../pipes/safe-html.pipe";
+import { DatatableSearchNumberColumn } from "../../types/datatable-column.type";
+import { OperatorSelectComponent } from "../operator-select/operator-select.component";
 
 @Component({
-  selector: 'lib-header-number-filter',
+  selector: "lib-header-number-filter",
   imports: [
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -45,8 +45,9 @@ import { OperatorSelectComponent } from '../operator-select/operator-select.comp
     OperatorSelectComponent,
     SafeHtmlPipe,
   ],
-  templateUrl: './header-number-filter.component.html',
-  styleUrl: './header-number-filter.component.scss',
+  templateUrl: "./header-number-filter.component.html",
+  styleUrl: "./header-number-filter.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -55,13 +56,15 @@ import { OperatorSelectComponent } from '../operator-select/operator-select.comp
     },
   ],
 })
-export class HeaderNumberFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderNumberFilterComponent<Record>
+  implements AfterViewInit, OnDestroy, ControlValueAccessor
+{
   @Input()
   column!: DatatableSearchNumberColumn<Record>;
 
   control!: FormControl<any>;
   selectControl = new FormControl();
-  operatorControl = new FormControl('=');
+  operatorControl = new FormControl("=");
 
   onChange: (value: any) => void = () => {};
 
@@ -78,7 +81,8 @@ export class HeaderNumberFilterComponent<Record> implements AfterViewInit, OnDes
     if (value?.operator && value.operator !== this.operatorControl.value) {
       this.operatorControl.setValue(value.operator, { emitEvent: false });
     }
-    if (value?.value !== this.selectControl.value) this.selectControl.setValue(value?.value, { emitEvent: false });
+    if (value?.value !== this.selectControl.value)
+      this.selectControl.setValue(value?.value, { emitEvent: false });
     this.changeDetectorRef.markForCheck();
   }
 
@@ -102,19 +106,31 @@ export class HeaderNumberFilterComponent<Record> implements AfterViewInit, OnDes
 
   async ngAfterViewInit(): Promise<void> {
     const ngControl: NgControl | null = this.injector.get(NgControl, null);
-    if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
+    if (!ngControl)
+      throw new Error(
+        `${this.constructor.name} missing control [column:${this.column.columnDef}]`,
+      );
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
         if (this.control.invalid) return;
         else if (this.isEmptyValue(value)) this.onChange(undefined);
-        else this.onChange({ value, regex: false, operator: this.operatorControl.value });
+        else
+          this.onChange({
+            value,
+            regex: false,
+            operator: this.operatorControl.value,
+          });
       }),
     );
     this.subsink.add(
       this.operatorControl.valueChanges.subscribe((value: any) => {
         if (this.isEmptyValue(this.selectControl.value)) return;
-        this.onChange({ value: this.selectControl.value, regex: false, operator: value });
+        this.onChange({
+          value: this.selectControl.value,
+          regex: false,
+          operator: value,
+        });
       }),
     );
     this.changeDetectorRef.detectChanges();
@@ -125,6 +141,6 @@ export class HeaderNumberFilterComponent<Record> implements AfterViewInit, OnDes
   }
 
   private isEmptyValue(value: any): boolean {
-    return value === null || value === undefined || value === '';
+    return value === null || value === undefined || value === "";
   }
 }

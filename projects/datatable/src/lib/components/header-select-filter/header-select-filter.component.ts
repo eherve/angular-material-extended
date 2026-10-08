@@ -1,6 +1,6 @@
 /** @format */
 
-import { CommonModule } from '@angular/common';
+import { CommonModule } from "@angular/common";
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -10,7 +10,8 @@ import {
   Injector,
   Input,
   OnDestroy,
-} from '@angular/core';
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   ControlValueAccessor,
   FormControl,
@@ -19,21 +20,24 @@ import {
   NgControl,
   ReactiveFormsModule,
   UntypedFormControl,
-} from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSelectModule } from '@angular/material/select';
-import { Subscription } from 'rxjs';
-import { IsArrayPipe } from '../../pipes/is-array.pipe';
-import { NgxMatDatatableIntl } from '../../datatable.intl';
-import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
-import { SelectOptionPipe } from '../../pipes/select-option.pipe';
-import { DatatableSearchListOption, DatatableSearchSelectColumn } from '../../types/datatable-column.type';
-import { SelectOptionsCacheService } from '../../select-options-cache.service';
+} from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatSelectModule } from "@angular/material/select";
+import { Subscription } from "rxjs";
+import { IsArrayPipe } from "../../pipes/is-array.pipe";
+import { NgxMatDatatableIntl } from "../../datatable.intl";
+import { SafeHtmlPipe } from "../../pipes/safe-html.pipe";
+import { SelectOptionPipe } from "../../pipes/select-option.pipe";
+import {
+  DatatableSearchListOption,
+  DatatableSearchSelectColumn,
+} from "../../types/datatable-column.type";
+import { SelectOptionsCacheService } from "../../select-options-cache.service";
 
 @Component({
-  selector: 'lib-header-select-filter',
+  selector: "lib-header-select-filter",
   imports: [
     CommonModule,
     FormsModule,
@@ -46,8 +50,9 @@ import { SelectOptionsCacheService } from '../../select-options-cache.service';
     SafeHtmlPipe,
     IsArrayPipe,
   ],
-  templateUrl: './header-select-filter.component.html',
-  styleUrl: './header-select-filter.component.scss',
+  templateUrl: "./header-select-filter.component.html",
+  styleUrl: "./header-select-filter.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -56,7 +61,9 @@ import { SelectOptionsCacheService } from '../../select-options-cache.service';
     },
   ],
 })
-export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderSelectFilterComponent<Record>
+  implements AfterViewInit, OnDestroy, ControlValueAccessor
+{
   @Input()
   column!: DatatableSearchSelectColumn<Record>;
 
@@ -81,7 +88,11 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
   writeValue(controlValue: any): void {
     if (controlValue?.value !== this.selectControl.value) {
       const value = controlValue?.value;
-      if (!this.isEmptyValue(value) && !Array.isArray(value) && this.column.multiple) {
+      if (
+        !this.isEmptyValue(value) &&
+        !Array.isArray(value) &&
+        this.column.multiple
+      ) {
         this.selectControl.setValue([value], { emitEvent: false });
       } else this.selectControl.setValue(value, { emitEvent: false });
     }
@@ -103,22 +114,33 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
 
   async ngAfterViewInit(): Promise<void> {
     const ngControl: NgControl | null = this.injector.get(NgControl, null);
-    if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
+    if (!ngControl)
+      throw new Error(
+        `${this.constructor.name} missing control [column:${this.column.columnDef}]`,
+      );
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
         if (this.isEmptyValue(value)) this.onChange(undefined);
-        else this.onChange({ value, operator: this.column.multiple ? '$in' : undefined, regex: false });
+        else
+          this.onChange({
+            value,
+            operator: this.column.multiple ? "$in" : undefined,
+            regex: false,
+          });
       }),
     );
-    if (Array.isArray(this.column.options)) this.buildOptions(this.column.options);
+    if (Array.isArray(this.column.options))
+      this.buildOptions(this.column.options);
     else
       this.subsink.add(
-        this.selectOptionsCache.resolve(this.column.options).subscribe(data => {
-          this.options = [];
-          this.groups = [];
-          this.buildOptions(data);
-        }),
+        this.selectOptionsCache
+          .resolve(this.column.options)
+          .subscribe((data) => {
+            this.options = [];
+            this.groups = [];
+            this.buildOptions(data);
+          }),
       );
     this.changeDetectorRef.detectChanges();
   }
@@ -128,16 +150,21 @@ export class HeaderSelectFilterComponent<Record> implements AfterViewInit, OnDes
   }
 
   private buildOptions(data: DatatableSearchListOption[]): void {
-    data.forEach(d => {
+    data.forEach((d) => {
       this.options.push(d);
-      const name = d.group ?? '';
-      const group = this.groups.find(g => g.name === name);
+      const name = d.group ?? "";
+      const group = this.groups.find((g) => g.name === name);
       if (!group) this.groups.push({ name, options: [d] });
       else group.options.push(d);
     });
   }
 
   private isEmptyValue(value: any): boolean {
-    return value === null || value === undefined || value === '' || (Array.isArray(value) && !value.length);
+    return (
+      value === null ||
+      value === undefined ||
+      value === "" ||
+      (Array.isArray(value) && !value.length)
+    );
   }
 }

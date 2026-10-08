@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TooltipComponent } from './tooltip.component';
+import { NgxMatTooltipComponent } from './tooltip.component';
+import { NgxMatTooltipModule } from './tooltip.module';
 
-describe('TooltipComponent', () => {
-  let component: TooltipComponent;
-  let fixture: ComponentFixture<TooltipComponent>;
+describe('NgxMatTooltipComponent', () => {
+  let component: NgxMatTooltipComponent;
+  let fixture: ComponentFixture<NgxMatTooltipComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TooltipComponent]
-    })
-    .compileComponents();
+      imports: [NgxMatTooltipModule],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(TooltipComponent);
+    fixture = TestBed.createComponent(NgxMatTooltipComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

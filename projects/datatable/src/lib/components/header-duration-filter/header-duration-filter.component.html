@@ -4,23 +4,42 @@
   <mat-form-field
     class="ngx-datatable-duration-filter"
     appearance="fill"
-    [class.has-value]="selectControl.value !== null && selectControl.value !== undefined">
+    [class.has-value]="
+      selectControl.value !== null && selectControl.value !== undefined
+    "
+  >
     <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
 
-    <lib-operator-select disableRange matPrefix [formControl]="operatorControl"></lib-operator-select>
+    <lib-operator-select
+      disableRange
+      matPrefix
+      [formControl]="operatorControl"
+    ></lib-operator-select>
 
-    <input matInput type="number" [formControl]="selectControl" [placeholder]="column.placeholder!" (blur)="onTouched()" />
+    <input
+      matInput
+      type="number"
+      [formControl]="selectControl"
+      [placeholder]="column.placeholder!"
+      (blur)="onTouched()"
+    />
 
-    <lib-time-unit-select [locale]="column.locale" matSuffix [formControl]="timeUnitControl"></lib-time-unit-select>
-
-    <button
-      *ngIf="selectControl.value !== null && selectControl.value !== undefined"
-      mat-icon-button
+    <lib-time-unit-select
+      [locale]="column.locale"
       matSuffix
-      size="small"
-      [attr.aria-label]="datatableIntl.clearFilterLabel"
-      (click)="selectControl.setValue(undefined)">
-      <mat-icon>close</mat-icon>
-    </button>
+      [formControl]="timeUnitControl"
+    ></lib-time-unit-select>
+
+    @if (selectControl.value !== null && selectControl.value !== undefined) {
+      <button
+        mat-icon-button
+        matSuffix
+        size="small"
+        [attr.aria-label]="datatableIntl.clearFilterLabel"
+        (click)="selectControl.setValue(undefined)"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    }
   </mat-form-field>
 }

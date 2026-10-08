@@ -102,10 +102,10 @@
     place-content: center start;
 
     button.toggle-off {
-      --mdc-icon-button-icon-color: var(--mdc-icon-button-disabled-icon-color);
+      --mat-icon-button-icon-color: var(--mat-icon-button-disabled-icon-color);
     }
     mat-icon.handle {
-      color: var(--mdc-icon-button-disabled-icon-color);
+      color: var(--mat-icon-button-disabled-icon-color);
     }
   }
 }
@@ -316,7 +316,7 @@
 
     .mat-mdc-paginator-range-actions {
       button {
-        --mdc-icon-button-state-layer-size: 36px;
+        --mat-icon-button-state-layer-size: 36px;
         padding: 6px;
       }
     }
@@ -340,8 +340,8 @@
 
 ::ng-deep {
   .mat-mdc-icon-button[mat-icon-button][size='small'] {
-    --mdc-icon-button-state-layer-size: 30px;
-    --mdc-icon-button-icon-size: 18px;
+    --mat-icon-button-state-layer-size: 30px;
+    --mat-icon-button-icon-size: 18px;
 
     .mat-mdc-button-touch-target {
       height: 36px;
@@ -386,7 +386,7 @@
 
 .facet {
   margin: 8px;
-  --mdc-elevated-card-container-color: transparent;
+  --mat-card-elevated-container-color: transparent;
 
   mat-card-content {
     display: flex;
@@ -485,11 +485,11 @@
         flex-direction: row;
       }
       .chip-facet-key {
-        background-color: var(--mdc-chip-label-text-color);
-        color: var(--facet-label-color, var(--mdc-chip-elevated-container-color));
+        background-color: var(--mat-chip-label-text-color);
+        color: var(--facet-label-color, var(--mat-chip-elevated-container-color));
       }
       .chip-facet-value {
-        color: var(--facet-value-color, var(--mdc-chip-label-text-color));
+        color: var(--facet-value-color, var(--mat-chip-label-text-color));
       }
     }
   }

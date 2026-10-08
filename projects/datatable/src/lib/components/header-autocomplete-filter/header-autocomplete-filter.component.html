@@ -12,15 +12,22 @@
       [matAutocomplete]="auto"
       (input)="filter()"
       (focus)="focus()"
-      (blur)="onTouched()" />
-    <mat-autocomplete #auto="matAutocomplete" requireSelection [displayWith]="displayWith">
+      (blur)="onTouched()"
+    />
+    <mat-autocomplete
+      #auto="matAutocomplete"
+      requireSelection
+      [displayWith]="displayWith"
+    >
       @if (column.hasGroup) {
         @for (group of groups; track group) {
           <mat-optgroup>
             <mat-label [innerHTML]="group.name | safeHtml"></mat-label>
             @for (option of group.options; track option) {
               <mat-option [value]="option.value">
-                <ng-container *ngTemplateOutlet="autocompleteOption; context: { option }"></ng-container>
+                <ng-container
+                  *ngTemplateOutlet="autocompleteOption; context: { option }"
+                ></ng-container>
               </mat-option>
             }
           </mat-optgroup>
@@ -28,7 +35,9 @@
       } @else {
         @for (option of options; track option.value) {
           <mat-option [value]="option.value">
-            <ng-container *ngTemplateOutlet="autocompleteOption; context: { option }"></ng-container>
+            <ng-container
+              *ngTemplateOutlet="autocompleteOption; context: { option }"
+            ></ng-container>
           </mat-option>
         }
       }
@@ -40,20 +49,31 @@
       </mat-option>
 
       @if (hasMore && !searching) {
-        <mat-option id="load-more-options" disabled intersectionObserver (intersection)="loadMore($event.intersect)">
+        <mat-option
+          id="load-more-options"
+          disabled
+          intersectionObserver
+          (intersection)="loadMore($event.intersect)"
+        >
         </mat-option>
       }
     </mat-autocomplete>
 
-    <button
-      *ngIf="selectControl.value !== null && selectControl.value !== undefined && selectControl.value !== ''"
-      mat-icon-button
-      matSuffix
-      size="small"
-      [attr.aria-label]="datatableIntl.clearFilterLabel"
-      (click)="selectControl.setValue(undefined)">
-      <mat-icon>close</mat-icon>
-    </button>
+    @if (
+      selectControl.value !== null &&
+      selectControl.value !== undefined &&
+      selectControl.value !== ""
+    ) {
+      <button
+        mat-icon-button
+        matSuffix
+        size="small"
+        [attr.aria-label]="datatableIntl.clearFilterLabel"
+        (click)="selectControl.setValue(undefined)"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    }
   </mat-form-field>
 }
 
@@ -61,16 +81,26 @@
   <div class="option">
     @if (option.icon) {
       @switch (option.iconSrc) {
-        @case ('svg') {
-          <mat-icon [svgIcon]="option.icon" [style.color]="option.iconColor ?? option.color" [style.margin-right.px]="8"></mat-icon>
+        @case ("svg") {
+          <mat-icon
+            [svgIcon]="option.icon"
+            [style.color]="option.iconColor ?? option.color"
+            [style.margin-right.px]="8"
+          ></mat-icon>
         }
         @default {
-          <mat-icon [style.color]="option.iconColor ?? option.color" [style.margin-right.px]="8">
+          <mat-icon
+            [style.color]="option.iconColor ?? option.color"
+            [style.margin-right.px]="8"
+          >
             {{ option.icon }}
           </mat-icon>
         }
       }
     }
-    <mat-label [style.color]="option.color" [innerHTML]="option.name | safeHtml"></mat-label>
+    <mat-label
+      [style.color]="option.color"
+      [innerHTML]="option.name | safeHtml"
+    ></mat-label>
   </div>
 </ng-template>

@@ -6,7 +6,6 @@
     "paths": {
       "tooltip": ["./dist/angular-material-tooltip"]
     },
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,

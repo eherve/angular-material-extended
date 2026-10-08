@@ -1,6 +1,6 @@
 {
   "name": "@eherve/angular-material-datatable",
-  "version": "19.28.0",
+  "version": "22.0.0",
   "author": "Eric Herve <eric.herve.95@gmail.com>",
   "repository": {
     "type": "git",
@@ -11,14 +11,14 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@angular/animations": "^19.0.4",
-    "@angular/cdk": "^19.0.4",
-    "@angular/common": "^19.0.4",
-    "@angular/core": "^19.0.4",
-    "@angular/forms": "^19.0.4",
-    "@angular/material": "^19.0.4",
-    "@angular/material-moment-adapter": "^19.0.4",
-    "@angular/platform-browser": "^19.0.4",
+    "@angular/animations": "^22.0.0",
+    "@angular/cdk": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/forms": "^22.0.0",
+    "@angular/material": "^22.0.0",
+    "@angular/material-moment-adapter": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
     "humanize-duration": "^3.32.1",
     "lodash-es": "^4.17.21",
     "moment": "^2.30.1",

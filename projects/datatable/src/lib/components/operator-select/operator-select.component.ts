@@ -1,33 +1,49 @@
 /** @format */
 
-import { animate, style, transition, trigger } from '@angular/animations';
-import { OverlayModule } from '@angular/cdk/overlay';
-import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, forwardRef, inject, Injector, Input } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl, UntypedFormControl } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { animate, style, transition, trigger } from "@angular/animations";
+import { OverlayModule } from "@angular/cdk/overlay";
 
-export type OPERATOR = '=' | '>' | '≥' | '<' | '≤' | '<>' | '≤≥';
-const OPERATORS: OPERATOR[] = ['=', '>', '≥', '<', '≤', '<>', '≤≥'];
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  forwardRef,
+  inject,
+  Injector,
+  Input,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR,
+  NgControl,
+  UntypedFormControl,
+} from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
+
+export type OPERATOR = "=" | ">" | "≥" | "<" | "≤" | "<>" | "≤≥";
+const OPERATORS: OPERATOR[] = ["=", ">", "≥", "<", "≤", "<>", "≤≥"];
 
 @Component({
-  selector: 'lib-operator-select',
-  imports: [CommonModule, OverlayModule, MatIconModule, MatButtonModule],
-  templateUrl: './operator-select.component.html',
-  styleUrl: './operator-select.component.scss',
+  selector: "lib-operator-select",
+  imports: [OverlayModule, MatIconModule, MatButtonModule],
+  templateUrl: "./operator-select.component.html",
+  styleUrl: "./operator-select.component.scss",
   animations: [
-    trigger('fade', [
-      transition(':enter', [
+    trigger("fade", [
+      transition(":enter", [
         style({ opacity: 0 }), // initial
-        animate('0.2s', style({ opacity: 1 })), // final
+        animate("0.2s", style({ opacity: 1 })), // final
       ]),
-      transition(':leave', [
+      transition(":leave", [
         style({ opacity: 1 }), // initial
-        animate('0.2s', style({ opacity: 0 })), // final
+        animate("0.2s", style({ opacity: 0 })), // final
       ]),
     ]),
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -36,8 +52,10 @@ const OPERATORS: OPERATOR[] = ['=', '>', '≥', '<', '≤', '<>', '≤≥'];
     },
   ],
 })
-export class OperatorSelectComponent implements AfterViewInit, ControlValueAccessor {
-  @Input('disableRange')
+export class OperatorSelectComponent
+  implements AfterViewInit, ControlValueAccessor
+{
+  @Input("disableRange")
   set setDisableRange(disableRange: any) {
     this.disableRange = disableRange !== false;
     if (this.disableRange) this.operators = OPERATORS.slice(0, 5);

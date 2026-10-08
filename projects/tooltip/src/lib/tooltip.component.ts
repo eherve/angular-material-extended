@@ -1,87 +1,104 @@
 /** @format */
 
-import { animate, style, transition, trigger } from '@angular/animations';
-import { ConnectedOverlayPositionChange, ConnectedPosition } from '@angular/cdk/overlay';
-import { ChangeDetectorRef, Component, ElementRef, Input, TemplateRef } from '@angular/core';
+import { animate, style, transition, trigger } from "@angular/animations";
+import {
+  ConnectedOverlayPositionChange,
+  ConnectedPosition,
+} from "@angular/cdk/overlay";
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  TemplateRef,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 
 const topPosition: ConnectedPosition = {
-  originX: 'center',
-  originY: 'top',
-  overlayX: 'center',
-  overlayY: 'bottom',
+  originX: "center",
+  originY: "top",
+  overlayX: "center",
+  overlayY: "bottom",
   offsetY: -10,
   offsetX: 0,
-  panelClass: 'position-top',
+  panelClass: "position-top",
 };
 
 const bottomPosition: ConnectedPosition = {
-  originX: 'center',
-  originY: 'bottom',
-  overlayX: 'center',
-  overlayY: 'top',
+  originX: "center",
+  originY: "bottom",
+  overlayX: "center",
+  overlayY: "top",
   offsetY: 10,
   offsetX: 0,
-  panelClass: 'position-bottom',
+  panelClass: "position-bottom",
 };
 
 const bottomStartPosition: ConnectedPosition = {
-  originX: 'end',
-  originY: 'bottom',
-  overlayX: 'end',
-  overlayY: 'top',
+  originX: "end",
+  originY: "bottom",
+  overlayX: "end",
+  overlayY: "top",
   offsetY: 10,
   offsetX: 0,
-  panelClass: 'position-bottom-start',
+  panelClass: "position-bottom-start",
 };
 
 const bottomEndPosition: ConnectedPosition = {
-  originX: 'start',
-  originY: 'bottom',
-  overlayX: 'start',
-  overlayY: 'top',
+  originX: "start",
+  originY: "bottom",
+  overlayX: "start",
+  overlayY: "top",
   offsetY: 10,
   offsetX: 0,
-  panelClass: 'position-bottom-end',
+  panelClass: "position-bottom-end",
 };
 
 const leftPosition: ConnectedPosition = {
-  originX: 'start',
-  originY: 'center',
-  overlayX: 'end',
-  overlayY: 'center',
+  originX: "start",
+  originY: "center",
+  overlayX: "end",
+  overlayY: "center",
   offsetY: 0,
   offsetX: -10,
-  panelClass: 'position-left',
+  panelClass: "position-left",
 };
 
 const rightPosition: ConnectedPosition = {
-  originX: 'end',
-  originY: 'center',
-  overlayX: 'start',
-  overlayY: 'center',
+  originX: "end",
+  originY: "center",
+  overlayX: "start",
+  overlayY: "center",
   offsetY: 0,
   offsetX: 10,
-  panelClass: 'position-right',
+  panelClass: "position-right",
 };
 
-export type Position = 'bottom' | 'bottom start' | 'bottom end' | 'right' | 'top' | 'left';
+export type Position =
+  | "bottom"
+  | "bottom start"
+  | "bottom end"
+  | "right"
+  | "top"
+  | "left";
 
 @Component({
-  selector: 'lib-tooltip',
-  templateUrl: './tooltip.component.html',
-  styleUrl: './tooltip.component.scss',
+  selector: "lib-tooltip",
+  templateUrl: "./tooltip.component.html",
+  styleUrl: "./tooltip.component.scss",
   animations: [
-    trigger('fade', [
-      transition(':enter', [
+    trigger("fade", [
+      transition(":enter", [
         style({ opacity: 0 }), // initial
-        animate('0.2s', style({ opacity: 1 })), // final
+        animate("0.2s", style({ opacity: 1 })), // final
       ]),
-      transition(':leave', [
+      transition(":leave", [
         style({ opacity: 1 }), // initial
-        animate('0.2s', style({ opacity: 0 })), // final
+        animate("0.2s", style({ opacity: 0 })), // final
       ]),
     ]),
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false,
 })
 export class NgxMatTooltipComponent {
@@ -109,22 +126,22 @@ export class NgxMatTooltipComponent {
 
   setPosition(position: Position) {
     switch (position) {
-      case 'bottom':
+      case "bottom":
         this.positions = [bottomPosition];
         break;
-      case 'bottom start':
+      case "bottom start":
         this.positions = [bottomStartPosition];
         break;
-      case 'bottom end':
+      case "bottom end":
         this.positions = [bottomEndPosition];
         break;
-      case 'right':
+      case "right":
         this.positions = [rightPosition];
         break;
-      case 'top':
+      case "top":
         this.positions = [topPosition];
         break;
-      case 'left':
+      case "left":
         this.positions = [leftPosition];
         break;
     }

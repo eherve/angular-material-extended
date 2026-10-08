@@ -4,56 +4,101 @@
   <div #container id="container">
     <ng-container *ngTemplateOutlet="headTmpl"></ng-container>
 
-    <div id="table-container" intersectionObserver (intersection)="load($event.intersect)">
-      <table id="table" #table mat-table [fixedLayout]="false" [dataSource]="dataSource" multiTemplateDataRows>
+    <div
+      id="table-container"
+      intersectionObserver
+      (intersection)="load($event.intersect)"
+    >
+      <table
+        id="table"
+        #table
+        mat-table
+        [fixedLayout]="false"
+        [dataSource]="dataSource"
+        multiTemplateDataRows
+      >
         @for (column of options.columns; track column.columnDef) {
-          <ng-container [matColumnDef]="column.columnDef" [sticky]="column.sticky">
+          <ng-container
+            [matColumnDef]="column.columnDef"
+            [sticky]="column.sticky"
+          >
             <th
               mat-header-cell
               *matHeaderCellDef
               [class.searchable]="column.searchable"
               [attr.aria-sort]="
-                column.sortable ?
-                  column.order?.dir === 'asc' ? 'ascending'
-                  : column.order?.dir === 'desc' ? 'descending'
-                  : 'none'
-                : null
+                column.sortable
+                  ? column.order?.dir === 'asc'
+                    ? 'ascending'
+                    : column.order?.dir === 'desc'
+                      ? 'descending'
+                      : 'none'
+                  : null
               "
-              [style.min-width.px]="column.minWidth || options.columnMinWith">
-              <ng-container *ngTemplateOutlet="headerTmpl; context: { column }"></ng-container>
+              [style.min-width.px]="column.minWidth || options.columnMinWith"
+            >
+              <ng-container
+                *ngTemplateOutlet="headerTmpl; context: { column }"
+              ></ng-container>
             </th>
             <td
               mat-cell
               *matCellDef="let row"
               [style.min-width.px]="column.minWidth || options.columnMinWith"
               [style.--datatable-cell-color]="row | cellColor: column : options"
-              [style.--datatable-cell-opacity]="row | cellOpacity: column : options"
-              [style.--datatable-cell-background-color]="row | backgroundColor: column : options">
-              <ng-container *ngTemplateOutlet="cellTmpl; context: { column, row }"></ng-container>
+              [style.--datatable-cell-opacity]="
+                row | cellOpacity: column : options
+              "
+              [style.--datatable-cell-background-color]="
+                row | backgroundColor: column : options
+              "
+            >
+              <ng-container
+                *ngTemplateOutlet="cellTmpl; context: { column, row }"
+              ></ng-container>
             </td>
           </ng-container>
         }
 
-        <ng-container *ngIf="options.expandedDetailContentId" matColumnDef="expandedDetail">
-          <td mat-cell *matCellDef="let row" [attr.colspan]="visibleColumnsColspan">
-            @let content = contentRefs | findContent: options.expandedDetailContentId;
-            <div
-              *ngIf="content"
-              class="element-detail"
-              [@detailExpand]="row === expandedRow ? 'expanded' : 'collapsed'">
-              <ng-container *ngTemplateOutlet="content.templateRef; context: { row }"> </ng-container>
-            </div>
-          </td>
-        </ng-container>
+        @if (options.expandedDetailContentId) {
+          <ng-container matColumnDef="expandedDetail">
+            <td
+              mat-cell
+              *matCellDef="let row"
+              [attr.colspan]="visibleColumnsColspan"
+            >
+              @let content =
+                contentRefs | findContent: options.expandedDetailContentId;
+              @if (content) {
+                <div
+                  class="element-detail"
+                  [@detailExpand]="
+                    row === expandedRow ? 'expanded' : 'collapsed'
+                  "
+                >
+                  <ng-container
+                    *ngTemplateOutlet="content.templateRef; context: { row }"
+                  >
+                  </ng-container>
+                </div>
+              }
+            </td>
+          </ng-container>
+        }
 
         <ng-container matColumnDef="_incrementalLoad">
-          <td mat-footer-cell *matFooterCellDef [attr.colspan]="visibleColumnsColspan">
+          <td
+            mat-footer-cell
+            *matFooterCellDef
+            [attr.colspan]="visibleColumnsColspan"
+          >
             <div class="incremental-load-row">
               @if (showIncrementalInViewTrigger) {
                 <div
                   class="incremental-sentinel"
                   intersectionObserver
-                  (intersection)="onIncrementalIntersection($event.intersect)">
+                  (intersection)="onIncrementalIntersection($event.intersect)"
+                >
                   @if (loadingNextRecords) {
                     <mat-spinner [diameter]="20"></mat-spinner>
                     <span>{{ incrementalLoadingLabel }}</span>
@@ -62,7 +107,12 @@
               }
 
               @if (showIncrementalButtonTrigger) {
-                <button mat-button color="primary" [disabled]="loadingNextRecords" (click)="loadNextIncrementalPage()">
+                <button
+                  mat-button
+                  color="primary"
+                  [disabled]="loadingNextRecords"
+                  (click)="loadNextIncrementalPage()"
+                >
                   @if (loadingNextRecords) {
                     <mat-spinner [diameter]="20"></mat-spinner>
                     <span>{{ incrementalLoadingLabel }}</span>
@@ -75,34 +125,51 @@
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr
+          mat-header-row
+          *matHeaderRowDef="displayedColumns; sticky: true"
+        ></tr>
 
         <tr
           mat-row
           *matRowDef="let row; columns: displayedColumns"
           [datatableRowViewport]="row"
           (datatableRowVisible)="renderRow($event)"
-          [class.has-click]="!!options.actions?.rowClick || !!options.expandedDetailContentId"
+          [class.has-click]="
+            !!options.actions?.rowClick || !!options.expandedDetailContentId
+          "
           [class.is-disabled]="row | includedIn: disabledRows"
-          [attr.aria-disabled]="(row | includedIn: disabledRows) ? 'true' : null"
-          [attr.aria-expanded]="options.expandedDetailContentId ? row === expandedRow : null"
+          [attr.aria-disabled]="
+            (row | includedIn: disabledRows) ? 'true' : null
+          "
+          [attr.aria-expanded]="
+            options.expandedDetailContentId ? row === expandedRow : null
+          "
           [attr.tabindex]="
-            (!!options.actions?.rowClick || !!options.expandedDetailContentId) && !(row | includedIn: disabledRows) ?
-              0
-            : null
+            (!!options.actions?.rowClick ||
+              !!options.expandedDetailContentId) &&
+            !(row | includedIn: disabledRows)
+              ? 0
+              : null
           "
           (click)="rowClick(row)"
-          (keydown)="rowKeydown($event, row)"></tr>
+          (keydown)="rowKeydown($event, row)"
+        ></tr>
 
-        <ng-container *ngIf="options.expandedDetailContentId">
-          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
-        </ng-container>
+        @if (options.expandedDetailContentId) {
+          <tr
+            mat-row
+            *matRowDef="let row; columns: ['expandedDetail']"
+            class="detail-row"
+          ></tr>
+        }
 
         <tr
           mat-footer-row
           *matFooterRowDef="incrementalRowColumns"
           class="incremental-row"
-          [class.is-hidden]="!showIncrementalRow"></tr>
+          [class.is-hidden]="!showIncrementalRow"
+        ></tr>
 
         <tr class="mat-row" *matNoDataRow>
           <td [attr.colspan]="displayedColumns.length">
@@ -114,27 +181,33 @@
       </table>
     </div>
 
-    <mat-paginator
-      *ngIf="loadMode === 'pagination'"
-      id="paginator"
-      [length]="dataSource.recordsFiltered"
-      [pageSizeOptions]="paginationPageSizeOptions"
-      [pageSize]="paginationPageSize"
-      [pageIndex]="paginationPageIndex"
-      [showFirstLastButtons]="true">
-    </mat-paginator>
+    @if (loadMode === "pagination") {
+      <mat-paginator
+        id="paginator"
+        [length]="dataSource.recordsFiltered"
+        [pageSizeOptions]="paginationPageSizeOptions"
+        [pageSize]="paginationPageSize"
+        [pageIndex]="paginationPageIndex"
+        [showFirstLastButtons]="true"
+      >
+      </mat-paginator>
+    }
   </div>
 }
 
-<div id="loading" *ngIf="!dataSource || (dataSource.loading$ | async)" @fade>
-  <ng-content select="[loader-spinner]">
-    <mat-spinner loader-spinner></mat-spinner>
-  </ng-content>
-</div>
+@if (!dataSource || (dataSource.loading$ | async)) {
+  <div id="loading" @fade>
+    <ng-content select="[loader-spinner]">
+      <mat-spinner loader-spinner></mat-spinner>
+    </ng-content>
+  </div>
+}
 
 <ng-template #headTmpl>
   @let hasColumnDisplay =
-    options.actions?.columns?.hideAndShow || options.actions?.columns?.sticky || options.actions?.columns?.reorder;
+    options.actions?.columns?.hideAndShow ||
+    options.actions?.columns?.sticky ||
+    options.actions?.columns?.reorder;
   @let hasHead =
     !!options.title ||
     !!options.facets?.length ||
@@ -143,94 +216,138 @@
     options.actions?.export ||
     options.actions?.refresh ||
     showRecordsCount;
-  <div *ngIf="hasHead" id="head" #head>
-    <div id="head-start">
-      <span *ngIf="options.title" id="title" [innerHTML]="options.title"></span>
-
-      @for (facetOptions of options.facets | filter: { position: 'start' }; track facetOptions.id) {
-        <ng-container *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"></ng-container>
-      }
-      @for (action of options.actions?.user | filter: { position: 'start' }; track action) {
-        <ng-container *ngTemplateOutlet="actionTmpl; context: { action }"></ng-container>
-      }
-    </div>
-
-    <div id="head-center">
-      @for (facetOptions of options.facets | filter: { position: 'center' }; track facetOptions.id) {
-        <ng-container *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"></ng-container>
-      }
-      @for (action of options.actions?.user | filter: { position: 'center' }; track action) {
-        <ng-container *ngTemplateOutlet="actionTmpl; context: { action }"></ng-container>
-      }
-    </div>
-
-    <div id="head-end">
-      @for (facetOptions of options.facets | filter: { position: 'end' }; track facetOptions.id) {
-        <ng-container *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"></ng-container>
-      }
-      @for (action of options.actions?.user | filter: { position: 'end' }; track action) {
-        <ng-container *ngTemplateOutlet="actionTmpl; context: { action }"></ng-container>
-      }
-
-      @if (hasColumnDisplay) {
-        <div class="action">
-          <button
-            mat-icon-button
-            color="primary"
-            class="icon-only action"
-            [matTooltip]="options.actions?.columns?.tooltip || datatableIntl.columnsActionLabel"
-            [attr.aria-label]="options.actions?.columns?.tooltip || datatableIntl.columnsActionLabel"
-            [matMenuTriggerFor]="columnsMenu"
-            (menuOpened)="openUpdateColumnDisplay()"
-            (menuClosed)="closeUpdateColumnDisplay()">
-            <mat-icon>view_column</mat-icon>
-          </button>
-        </div>
-      }
-
-      @if (options.actions?.export) {
-        <div class="action">
-          <button
-            mat-icon-button
-            color="primary"
-            [attr.aria-label]="datatableIntl.exportActionLabel"
-            [disabled]="exporting"
-            (click)="export()">
-            <mat-icon>download</mat-icon>
-          </button>
-          <div class="action-loader" *ngIf="exporting" @fade>
-            <mat-spinner [diameter]="32"></mat-spinner>
+  @if (hasHead) {
+    <div id="head" #head>
+      <div id="head-start">
+        @if (options.title) {
+          <span id="title" [innerHTML]="options.title"></span>
+        }
+        @for (
+          facetOptions of options.facets | filter: { position: "start" };
+          track facetOptions.id
+        ) {
+          <ng-container
+            *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"
+          ></ng-container>
+        }
+        @for (
+          action of $safeNavigationMigration(options.actions?.user)
+            | filter: { position: "start" };
+          track action
+        ) {
+          <ng-container
+            *ngTemplateOutlet="actionTmpl; context: { action }"
+          ></ng-container>
+        }
+      </div>
+      <div id="head-center">
+        @for (
+          facetOptions of options.facets | filter: { position: "center" };
+          track facetOptions.id
+        ) {
+          <ng-container
+            *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"
+          ></ng-container>
+        }
+        @for (
+          action of $safeNavigationMigration(options.actions?.user)
+            | filter: { position: "center" };
+          track action
+        ) {
+          <ng-container
+            *ngTemplateOutlet="actionTmpl; context: { action }"
+          ></ng-container>
+        }
+      </div>
+      <div id="head-end">
+        @for (
+          facetOptions of options.facets | filter: { position: "end" };
+          track facetOptions.id
+        ) {
+          <ng-container
+            *ngTemplateOutlet="facetsTmpl; context: { facetOptions }"
+          ></ng-container>
+        }
+        @for (
+          action of $safeNavigationMigration(options.actions?.user)
+            | filter: { position: "end" };
+          track action
+        ) {
+          <ng-container
+            *ngTemplateOutlet="actionTmpl; context: { action }"
+          ></ng-container>
+        }
+        @if (hasColumnDisplay) {
+          <div class="action">
+            <button
+              mat-icon-button
+              color="primary"
+              class="icon-only action"
+              [matTooltip]="
+                options.actions?.columns?.tooltip ||
+                datatableIntl.columnsActionLabel
+              "
+              [attr.aria-label]="
+                options.actions?.columns?.tooltip ||
+                datatableIntl.columnsActionLabel
+              "
+              [matMenuTriggerFor]="columnsMenu"
+              (menuOpened)="openUpdateColumnDisplay()"
+              (menuClosed)="closeUpdateColumnDisplay()"
+            >
+              <mat-icon>view_column</mat-icon>
+            </button>
           </div>
-        </div>
-      }
-
-      @if (options.actions?.refresh) {
-        <div class="action">
-          <button
-            mat-icon-button
-            color="primary"
-            [attr.aria-label]="datatableIntl.refreshActionLabel"
-            [disabled]="dataSource.loading$ | async"
-            (click)="loadPage()">
-            <mat-icon>sync</mat-icon>
-          </button>
-          <div class="action-loader" *ngIf="dataSource.loading$ | async" @fade>
-            <mat-spinner [diameter]="32"></mat-spinner>
+        }
+        @if (options.actions?.export) {
+          <div class="action">
+            <button
+              mat-icon-button
+              color="primary"
+              [attr.aria-label]="datatableIntl.exportActionLabel"
+              [disabled]="exporting"
+              (click)="export()"
+            >
+              <mat-icon>download</mat-icon>
+            </button>
+            @if (exporting) {
+              <div class="action-loader" @fade>
+                <mat-spinner [diameter]="32"></mat-spinner>
+              </div>
+            }
           </div>
-        </div>
-      }
-
-      @if (showRecordsCount) {
-        <div id="records-count">
-          <span
-            [countUp]="displayedRecordsCount"
-            [options]="datatableIntl.numberOptions"
-            [reanimateOnClick]="false"></span>
-          / {{ totalRecordsCount }}
-        </div>
-      }
+        }
+        @if (options.actions?.refresh) {
+          <div class="action">
+            <button
+              mat-icon-button
+              color="primary"
+              [attr.aria-label]="datatableIntl.refreshActionLabel"
+              [disabled]="dataSource.loading$ | async"
+              (click)="loadPage()"
+            >
+              <mat-icon>sync</mat-icon>
+            </button>
+            @if (dataSource.loading$ | async) {
+              <div class="action-loader" @fade>
+                <mat-spinner [diameter]="32"></mat-spinner>
+              </div>
+            }
+          </div>
+        }
+        @if (showRecordsCount) {
+          <div id="records-count">
+            <span
+              [countUp]="displayedRecordsCount"
+              [options]="datatableIntl.numberOptions"
+              [reanimateOnClick]="false"
+            ></span>
+            / {{ totalRecordsCount }}
+          </div>
+        }
+      </div>
     </div>
-  </div>
+  }
 </ng-template>
 
 <mat-menu #columnsMenu="matMenu" class="datatable-columns-menu">
@@ -239,53 +356,69 @@
     cdkDropList
     has-handle
     [cdkDropListDisabled]="!options.actions?.columns?.reorder"
-    (cdkDropListDropped)="reorderColumns($event)">
+    (cdkDropListDropped)="reorderColumns($event)"
+  >
     @for (column of updateColumns; track column.columnDef) {
-      @if (['_select', '_rownumber'].includes(column.header)) {
+      @if (["_select", "_rownumber"].includes(column.header)) {
         <div mat-list-item cdkDrag></div>
       } @else {
-        <div class="column-options-item" mat-list-item cdkDrag (click)="$event.stopPropagation()">
-          <button
-            *ngIf="options.actions?.columns?.hideAndShow"
-            mat-icon-button
-            size="small"
-            color="primary"
-            [class]="column.hidden ? 'toggle-off' : 'toggle-on'"
-            [attr.aria-label]="
-              column.hidden ? datatableIntl.showColumnActionLabel : datatableIntl.hideColumnActionLabel
-            "
-            (click)="column.hidden = !column.hidden"
-            [style.margin-right.px]="8">
-            <mat-icon>
-              @if (!column.hidden) {
-                visibility
-              } @else {
-                visibility_off
-              }
-            </mat-icon>
-          </button>
-          <button
-            *ngIf="options.actions?.columns?.sticky"
-            mat-icon-button
-            size="small"
-            color="primary"
-            [class]="column.sticky ? 'toggle-on' : 'toggle-off'"
-            [attr.aria-label]="
-              column.sticky ? datatableIntl.unpinColumnActionLabel : datatableIntl.pinColumnActionLabel
-            "
-            (click)="column.sticky = !column.sticky"
-            [style.margin-right.px]="8">
-            <mat-icon>push_pin </mat-icon>
-          </button>
+        <div
+          class="column-options-item"
+          mat-list-item
+          cdkDrag
+          (click)="$event.stopPropagation()"
+        >
+          @if (options.actions?.columns?.hideAndShow) {
+            <button
+              mat-icon-button
+              size="small"
+              color="primary"
+              [class]="column.hidden ? 'toggle-off' : 'toggle-on'"
+              [attr.aria-label]="
+                column.hidden
+                  ? datatableIntl.showColumnActionLabel
+                  : datatableIntl.hideColumnActionLabel
+              "
+              (click)="column.hidden = !column.hidden"
+              [style.margin-right.px]="8"
+            >
+              <mat-icon>
+                @if (!column.hidden) {
+                  visibility
+                } @else {
+                  visibility_off
+                }
+              </mat-icon>
+            </button>
+          }
+          @if (options.actions?.columns?.sticky) {
+            <button
+              mat-icon-button
+              size="small"
+              color="primary"
+              [class]="column.sticky ? 'toggle-on' : 'toggle-off'"
+              [attr.aria-label]="
+                column.sticky
+                  ? datatableIntl.unpinColumnActionLabel
+                  : datatableIntl.pinColumnActionLabel
+              "
+              (click)="column.sticky = !column.sticky"
+              [style.margin-right.px]="8"
+            >
+              <mat-icon>push_pin </mat-icon>
+            </button>
+          }
           <span [style.margin-right.px]="8" [innerHTML]="column.header"></span>
-          <mat-icon
-            *ngIf="options.actions?.columns?.reorder"
-            size="small"
-            class="handle"
-            cdkDragHandle
-            [style.margin]="'0 8px 0 auto'">
-            open_with
-          </mat-icon>
+          @if (options.actions?.columns?.reorder) {
+            <mat-icon
+              size="small"
+              class="handle"
+              cdkDragHandle
+              [style.margin]="'0 8px 0 auto'"
+            >
+              open_with
+            </mat-icon>
+          }
         </div>
       }
     }
@@ -297,40 +430,47 @@
     <div class="header" [formGroup]="searchFormGroup">
       @if (column.searchable) {
         @switch (column.type) {
-          @case ('text') {
+          @case ("text") {
             <lib-header-text-filter
               [column]="column"
-              [formControlName]="searchControlNames[column.columnDef]"></lib-header-text-filter>
+              [formControlName]="searchControlNames[column.columnDef]"
+            ></lib-header-text-filter>
           }
-          @case ('number') {
+          @case ("number") {
             <lib-header-number-filter
               [column]="column"
-              [formControlName]="searchControlNames[column.columnDef]"></lib-header-number-filter>
+              [formControlName]="searchControlNames[column.columnDef]"
+            ></lib-header-number-filter>
           }
-          @case ('select') {
+          @case ("select") {
             <lib-header-select-filter
               [column]="column"
-              [formControlName]="searchControlNames[column.columnDef]"></lib-header-select-filter>
+              [formControlName]="searchControlNames[column.columnDef]"
+            ></lib-header-select-filter>
           }
-          @case ('autocomplete') {
+          @case ("autocomplete") {
             <lib-header-autocomplete-filter
               [column]="column"
-              [formControlName]="searchControlNames[column.columnDef]"></lib-header-autocomplete-filter>
+              [formControlName]="searchControlNames[column.columnDef]"
+            ></lib-header-autocomplete-filter>
           }
-          @case ('checkbox') {
+          @case ("checkbox") {
             <lib-header-checkbox-filter
               [column]="column"
-              [formControlName]="searchControlNames[column.columnDef]"></lib-header-checkbox-filter>
+              [formControlName]="searchControlNames[column.columnDef]"
+            ></lib-header-checkbox-filter>
           }
-          @case ('date') {
+          @case ("date") {
             <lib-header-date-filter
               [column]="column"
-              [formControlName]="searchControlNames[column.columnDef]"></lib-header-date-filter>
+              [formControlName]="searchControlNames[column.columnDef]"
+            ></lib-header-date-filter>
           }
-          @case ('duration') {
+          @case ("duration") {
             <lib-header-duration-filter
               [column]="column"
-              [formControlName]="searchControlNames[column.columnDef]"></lib-header-duration-filter>
+              [formControlName]="searchControlNames[column.columnDef]"
+            ></lib-header-duration-filter>
           }
           @default {
             <span [innerHTML]="column.header | safeHtml"></span>
@@ -339,14 +479,16 @@
       } @else {
         <span [innerHTML]="column.header | safeHtml"></span>
       }
-      <ng-container *ngTemplateOutlet="headerActionsTmpl; context: { column }"></ng-container>
+      <ng-container
+        *ngTemplateOutlet="headerActionsTmpl; context: { column }"
+      ></ng-container>
     </div>
   </div>
 </ng-template>
 
 <ng-template #headerActionsTmpl let-column="column">
   <div class="header-actions">
-    <ng-container *ngIf="column.sortable">
+    @if (column.sortable) {
       <button
         class="sort-btn"
         mat-icon-button
@@ -354,12 +496,13 @@
         (click)="sortColumn(column)"
         [attr.aria-label]="datatableIntl.sortColumnActionLabel"
         [matBadgeHidden]="!column.order"
-        [matBadge]="column.order?.index + 1">
+        [matBadge]="$safeNavigationMigration(column.order?.index) + 1"
+      >
         @switch (column.order?.dir) {
-          @case ('asc') {
+          @case ("asc") {
             <mat-icon size="small">arrow_upward</mat-icon>
           }
-          @case ('desc') {
+          @case ("desc") {
             <mat-icon size="small">arrow_downward</mat-icon>
           }
           @default {
@@ -367,7 +510,7 @@
           }
         }
       </button>
-    </ng-container>
+    }
   </div>
 </ng-template>
 
@@ -378,59 +521,119 @@
       [@.disabled]="!!options.disableRowAnimation"
       @fade
       [style.place-content]="column.align"
-      [style.max-height.px]="options.rowMaxHeight">
+      [style.max-height.px]="options.rowMaxHeight"
+    >
       @let value = row | get: column.property;
       @if (column.cellComponent) {
-        <ng-container *ngComponentOutlet="column.cellComponent; inputs: { column, row, value }" />
+        <ng-container
+          *ngComponentOutlet="
+            column.cellComponent;
+            inputs: { column, row, value }
+          "
+        />
       } @else if (column.cellContentId) {
         @let cell = contentRefs | findContent: column.cellContentId;
         @if (cell) {
-          <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
+          <ng-container
+            *ngTemplateOutlet="
+              cell.templateRef;
+              context: { column, row, value }
+            "
+          />
         }
       } @else {
         @if (column.prefixContentId) {
           @let cell = contentRefs | findContent: column.prefixContentId;
           @if (cell) {
-            <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
+            <ng-container
+              *ngTemplateOutlet="
+                cell.templateRef;
+                context: { column, row, value }
+              "
+            />
           }
         } @else if (column.prefixComponent) {
-          <ng-container *ngComponentOutlet="column.prefixComponent; inputs: { column, row, value }" />
+          <ng-container
+            *ngComponentOutlet="
+              column.prefixComponent;
+              inputs: { column, row, value }
+            "
+          />
         } @else if (column.prefixFunction) {
-          <span [innerHTML]="value | valueFunction: column.prefixFunction : row : column | safeHtml"></span>
+          <span
+            [innerHTML]="
+              value
+                | valueFunction: column.prefixFunction : row : column
+                | safeHtml
+            "
+          ></span>
         } @else if (column.prefix) {
           <span [innerHTML]="column.prefix | safeHtml"></span>
         }
 
         @switch (column.type) {
-          @case ('number') {
-            <lib-cell-number-value [column]="column" [row]="row"></lib-cell-number-value>
+          @case ("number") {
+            <lib-cell-number-value
+              [column]="column"
+              [row]="row"
+            ></lib-cell-number-value>
           }
-          @case ('select') {
-            <lib-cell-select-value [column]="column" [row]="row"></lib-cell-select-value>
+          @case ("select") {
+            <lib-cell-select-value
+              [column]="column"
+              [row]="row"
+            ></lib-cell-select-value>
           }
-          @case ('checkbox') {
-            <lib-cell-checkbox-value [column]="column" [row]="row"></lib-cell-checkbox-value>
+          @case ("checkbox") {
+            <lib-cell-checkbox-value
+              [column]="column"
+              [row]="row"
+            ></lib-cell-checkbox-value>
           }
-          @case ('date') {
-            <lib-cell-date-value [column]="column" [row]="row"></lib-cell-date-value>
+          @case ("date") {
+            <lib-cell-date-value
+              [column]="column"
+              [row]="row"
+            ></lib-cell-date-value>
           }
-          @case ('duration') {
-            <lib-cell-duration-value [column]="column" [row]="row"></lib-cell-duration-value>
+          @case ("duration") {
+            <lib-cell-duration-value
+              [column]="column"
+              [row]="row"
+            ></lib-cell-duration-value>
           }
           @default {
-            <span [innerHTML]="(value | transform: row : column) ?? '' | safeHtml"></span>
+            <span
+              [innerHTML]="(value | transform: row : column) ?? '' | safeHtml"
+            ></span>
           }
         }
 
         @if (column.suffixContentId) {
           @let cell = contentRefs | findContent: column.suffixContentId;
           @if (cell) {
-            <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, row, value }" />
+            <ng-container
+              *ngTemplateOutlet="
+                cell.templateRef;
+                context: { column, row, value }
+              "
+            />
           }
         } @else if (column.suffixComponent) {
-          <ng-container *ngComponentOutlet="column.suffixComponent; inputs: { column, row, value }" />
+          <ng-container
+            *ngComponentOutlet="
+              column.suffixComponent;
+              inputs: { column, row, value }
+            "
+          />
         } @else if (column.suffixFunction) {
-          <span [innerHTML]="value | valueFunction: column.suffixFunction : row : column | safeHtml"></span>
+          <span
+            [innerHTML]="
+              value
+                | valueFunction: column.suffixFunction : row : column
+                | safeHtml
+            "
+          ></span>
         } @else if (column.suffix) {
           <span [innerHTML]="column.suffix | safeHtml"></span>
         }
@@ -444,23 +647,31 @@
 <ng-template #actionTmpl let-action="action">
   @if (!action.isHidden) {
     @switch (action.kind) {
-      @case ('icon') {
+      @case ("icon") {
         <div class="action user-action" [matTooltip]="action.tooltip">
           <button
             [style.--action-color]="action.color"
             mat-icon-button
-            [attr.aria-label]="action.ariaLabel || action.tooltip || action.icon"
+            [attr.aria-label]="
+              action.ariaLabel || action.tooltip || action.icon
+            "
             (click)="action.onclick(this)"
-            [disabled]="!!action.isDisabled">
+            [disabled]="!!action.isDisabled"
+          >
             <mat-icon>{{ action.icon }}</mat-icon>
           </button>
         </div>
       }
-      @case ('template') {
+      @case ("template") {
         <div class="action user-action">
           @let content = contentRefs | findContent: action.contentId;
           @if (content) {
-            <ng-container *ngTemplateOutlet="content.templateRef; context: { datatable: this, action }" />
+            <ng-container
+              *ngTemplateOutlet="
+                content.templateRef;
+                context: { datatable: this, action }
+              "
+            />
           }
         </div>
       }
@@ -470,62 +681,97 @@
 
 <ng-template #facetsTmpl let-facetOptions="facetOptions">
   @let column = options.columns | find: { columnDef: facetOptions.columnDef };
-  @let data = (dataSource.facets ?? {})[facetOptions.id] | sortFacetEntries: facetOptions.options;
+  @let data =
+    (dataSource.facets ?? {})[facetOptions.id]
+      | sortFacetEntries: facetOptions.options;
   @if (data) {
     @if (facetOptions.contentId) {
       @let cell = contentRefs | findContent: facetOptions.contentId;
       @if (cell) {
-        <ng-container *ngTemplateOutlet="cell.templateRef; context: { column, facetOptions, data }" />
+        <ng-container
+          *ngTemplateOutlet="
+            cell.templateRef;
+            context: { column, facetOptions, data }
+          "
+        />
       }
     } @else {
       @switch (facetOptions.display) {
-        @case ('chips') {
-          <ng-container *ngTemplateOutlet="facetsChipsTmpl; context: { column, data, facetOptions }"></ng-container>
+        @case ("chips") {
+          <ng-container
+            *ngTemplateOutlet="
+              facetsChipsTmpl;
+              context: { column, data, facetOptions }
+            "
+          ></ng-container>
         }
         @default {
           <ng-container
-            *ngTemplateOutlet="facetsProgressSpinnersTmpl; context: { column, data, facetOptions }"></ng-container>
+            *ngTemplateOutlet="
+              facetsProgressSpinnersTmpl;
+              context: { column, data, facetOptions }
+            "
+          ></ng-container>
         }
       }
     }
   }
 </ng-template>
 
-<ng-template #facetsChipsTmpl let-column="column" let-data="data" let-facetOptions="facetOptions">
+<ng-template
+  #facetsChipsTmpl
+  let-column="column"
+  let-data="data"
+  let-facetOptions="facetOptions"
+>
   @let size = facetOptions.size;
-  @let fontSize = facetOptions.fontSize ?? '1em';
+  @let fontSize = facetOptions.fontSize ?? "1em";
   <!-- @let total = (data | sum: 'value') || 1; -->
   <mat-chip-set class="chips-facet">
-    @for (d of data | orderBy: '_id'; track d._id) {
-      @let option = facetOptions?.option ? facetOptions.option(d) : (facetOptions.options | find: { value: d._id });
+    @for (d of data | orderBy: "_id"; track d._id) {
+      @let option =
+        facetOptions?.option
+          ? facetOptions.option(d)
+          : (facetOptions.options | find: { value: d._id });
       @let name = option?.name ?? d._id;
-      @let color = option?.color ?? 'var(--mat-sys-primary)';
-      @let labelColor = option?.labelColor;
+      @let color = option?.color ?? "var(--mat-sys-primary)";
+      @let labelColor = $safeNavigationMigration(option?.labelColor);
       <!-- @let percent = (d.value / total) * 100; -->
       <mat-chip
         class="chip-facet"
         [class.has-action]="column?.searchable === true"
         [attr.tabindex]="column?.searchable === true ? 0 : null"
         (click)="column?.searchable === true && facetClick(column, d, option)"
-        (keydown.enter)="column?.searchable === true && facetClick(column, d, option)"
-        (keydown.space)="column?.searchable === true && facetClick(column, d, option); $event.preventDefault()"
+        (keydown.enter)="
+          column?.searchable === true && facetClick(column, d, option)
+        "
+        (keydown.space)="
+          column?.searchable === true && facetClick(column, d, option);
+          $event.preventDefault()
+        "
         [style.--facet-color]="color"
         [style.--facet-label-color]="labelColor ?? 'var(--mat-sys-on-primary)'"
         [style.--facet-value-color]="labelColor ?? color"
-        [style.width.px]="size">
+        [style.width.px]="size"
+      >
         <div class="chip-facet-content" [style.font-size]="fontSize">
           <div class="chip-facet-key">{{ name }}</div>
-          <div class="chip-facet-value">{{ d.value | number: '0.0-2' }}</div>
+          <div class="chip-facet-value">{{ d.value | number: "0.0-2" }}</div>
         </div>
       </mat-chip>
     }
   </mat-chip-set>
 </ng-template>
 
-<ng-template #facetsProgressSpinnersTmpl let-column="column" let-data="data" let-facetOptions="facetOptions">
+<ng-template
+  #facetsProgressSpinnersTmpl
+  let-column="column"
+  let-data="data"
+  let-facetOptions="facetOptions"
+>
   @let size = facetOptions.size ?? 80;
-  @let fontSize = facetOptions.fontSize ?? '1em';
-  @let total = (data | sum: 'value') || 1;
+  @let fontSize = facetOptions.fontSize ?? "1em";
+  @let total = (data | sum: "value") || 1;
   <mat-card class="facet">
     @if (facetOptions.name) {
       <mat-card-header>
@@ -534,9 +780,12 @@
     }
     <mat-card-content>
       @for (d of data; track d._id) {
-        @let option = facetOptions?.option ? facetOptions.option(d) : (facetOptions.options | find: { value: d._id });
+        @let option =
+          facetOptions?.option
+            ? facetOptions.option(d)
+            : (facetOptions.options | find: { value: d._id });
         @let name = option?.name ?? d._id;
-        @let color = option?.color ?? 'var(--mat-sys-primary)';
+        @let color = option?.color ?? "var(--mat-sys-primary)";
         @let percent = (d.value / total) * 100;
         <div
           class="facet-indicator"
@@ -544,9 +793,20 @@
           [attr.role]="column?.searchable === true ? 'button' : null"
           [attr.tabindex]="column?.searchable === true ? 0 : null"
           (click)="column?.searchable === true && facetClick(column, d, option)"
-          (keydown.enter)="column?.searchable === true && facetClick(column, d, option)"
-          (keydown.space)="column?.searchable === true && facetClick(column, d, option); $event.preventDefault()">
-          <lib-progress-spinner [diameter]="size" [color]="color" [fontSize]="fontSize" [value]="percent">
+          (keydown.enter)="
+            column?.searchable === true && facetClick(column, d, option)
+          "
+          (keydown.space)="
+            column?.searchable === true && facetClick(column, d, option);
+            $event.preventDefault()
+          "
+        >
+          <lib-progress-spinner
+            [diameter]="size"
+            [color]="color"
+            [fontSize]="fontSize"
+            [value]="percent"
+          >
             <mat-label>{{ name }}</mat-label>
           </lib-progress-spinner>
           <mat-label
@@ -554,8 +814,9 @@
             [style.font-size]="fontSize"
             [countUp]="d.value"
             [options]="datatableIntl.numberOptions"
-            [reanimateOnClick]="false">
-            {{ d.value | number: '0.0-2' }}
+            [reanimateOnClick]="false"
+          >
+            {{ d.value | number: "0.0-2" }}
           </mat-label>
         </div>
       }

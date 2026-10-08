@@ -9,10 +9,10 @@ mat-form-field {
   min-width: auto;
   flex: 1 1 100%;
   margin: 6px 0;
-  --mdc-filled-text-field-active-indicator-color: #999;
+  --mat-form-field-filled-active-indicator-color: #999;
   --mat-form-field-hover-state-layer-opacity: 0;
-  --mdc-filled-text-field-container-shape: 0;
-  --mdc-filled-text-field-container-color: var(--datatable-background);
+  --mat-form-field-filled-container-shape: 0;
+  --mat-form-field-filled-container-color: var(--datatable-background);
 
   ::ng-deep {
     .mat-mdc-form-field-bottom-align {

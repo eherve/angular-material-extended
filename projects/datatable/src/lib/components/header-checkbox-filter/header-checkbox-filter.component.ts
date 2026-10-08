@@ -1,6 +1,6 @@
 /** @format */
 
-import { CommonModule } from '@angular/common';
+import { CommonModule } from "@angular/common";
 import {
   AfterViewInit,
   ChangeDetectorRef,
@@ -10,7 +10,8 @@ import {
   Injector,
   Input,
   OnDestroy,
-} from '@angular/core';
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   ControlValueAccessor,
   FormControl,
@@ -19,19 +20,18 @@ import {
   NgControl,
   ReactiveFormsModule,
   UntypedFormControl,
-} from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { filter, Subscription, tap } from 'rxjs';
-import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
-import { DatatableSearchCheckboxColumn } from '../../types/datatable-column.type';
+} from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { filter, Subscription, tap } from "rxjs";
+import { SafeHtmlPipe } from "../../pipes/safe-html.pipe";
+import { DatatableSearchCheckboxColumn } from "../../types/datatable-column.type";
 
 @Component({
-  selector: 'lib-header-checkbox-filter',
+  selector: "lib-header-checkbox-filter",
   imports: [
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -40,8 +40,9 @@ import { DatatableSearchCheckboxColumn } from '../../types/datatable-column.type
     ReactiveFormsModule,
     SafeHtmlPipe,
   ],
-  templateUrl: './header-checkbox-filter.component.html',
-  styleUrl: './header-checkbox-filter.component.scss',
+  templateUrl: "./header-checkbox-filter.component.html",
+  styleUrl: "./header-checkbox-filter.component.scss",
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -50,7 +51,9 @@ import { DatatableSearchCheckboxColumn } from '../../types/datatable-column.type
     },
   ],
 })
-export class HeaderCheckboxFilterComponent<Record> implements AfterViewInit, OnDestroy, ControlValueAccessor {
+export class HeaderCheckboxFilterComponent<Record>
+  implements AfterViewInit, OnDestroy, ControlValueAccessor
+{
   @Input()
   column!: DatatableSearchCheckboxColumn<Record>;
 
@@ -69,7 +72,8 @@ export class HeaderCheckboxFilterComponent<Record> implements AfterViewInit, OnD
   writeValue(value: any): void {
     const nextValue = value?.value;
     this.previousValue = nextValue;
-    if (nextValue !== this.selectControl.value) this.selectControl.setValue(nextValue, { emitEvent: false });
+    if (nextValue !== this.selectControl.value)
+      this.selectControl.setValue(nextValue, { emitEvent: false });
     this.changeDetectorRef.markForCheck();
   }
 
@@ -88,13 +92,16 @@ export class HeaderCheckboxFilterComponent<Record> implements AfterViewInit, OnD
 
   async ngAfterViewInit(): Promise<void> {
     const ngControl: NgControl | null = this.injector.get(NgControl, null);
-    if (!ngControl) throw new Error(`${this.constructor.name} missing control [column:${this.column.columnDef}]`);
+    if (!ngControl)
+      throw new Error(
+        `${this.constructor.name} missing control [column:${this.column.columnDef}]`,
+      );
     this.control = ngControl.control as UntypedFormControl;
     this.previousValue = this.control.value?.value;
     this.subsink.add(
       this.selectControl.valueChanges
         .pipe(
-          filter(value => {
+          filter((value) => {
             if (value === true && this.previousValue === false) {
               this.selectControl.setValue(undefined, { emitEvent: false });
               this.previousValue = undefined;
@@ -103,7 +110,7 @@ export class HeaderCheckboxFilterComponent<Record> implements AfterViewInit, OnD
             }
             return true;
           }),
-          tap(value => (this.previousValue = value)),
+          tap((value) => (this.previousValue = value)),
         )
         .subscribe((value: any) => {
           if (value === undefined) this.onChange(undefined);

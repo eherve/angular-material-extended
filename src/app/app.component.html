@@ -12,7 +12,7 @@
       [config]="config"
       (configUpdated)="updatedConfig($event)"
       (searchUpdated)="searchUpdated($event)">
-      <mat-spinner [style.--mdc-circular-progress-active-indicator-color]="'red'" loader-spinner></mat-spinner>
+      <mat-spinner [style.--mat-progress-spinner-active-indicator-color]="'red'" loader-spinner></mat-spinner>
       <ng-template ngxMatDatatableContent="action">
         <button mat-button>Test</button>
       </ng-template>
