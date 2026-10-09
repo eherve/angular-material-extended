@@ -56,7 +56,7 @@ import {
   ],
   templateUrl: "./header-duration-filter.component.html",
   styleUrl: "./header-duration-filter.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

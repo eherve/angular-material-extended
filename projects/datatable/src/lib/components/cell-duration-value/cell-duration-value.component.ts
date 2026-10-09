@@ -20,7 +20,7 @@ import {
   selector: "lib-cell-duration-value",
   imports: [MatIconModule],
   templateUrl: "./cell-duration-value.component.html",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./cell-duration-value.component.scss",
 })
 export class CellDurationValueComponent<Record> {

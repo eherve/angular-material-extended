@@ -98,7 +98,7 @@ export type Position =
       ]),
     ]),
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
 export class NgxMatTooltipComponent {

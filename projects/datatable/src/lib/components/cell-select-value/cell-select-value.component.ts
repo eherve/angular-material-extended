@@ -36,7 +36,7 @@ import { SelectOptionsCacheService } from "../../select-options-cache.service";
     SafeHtmlPipe,
   ],
   templateUrl: "./cell-select-value.component.html",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./cell-select-value.component.scss",
 })
 export class CellSelectValueComponent<Record> implements OnInit, OnDestroy {

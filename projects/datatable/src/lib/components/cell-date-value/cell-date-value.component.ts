@@ -25,7 +25,7 @@ import {
   selector: "lib-cell-date-value",
   imports: [MatIconModule, MomentFormatPipe],
   templateUrl: "./cell-date-value.component.html",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./cell-date-value.component.scss",
 })
 export class CellDateValueComponent<Record> implements OnInit, OnDestroy {

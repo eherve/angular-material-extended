@@ -61,7 +61,7 @@ const MOMENT_RELATIVE_TIME_KEY: RelativeTimeKey[] = [
       ]),
     ]),
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

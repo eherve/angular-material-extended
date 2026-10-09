@@ -52,7 +52,7 @@ import { SelectOptionsCacheService } from "../../select-options-cache.service";
   ],
   templateUrl: "./header-select-filter.component.html",
   styleUrl: "./header-select-filter.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

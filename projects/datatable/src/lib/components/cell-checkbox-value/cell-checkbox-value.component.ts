@@ -11,7 +11,7 @@ import { DatatableCheckboxColumn } from "../../types/datatable-column.type";
   selector: "lib-cell-checkbox-value",
   imports: [GetPipe, MatIconModule, TransformPipe],
   templateUrl: "./cell-checkbox-value.component.html",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./cell-checkbox-value.component.scss",
 })
 export class CellCheckboxValueComponent<Record> {

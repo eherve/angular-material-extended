@@ -156,7 +156,7 @@ const service: NgxMatDatasourceService<any> = (options) => {
   standalone: false,
   selector: "app-root",
   templateUrl: "./app.component.html",
-  changeDetection: ChangeDetectionStrategy.Eager,
+    changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent {
@@ -536,7 +536,7 @@ export class AppComponent {
 
 @Component({
   template: "<span>Template component : {{value}}</span>",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
 export class ComponentCellComponent {

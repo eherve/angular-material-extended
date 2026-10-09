@@ -43,7 +43,7 @@ const OPERATORS: OPERATOR[] = ["=", ">", "≥", "<", "≤", "<>", "≤≥"];
       ]),
     ]),
   ],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

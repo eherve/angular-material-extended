@@ -42,7 +42,7 @@ import { DatatableSearchCheckboxColumn } from "../../types/datatable-column.type
   ],
   templateUrl: "./header-checkbox-filter.component.html",
   styleUrl: "./header-checkbox-filter.component.scss",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

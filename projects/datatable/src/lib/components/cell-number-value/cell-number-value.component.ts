@@ -11,7 +11,7 @@ import { DatatableNumberColumn } from "../../types/datatable-column.type";
   selector: "lib-cell-number-value",
   imports: [CommonModule, GetPipe, MatIconModule, TransformPipe],
   templateUrl: "./cell-number-value.component.html",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./cell-number-value.component.scss",
 })
 export class CellNumberValueComponent<Record> {

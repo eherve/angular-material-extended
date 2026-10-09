@@ -23,7 +23,7 @@ import { MergePipe } from "../../pipes/merge.pipe";
     MergePipe,
   ],
   templateUrl: "./progress-spinner.component.html",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: "./progress-spinner.component.scss",
 })
 export class ProgressSpinnerComponent {
