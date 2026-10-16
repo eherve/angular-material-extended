@@ -6,21 +6,38 @@
     [cdkConnectedOverlayOrigin]="trigger"
     [cdkConnectedOverlayOpen]="isOpen"
     [cdkConnectedOverlayPositions]="positions"
-    (positionChange)="positionChange($event)">
+    [cdkConnectedOverlayFlexibleDimensions]="true"
+    [cdkConnectedOverlayGrowAfterOpen]="true"
+    [cdkConnectedOverlayPush]="true"
+    [cdkConnectedOverlayViewportMargin]="8"
+    (overlayKeydown)="onKeydown($event)"
+    (overlayOutsideClick)="onOutsideClick($event)"
+    (positionChange)="positionChange($event)"
+  >
     <div
+      #tooltipContent
+      [id]="id"
+      role="tooltip"
       @fade
       class="ngx-mat-tooltip {{ position?.panelClass }}"
       (mouseenter)="onMouseEnter()"
       (mouseleave)="onMouseLeave()"
+      (focusin)="onMouseEnter()"
+      (focusout)="onFocusOut($event)"
       [style.--trigger-width]="trigger.nativeElement.clientWidth"
-      [style.--trigger-height]="trigger.nativeElement.clientHeight">
-      @if (templateRef) {
-        <ng-container *ngTemplateOutlet="templateRef; context: templateContext"> </ng-container>
-      }
-
-      @if (content) {
-        <div [innerHTML]="content"></div>
-      }
+      [style.--trigger-height]="trigger.nativeElement.clientHeight"
+    >
+      <div class="ngx-mat-tooltip-content">
+        @if (templateRef) {
+          <ng-container
+            *ngTemplateOutlet="templateRef; context: templateContext"
+          >
+          </ng-container>
+        }
+        @if (content) {
+          <div [innerHTML]="content"></div>
+        }
+      </div>
     </div>
   </ng-template>
 }

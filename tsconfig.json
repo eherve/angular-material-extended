@@ -4,7 +4,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "tooltip": ["./dist/angular-material-tooltip"]
+      "@eherve/angular-material-tooltip": ["./dist/tooltip"]
     },
     "outDir": "./dist/out-tsc",
     "strict": true,

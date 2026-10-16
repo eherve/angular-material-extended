@@ -19,6 +19,7 @@
     "build:demo": "ng build angular-material-extended",
     "check:datatable": "npm run test:datatable && npm run build:datatable && npm run test:demo && npm run build:demo",
     "build:tooltip": "ng build NgxMatTooltip",
+    "check:tooltip": "npm run test:tooltip && npm run build:tooltip",
     "publish:datatable": "ng build NgxMatDatatable && cd dist/datatable && npm publish && cd -",
     "publish:tooltip": "ng build NgxMatTooltip && cd dist/tooltip && npm publish && cd -"
   },

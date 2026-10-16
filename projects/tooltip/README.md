@@ -1,63 +1,97 @@
-# Tooltip
+# @eherve/angular-material-tooltip
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.0.
+Angular 22 rich tooltips built with CDK connected overlays. Supports sanitized HTML strings,
+Angular templates with context, mouse hover, keyboard focus, click and touch activation.
 
-## Code scaffolding
+## Installation
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```sh
+npm install @eherve/angular-material-tooltip
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Import `NgxMatTooltipModule` in the consuming NgModule or standalone component's `imports`.
+Enable Angular animations with `provideAnimationsAsync()` at bootstrap, or use
+`provideNoopAnimations()` when animations should be disabled. Include an Angular Material
+prebuilt theme or `@angular/cdk/overlay-prebuilt.css` globally for the overlay container styles.
 
-```bash
-ng generate --help
+```ts
+import { NgxMatTooltipModule } from "@eherve/angular-material-tooltip";
+
+@Component({
+  imports: [NgxMatTooltipModule],
+  template: `
+    <button ngxMatTooltip="Details">Hover or focus</button>
+    <button
+      [ngxMatTooltip]="details"
+      [ngxMatTooltipContext]="{ name: 'Alice' }"
+      [ngxMatTooltipOpenDelay]="0"
+      ngxMatTooltipPosition="top"
+    >
+      Show details
+    </button>
+    <ng-template #details let-name="name"
+      ><strong>{{ name }}</strong></ng-template
+    >
+  `,
+})
+export class ExampleComponent {}
 ```
 
-## Building
+## Inputs
 
-To build the library, run:
+| Input                         | Default   | Behavior                                                                                                                                                                              |
+| ----------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ngxMatTooltip`               | —         | String or `TemplateRef`; empty, null and undefined close the tooltip and cancel pending opening. HTML strings use Angular sanitization.                                               |
+| `ngxMatTooltipContext`        | —         | Context passed to the template; replacement updates an open tooltip.                                                                                                                  |
+| `ngxMatTooltipDisabled`       | `false`   | Boolean attribute; disabling closes immediately. The string `"false"` is false.                                                                                                       |
+| `ngxMatTooltipTrigger`        | `hover`   | `hover` opens on mouse enter or focus within the trigger; a touch tap toggles it. `click` toggles on click, including native button keyboard activation.                              |
+| `ngxMatTooltipOpenDelay`      | `100`     | Opening delay in milliseconds for hover/focus. Zero opens immediately. Click/tap is immediate.                                                                                        |
+| `ngxMatTooltipOnOverflowOnly` | `false`   | Open only when the trigger's horizontal scroll width exceeds its offset width.                                                                                                        |
+| `ngxMatTooltipPosition`       | automatic | `bottom`, `bottom start`, `bottom end`, `right`, `top` or `left`. Automatic mode tries these positions in this order. Explicit positions are pushed into the viewport when necessary. |
 
-```bash
-ng build tooltip
+Leaving the trigger schedules closing after 100 ms, allowing the pointer or focus to reach
+rich content. Escape and an outside click dismiss the tooltip. No backdrop consumes outside
+clicks. Destruction cancels timers and disposes of the overlay.
+
+The rendered content has `role="tooltip"` and a unique ID associated with the trigger through
+`aria-describedby`; existing description IDs are preserved. Use a native focusable trigger
+such as a button. A custom element needs an appropriate keyboard/focus contract in its app.
+Use a dialog or menu for content requiring dialog/menu semantics.
+
+Content and position changes update OnPush views. The public `Position` type is exported.
+The old sésiO-only `visible` input is not part of this library's directive API.
+
+## Styling
+
+The default appearance includes a white background, padding, rounded corners, a directional
+arrow and a drop shadow. Width is constrained by the viewport rather than the trigger, so
+small icon and graph-node triggers can show rich content.
+
+Customize globally (overlays render outside the trigger's ancestor tree):
+
+```css
+.ngx-mat-tooltip {
+  --ngx-mat-tooltip-background-color: white;
+  --ngx-mat-tooltip-border: none;
+  --ngx-mat-tooltip-border-radius: 4px;
+  --ngx-mat-tooltip-padding: 8px;
+  --ngx-mat-tooltip-margin: 4px;
+  --ngx-mat-tooltip-max-width: 640px;
+  --ngx-mat-tooltip-filter: drop-shadow(0 3px 4px rgb(0 0 0 / 50%));
+}
 ```
 
-This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
+## Validation and packaging
 
-### Publishing the Library
+From the repository root:
 
-Once the project is built, you can publish your library by following these steps:
-
-1. Navigate to the `dist` directory:
-   ```bash
-   cd dist/tooltip
-   ```
-
-2. Run the `npm publish` command to publish your library to the npm registry:
-   ```bash
-   npm publish
-   ```
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
+```sh
+npm run check:tooltip
+npm run test:tooltip -- --code-coverage
+npm pack ./dist/tooltip --dry-run
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The focused ChromeHeadless suite covers host integration, delays and cancellation, live
+content/context/position changes, disabled and empty states, keyboard/ARIA, touch, outside
+clicks, sanitization, rich-content sizing, positions and destruction.
+Build output is `dist/tooltip`; publish that directory only after release approval.
