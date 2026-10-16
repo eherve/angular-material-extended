@@ -4,6 +4,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
+      "@eherve/angular-material-section-tabs": ["./dist/section-tabs"],
+      "@eherve/angular-material-display-dialog": ["./dist/display-dialog"],
+      "@eherve/angular-material-edit-entity-dialog": ["./dist/edit-entity-dialog"],
       "tooltip": ["./dist/angular-material-tooltip"]
     },
     "outDir": "./dist/out-tsc",

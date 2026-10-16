@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+.section-tabs-demo {
+  display: grid;
+  gap: 24px;
+  padding: 24px;
+}
+
+.section-tabs-demo section {
+  min-height: 280px;
+}

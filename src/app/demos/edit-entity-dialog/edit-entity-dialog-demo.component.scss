@@ -1,0 +1,16 @@
+:host {
+  display: block;
+  padding: 24px;
+  max-width: 1100px;
+  margin: auto;
+}
+.demo-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+pre {
+  padding: 16px;
+  background: #f4f6f8;
+  white-space: pre-wrap;
+}

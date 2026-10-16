@@ -1,0 +1,187 @@
+<!-- @format -->
+
+@if (loading) {
+  <div class="display-dialog-loading">
+    <mat-spinner [diameter]="72"></mat-spinner>
+    <span>{{ loadingLabel }}</span>
+  </div>
+} @else if (errorLabel) {
+  <div class="display-dialog-empty-state">
+    <mat-icon>info</mat-icon>
+    <span>{{ errorLabel }}</span>
+
+    @if (showCloseButton) {
+      <button mat-stroked-button type="button" (click)="close()">{{ closeLabel }}</button>
+    }
+  </div>
+} @else {
+  @if (title || subtitle || showCloseButton || getActions('top').length) {
+    <div mat-dialog-title class="display-dialog-title">
+      <div class="display-dialog-title-bar">
+        <div class="display-dialog-title-content">
+          @if (title) {
+            <h2 [innerHTML]="title"></h2>
+          }
+          @if (subtitle) {
+            <p [innerHTML]="subtitle"></p>
+          }
+        </div>
+
+        <div class="display-dialog-title-actions">
+          @for (action of getActions('top'); track trackAction($index, action)) {
+            <ng-container *ngTemplateOutlet="actionTemplate; context: { action }"></ng-container>
+          }
+
+          @if (isDialog && data?.showJsonDataButton === true) {
+            <button
+              mat-icon-button
+              type="button"
+
+              [matTooltip]="intl.messages.jsonButtonLabel"
+
+              [attr.aria-label]="intl.messages.jsonButtonLabel"
+              (click)="openJsonDataDialog()">
+              <mat-icon>file_json</mat-icon>
+            </button>
+          }
+
+
+          @if (showCloseButton) {
+            <button mat-icon-button type="button" [attr.aria-label]="closeLabel" (click)="close()">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (actionErrorLabel) { <div class="display-dialog-action-error" role="alert">{{ actionErrorLabel }}</div> }
+  <div mat-dialog-content class="display-dialog-content">
+    <ng-container *ngTemplateOutlet="displayDialogContent; context: { $implicit: renderState }"></ng-container>
+  </div>
+
+  @if (getActions('bottom').length || getActions('bottom-end').length) {
+    <footer class="display-dialog-actions">
+      <div class="display-dialog-actions-left">
+        @for (action of getActions('bottom'); track trackAction($index, action)) {
+          <ng-container *ngTemplateOutlet="actionTemplate; context: { action }"></ng-container>
+        }
+      </div>
+
+      <div class="display-dialog-actions-right">
+        @for (action of getActions('bottom-end'); track trackAction($index, action)) {
+          <ng-container *ngTemplateOutlet="actionTemplate; context: { action }"></ng-container>
+        }
+      </div>
+    </footer>
+  }
+
+  @if (handlingAction) {
+    <div class="display-dialog-handling-action">
+      <mat-spinner [diameter]="72"></mat-spinner>
+    </div>
+  }
+}
+
+<ng-template #displayDialogContent let-state>
+  @switch (state.kind) {
+    @case ('tabs') {
+      @if (state.tabs?.length) {
+        <mat-tab-group class="display-dialog-root-tabs" mat-stretch-tabs="false">
+          @for (tab of state.tabs; track tab.label) {
+            <mat-tab>
+              <ng-template mat-tab-label>
+                @if (tab.svgIcon) {
+                  <mat-icon class="display-dialog-root-tab-icon" [svgIcon]="tab.svgIcon"></mat-icon>
+                } @else if (tab.icon) {
+                  <mat-icon class="display-dialog-root-tab-icon">{{ tab.icon }}</mat-icon>
+                }
+                <span [innerHTML]="tab.label"></span>
+                @if (tab.badge !== undefined && tab.badge !== null) {
+                  <span class="display-dialog-root-tab-badge">{{ tab.badge }}</span>
+                }
+              </ng-template>
+
+              <ng-container
+                *ngTemplateOutlet="displayDialogContent; context: { $implicit: tab.renderState }"></ng-container>
+            </mat-tab>
+          }
+        </mat-tab-group>
+      }
+    }
+
+    @case ('sections') {
+      @if (state.sectionsOptions) {
+        <app-section-tabs-display
+          class="display-dialog-section-tabs-display"
+          [menuHeader]="state.sectionsMenuHeader"
+          [options]="state.sectionsOptions">
+        </app-section-tabs-display>
+      }
+    }
+
+    @case ('component') {
+      <div class="display-dialog-component-page" [class.overflow]="state.componentOverflow">
+        @if (state.component) {
+          <ng-container *ngComponentOutlet="state.component; inputs: state.componentInputs"></ng-container>
+        }
+      </div>
+    }
+
+    @case ('section') {
+      @if (state.singleSectionOptions) {
+        <app-section-tabs-display
+          class="display-dialog-section-tabs-display display-dialog-single-section-display"
+          [options]="state.singleSectionOptions">
+        </app-section-tabs-display>
+      }
+    }
+
+    @default {
+      <div class="display-dialog-empty-state">
+        <mat-icon>info</mat-icon>
+        <span>{{ intl.messages.emptyContentLabel }}</span>
+      </div>
+    }
+  }
+</ng-template>
+
+<ng-template #actionTemplate let-action="action">
+  @if (action.component) {
+    <ng-container *ngComponentOutlet="action.component; inputs: action.componentInputs"></ng-container>
+  } @else if (action.buttonType === 'raised') {
+    <button
+      class="display-dialog-action-btn"
+      mat-raised-button
+      type="button"
+      [style.--action-color]="action.contrastColor"
+      [style.--action-background-color]="action.color"
+      [disabled]="handlingAction || action.isDisabled"
+      [matTooltip]="action.tooltip || ''"
+      (click)="handleAction(action)">
+      @if (action.icon) {
+        <mat-icon>{{ action.icon }}</mat-icon>
+      }
+      @if (action.label) {
+        <span>{{ action.label }}</span>
+      }
+    </button>
+  } @else {
+    <button
+      class="display-dialog-action-btn"
+      mat-button
+      type="button"
+      [style.--action-color]="action.color"
+      [disabled]="handlingAction || action.isDisabled"
+      [matTooltip]="action.tooltip || ''"
+      (click)="handleAction(action)">
+      @if (action.icon) {
+        <mat-icon>{{ action.icon }}</mat-icon>
+      }
+      @if (action.label) {
+        <span>{{ action.label }}</span>
+      }
+    </button>
+  }
+</ng-template>

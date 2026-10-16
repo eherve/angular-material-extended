@@ -1,0 +1,696 @@
+<!-- @format -->
+
+@if (loading) {
+  <div class="edit-entity-loading">
+    <mat-spinner [diameter]="72" />
+    <span>{{ loadingLabel }}</span>
+  </div>
+} @else if (errorLabel) {
+  <div class="edit-entity-empty-state">
+    <mat-icon>info</mat-icon>
+    <span>{{ errorLabel }}</span>
+
+    @if (displayMode === "dialog") {
+      <button mat-stroked-button type="button" (click)="requestClose()">
+        {{ closeLabel }}
+      </button>
+    }
+  </div>
+} @else {
+  @if (
+    title || subtitle || displayMode === "dialog" || getActions("top").length
+  ) {
+    <header class="edit-entity-title-bar">
+      <div class="edit-entity-title-content">
+        @if (title) {
+          <h2 [innerHTML]="title"></h2>
+        }
+        @if (subtitle) {
+          <p [innerHTML]="subtitle"></p>
+        }
+      </div>
+
+      <div class="edit-entity-title-actions">
+        @for (
+          action of getActions("top");
+          track trackRuntimeAction($index, action)
+        ) {
+          <ng-container
+            *ngTemplateOutlet="actionTemplate; context: { action }"
+          ></ng-container>
+        }
+
+        @if (options.showJsonDataButton === true) {
+          <button
+            mat-icon-button
+            type="button"
+            [matTooltip]="intl.messages.showJson"
+            [attr.aria-label]="intl.messages.showJson"
+            (click)="openJsonDataDialog()"
+          >
+            <mat-icon>file_json</mat-icon>
+          </button>
+        }
+
+        @if (displayMode === "dialog") {
+          <button
+            mat-icon-button
+            type="button"
+            [attr.aria-label]="closeLabel"
+            (click)="requestClose()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+    </header>
+  }
+
+  <form class="edit-entity-form" [formGroup]="formGroup">
+    <main class="edit-entity-content">
+      <ng-container
+        *ngTemplateOutlet="
+          editEntityContent;
+          context: { $implicit: renderState() }
+        "
+      ></ng-container>
+    </main>
+  </form>
+
+  <footer class="edit-entity-actions">
+    <div class="edit-entity-actions-left">
+      @for (
+        action of getActions("bottom");
+        track trackRuntimeAction($index, action)
+      ) {
+        <ng-container
+          *ngTemplateOutlet="actionTemplate; context: { action }"
+        ></ng-container>
+      }
+    </div>
+
+    <div class="edit-entity-actions-right">
+      @for (
+        action of getActions("bottom-end");
+        track trackRuntimeAction($index, action)
+      ) {
+        <ng-container
+          *ngTemplateOutlet="actionTemplate; context: { action }"
+        ></ng-container>
+      }
+
+      @if (!updated && !isCreateEnabled && displayMode === "dialog") {
+        <button
+          mat-button
+          type="button"
+          cdkFocusInitial
+          (click)="requestClose()"
+        >
+          {{ closeLabel }}
+        </button>
+      }
+
+      @if (isCreateEnabled) {
+        <button
+          mat-raised-button
+          color="secondary"
+          type="button"
+          cdkFocusInitial
+          [disabled]="updating || !valid"
+          (click)="create()"
+        >
+          {{ createLabel }}
+        </button>
+      }
+
+      @if (isUpdateEnabled && updated) {
+        <button
+          mat-raised-button
+          color="secondary"
+          type="button"
+          cdkFocusInitial
+          [disabled]="updating || !valid"
+          (click)="update()"
+        >
+          {{ updateLabel }}
+        </button>
+      }
+
+      @if (updated && displayMode === "dialog") {
+        <button mat-button type="button" (click)="requestClose()">
+          {{ cancelLabel }}
+        </button>
+      }
+
+      @if (isArchiveEnabled) {
+        <button
+          mat-button
+          color="warning"
+          type="button"
+          [disabled]="updating"
+          (click)="archive()"
+        >
+          {{
+            options.record?.__archived?.isArchived
+              ? intl.messages.unarchive
+              : intl.messages.archive
+          }}
+        </button>
+      }
+
+      @if (isRemoveEnabled && isRemovable) {
+        <span
+          [matTooltip]="isRemovable.reason || ''"
+          [matTooltipDisabled]="isRemovable.removable"
+        >
+          <button
+            mat-button
+            color="danger"
+            type="button"
+            [disabled]="updating || !isRemovable.removable"
+            (click)="remove()"
+          >
+            {{ intl.messages.remove }}
+          </button>
+        </span>
+      }
+    </div>
+  </footer>
+
+  @if (updating) {
+    <div class="edit-entity-updating">
+      <mat-spinner [diameter]="72" />
+    </div>
+  }
+}
+
+<ng-template #editEntityContent let-state>
+  @switch (state.kind) {
+    @case ("tabs") {
+      @if (state.tabs?.length) {
+        <mat-tab-group
+          class="edit-entity-root-tabs"
+          mat-stretch-tabs="false"
+          [preserveContent]="true"
+        >
+          @for (tab of state.tabs; track tab.label) {
+            @if (tab.isVisible) {
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  @if (tab.svgIcon) {
+                    <mat-icon
+                      class="edit-entity-root-tab-icon"
+                      [svgIcon]="tab.svgIcon"
+                    ></mat-icon>
+                  } @else if (tab.icon) {
+                    <mat-icon class="edit-entity-root-tab-icon">{{
+                      tab.icon
+                    }}</mat-icon>
+                  }
+                  <span [innerHTML]="tab.label"></span>
+                  @if (tab.validationSummary.label) {
+                    <span
+                      class="edit-entity-root-tab-badge edit-entity-root-tab-badge--validation"
+                      [class.invalid]="
+                        tab.validationSummary.status === 'invalid'
+                      "
+                      [class.missing]="
+                        tab.validationSummary.status === 'missing'
+                      "
+                      [style.color]="tab.validationSummary.color"
+                      [attr.title]="tab.validationSummary.tooltip"
+                    >
+                      {{ tab.validationSummary.label }}
+                    </span>
+                  } @else if (tab.badge !== undefined && tab.badge !== null) {
+                    <span class="edit-entity-root-tab-badge">{{
+                      tab.badge
+                    }}</span>
+                  }
+                </ng-template>
+
+                <ng-template matTabContent>
+                  <ng-container
+                    *ngTemplateOutlet="
+                      editEntityContent;
+                      context: { $implicit: tab.renderState }
+                    "
+                  ></ng-container>
+                </ng-template>
+              </mat-tab>
+            }
+          }
+        </mat-tab-group>
+      }
+    }
+
+    @case ("sections") {
+      <ng-container
+        *ngTemplateOutlet="sectionsTemplate; context: { state }"
+      ></ng-container>
+    }
+
+    @case ("section") {
+      <ng-container
+        *ngTemplateOutlet="
+          sectionsTemplate;
+          context: { state, singleSection: true }
+        "
+      ></ng-container>
+    }
+
+    @case ("component") {
+      <div
+        class="edit-entity-component-page"
+        [class.overflow]="state.componentOverflow"
+      >
+        @if (state.component) {
+          <ng-container
+            *ngComponentOutlet="state.component; inputs: state.componentInputs"
+          ></ng-container>
+        }
+      </div>
+    }
+
+    @default {
+      <div class="edit-entity-empty-state">
+        <mat-icon>info</mat-icon>
+        <span>{{ intl.messages.noContent }}</span>
+      </div>
+    }
+  }
+</ng-template>
+
+<ng-template
+  #sectionsTemplate
+  let-state="state"
+  let-singleSection="singleSection"
+>
+  @if (state.sections?.length) {
+    <app-section-tabs
+      class="edit-entity-section-tabs"
+      [class.edit-entity-section-tabs--single]="singleSection === true"
+    >
+      @if (state.sectionsMenuHeader) {
+        <ng-template appSectionTabsMenuHeader>
+          <div>
+            <span>{{ state.sectionsMenuHeader }}</span>
+          </div>
+        </ng-template>
+      }
+
+      @if (state.showEmptyFieldsToggle) {
+        <ng-template appSectionTabsFooter>
+          <mat-slide-toggle
+            [checked]="showEmptyFields"
+            (change)="onShowEmptyFieldsChange($event.checked)"
+          >
+            <span
+              [innerHTML]="state.showEmptyFieldsLabel || showEmptyFieldsLabel"
+            ></span>
+          </mat-slide-toggle>
+        </ng-template>
+      }
+
+      @for (section of state.sections; track section.id) {
+        <app-section-tab
+          [done]="section.done"
+          [total]="section.total"
+          [progress]="section.progress"
+          [statusColor]="section.statusColor"
+        >
+          <ng-template appSectionTabLabel>
+            @if (section.icon) {
+              <mat-icon [attr.title]="section.tooltip">{{
+                section.icon
+              }}</mat-icon>
+            }
+            <span
+              [attr.title]="section.tooltip"
+              [innerHTML]="section.label"
+            ></span>
+          </ng-template>
+
+          <ng-template appSectionTabContent>
+            <div
+              class="edit-entity-section"
+              [class.edit-entity-section--single-card]="
+                section.sectionMode === 'single-card'
+              "
+              [class.edit-entity-section--single-card-only]="
+                section.sectionMode === 'single-card' && section.cardCount === 1
+              "
+              [class.edit-entity-section--single-card-multiple]="
+                section.sectionMode === 'single-card' && section.cardCount > 1
+              "
+              [ngStyle]="section.gridStyles"
+              [appEditEntityResponsiveGrid]="section.grid"
+            >
+              @for (cardItem of section.items; track cardItem.id) {
+                @if (cardItem.type === "break") {
+                  <div class="edit-entity-grid-break" aria-hidden="true"></div>
+                } @else {
+                  <article
+                    class="edit-entity-card section-tabs-card"
+                    [ngClass]="cardItem.classes"
+                    [ngStyle]="cardItem.styles"
+                  >
+                    @if (
+                      cardItem.label ||
+                      cardItem.icon ||
+                      cardItem.runtimeActions.length ||
+                      cardItem.completionLabel ||
+                      cardItem.headerValueLabel !== undefined
+                    ) {
+                      <header class="edit-entity-card-header card-header">
+                        <div class="edit-entity-card-title">
+                          @if (cardItem.icon) {
+                            <mat-icon [attr.title]="cardItem.tooltip">{{
+                              cardItem.icon
+                            }}</mat-icon>
+                          }
+                          <h3
+                            [attr.title]="cardItem.tooltip"
+                            [innerHTML]="cardItem.label"
+                          ></h3>
+                        </div>
+
+                        <div class="edit-entity-card-header-end">
+                          @if (cardItem.runtimeActions.length) {
+                            <div class="edit-entity-card-actions">
+                              @for (
+                                action of cardItem.runtimeActions;
+                                track action.id ||
+                                  action.label ||
+                                  action.icon ||
+                                  $index
+                              ) {
+                                @if (action.isVisible) {
+                                  @if (action.type === "button") {
+                                    @if (action.runtimeMenuOptions?.length) {
+                                      <button
+                                        mat-button
+                                        type="button"
+                                        [style.--action-color]="action.color"
+                                        class="edit-entity-card-action"
+                                        [disabled]="action.isDisabled"
+                                        [matTooltip]="action.tooltip || ''"
+                                        [attr.aria-label]="
+                                          action.ariaLabel ||
+                                          action.label ||
+                                          action.icon
+                                        "
+                                        [matMenuTriggerFor]="cardActionMenu"
+                                      >
+                                        @if (action.icon) {
+                                          <mat-icon>{{ action.icon }}</mat-icon>
+                                        }
+                                        <span [innerHTML]="action.label"></span>
+                                      </button>
+
+                                      <mat-menu #cardActionMenu="matMenu">
+                                        @for (
+                                          option of action.runtimeMenuOptions;
+                                          track option.id
+                                        ) {
+                                          @if (option.isVisible) {
+                                            <button
+                                              mat-menu-item
+                                              type="button"
+                                              [disabled]="option.isDisabled"
+                                              (click)="
+                                                handleCardMenuOption(
+                                                  cardItem,
+                                                  action,
+                                                  option,
+                                                  section.source
+                                                )
+                                              "
+                                            >
+                                              @if (option.icon) {
+                                                <mat-icon>{{
+                                                  option.icon
+                                                }}</mat-icon>
+                                              }
+                                              <span
+                                                [innerHTML]="option.label"
+                                              ></span>
+                                            </button>
+                                          }
+                                        }
+                                      </mat-menu>
+                                    } @else {
+                                      <button
+                                        mat-button
+                                        type="button"
+                                        [style.--action-color]="action.color"
+                                        class="edit-entity-card-action"
+                                        [disabled]="action.isDisabled"
+                                        [matTooltip]="action.tooltip || ''"
+                                        (click)="
+                                          handleCardAction(
+                                            cardItem,
+                                            action,
+                                            section.source
+                                          )
+                                        "
+                                      >
+                                        @if (action.icon) {
+                                          <mat-icon>{{ action.icon }}</mat-icon>
+                                        }
+                                        <span [innerHTML]="action.label"></span>
+                                      </button>
+                                    }
+                                  } @else {
+                                    @if (action.runtimeMenuOptions?.length) {
+                                      <button
+                                        mat-icon-button
+                                        type="button"
+                                        class="edit-entity-card-action"
+                                        [disabled]="action.isDisabled"
+                                        [matTooltip]="action.tooltip || ''"
+                                        [attr.aria-label]="
+                                          action.ariaLabel ||
+                                          action.label ||
+                                          action.icon
+                                        "
+                                        [matMenuTriggerFor]="cardActionMenu"
+                                      >
+                                        <mat-icon>{{
+                                          action.icon || "more_vert"
+                                        }}</mat-icon>
+                                      </button>
+
+                                      <mat-menu #cardActionMenu="matMenu">
+                                        @for (
+                                          option of action.runtimeMenuOptions;
+                                          track option.id
+                                        ) {
+                                          @if (option.isVisible) {
+                                            <button
+                                              mat-menu-item
+                                              type="button"
+                                              [disabled]="option.isDisabled"
+                                              (click)="
+                                                handleCardMenuOption(
+                                                  cardItem,
+                                                  action,
+                                                  option,
+                                                  section.source
+                                                )
+                                              "
+                                            >
+                                              @if (option.icon) {
+                                                <mat-icon>{{
+                                                  option.icon
+                                                }}</mat-icon>
+                                              }
+                                              <span
+                                                [innerHTML]="option.label"
+                                              ></span>
+                                            </button>
+                                          }
+                                        }
+                                      </mat-menu>
+                                    } @else {
+                                      <button
+                                        mat-icon-button
+                                        type="button"
+                                        class="edit-entity-card-action"
+                                        [disabled]="action.isDisabled"
+                                        [matTooltip]="action.tooltip || ''"
+                                        [attr.aria-label]="
+                                          action.ariaLabel ||
+                                          action.label ||
+                                          action.icon
+                                        "
+                                        (click)="
+                                          handleCardAction(
+                                            cardItem,
+                                            action,
+                                            section.source
+                                          )
+                                        "
+                                      >
+                                        <mat-icon>{{ action.icon }}</mat-icon>
+                                      </button>
+                                    }
+                                  }
+                                }
+                              }
+                            </div>
+                          }
+
+                          @if (cardItem.completionLabel) {
+                            <span
+                              class="edit-entity-completion-chip mini-chip"
+                              [style.color]="cardItem.completionColor"
+                              [attr.title]="cardItem.validationSummary.tooltip"
+                            >
+                              {{ cardItem.completionLabel }}
+                            </span>
+                          }
+
+                          @if (cardItem.headerValueLabel !== undefined) {
+                            <span class="edit-entity-card-header-value">{{
+                              cardItem.headerValueLabel
+                            }}</span>
+                          }
+                        </div>
+                      </header>
+                    }
+
+                    @if (cardItem.kind === "component") {
+                      <div class="edit-entity-component-card">
+                        @if (cardItem.component) {
+                          <ng-container
+                            *ngComponentOutlet="
+                              cardItem.component;
+                              inputs: cardItem.componentInputs
+                            "
+                          ></ng-container>
+                        } @else {
+                          <div class="edit-entity-empty-state">
+                            <mat-icon>extension_off</mat-icon>
+                            <strong>{{ intl.messages.noComponent }}</strong>
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <div
+                        class="edit-entity-field-grid"
+                        [ngStyle]="cardItem.gridStyles"
+                        [appEditEntityResponsiveGrid]="cardItem.grid"
+                      >
+                        @for (fieldItem of cardItem.items; track fieldItem.id) {
+                          @if (fieldItem.type === "break") {
+                            <div
+                              class="edit-entity-grid-break"
+                              aria-hidden="true"
+                            ></div>
+                          } @else if (fieldItem.kind === "separator") {
+                            <div
+                              class="edit-entity-separator"
+                              [ngClass]="fieldItem.classes"
+                              [ngStyle]="fieldItem.styles"
+                            >
+                              @if (fieldItem.separator?.divider !== false) {
+                                <span
+                                  class="edit-entity-separator-line"
+                                  [style.borderColor]="
+                                    fieldItem.separator?.dividerColor
+                                  "
+                                ></span>
+                              }
+                              @if (fieldItem.separator?.label) {
+                                <span
+                                  class="edit-entity-separator-label"
+                                  [style.color]="
+                                    fieldItem.separator?.labelColor
+                                  "
+                                  [innerHTML]="fieldItem.separator?.label"
+                                >
+                                </span>
+                              }
+                              @if (fieldItem.separator?.divider !== false) {
+                                <span
+                                  class="edit-entity-separator-line"
+                                  [style.borderColor]="
+                                    fieldItem.separator?.dividerColor
+                                  "
+                                ></span>
+                              }
+                            </div>
+                          } @else if (fieldItem.field) {
+                            <div
+                              class="edit-entity-field-cell"
+                              [ngClass]="fieldItem.classes"
+                              [ngStyle]="fieldItem.styles"
+                            >
+                              <app-edit-entity-field-renderer
+                                [record]="options.record"
+                                [formGroup]="formGroup"
+                                [field]="fieldItem.field"
+                              >
+                              </app-edit-entity-field-renderer>
+                            </div>
+                          }
+                        }
+                      </div>
+                    }
+                  </article>
+                }
+              }
+            </div>
+          </ng-template>
+        </app-section-tab>
+      }
+    </app-section-tabs>
+  } @else {
+    <div class="edit-entity-empty-state">
+      <mat-icon>info</mat-icon>
+      <span>{{ intl.messages.noSection }}</span>
+    </div>
+  }
+</ng-template>
+
+<ng-template #actionTemplate let-action="action">
+  @if (isRuntimeButtonAction(action)) {
+    @if (action.buttonType === "raised") {
+      <button
+        class="action-btn"
+        mat-raised-button
+        type="button"
+        [style.--action-color]="action.contrastColor"
+        [style.--action-background-color]="action.color"
+        [disabled]="updating || action.isDisabled"
+        [matTooltip]="action.tooltip || ''"
+        (click)="handleAction(action)"
+      >
+        @if (action.icon) {
+          <mat-icon>{{ action.icon }}</mat-icon>
+        }
+        <span [innerHTML]="action.label"></span>
+      </button>
+    } @else {
+      <button
+        class="action-btn"
+        mat-button
+        type="button"
+        [style.--action-color]="action.color"
+        [disabled]="updating || action.isDisabled"
+        [matTooltip]="action.tooltip || ''"
+        (click)="handleAction(action)"
+      >
+        @if (action.icon) {
+          <mat-icon>{{ action.icon }}</mat-icon>
+        }
+        <span [innerHTML]="action.label"></span>
+      </button>
+    }
+  } @else if (isRuntimeComponentAction(action)) {
+    <ng-container
+      *ngComponentOutlet="action.component; inputs: action.componentInputs"
+    ></ng-container>
+  }
+</ng-template>

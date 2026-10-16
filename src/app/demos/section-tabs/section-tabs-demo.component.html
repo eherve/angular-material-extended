@@ -1,0 +1,11 @@
+<main class="section-tabs-demo">
+  <h1>Section Tabs</h1>
+  <section>
+    <h2>État local</h2>
+    <app-section-tabs-display [options]="localOptions"></app-section-tabs-display>
+  </section>
+  <section>
+    <h2>Sélection synchronisée en mémoire</h2>
+    <app-section-tabs-display [options]="synchronizedOptions" queryParamKey="demo-section-group"></app-section-tabs-display>
+  </section>
+</main>

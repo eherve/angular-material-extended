@@ -1,0 +1,562 @@
+/** @format */
+
+@use "@angular/material" as mat;
+
+:host {
+  --edit-entity-background: var(
+    --ngx-mat-edit-entity-dialog-background,
+    #f4f6f8
+  );
+  --edit-entity-border: var(
+    --ngx-mat-edit-entity-dialog-border,
+    rgba(14, 43, 67, 0.12)
+  );
+  --edit-entity-text: var(--ngx-mat-edit-entity-dialog-text, #102f49);
+  --edit-entity-muted: var(--ngx-mat-edit-entity-dialog-muted, #61718a);
+  --edit-entity-primary: var(--ngx-mat-edit-entity-dialog-primary, #0f334d);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--edit-entity-text);
+}
+
+.edit-entity-loading,
+.edit-entity-empty-state {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 240px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 18px;
+  color: var(--edit-entity-primary);
+}
+
+.edit-entity-empty-state {
+  padding: 24px;
+  color: var(--edit-entity-muted);
+  text-align: center;
+
+  mat-icon {
+    width: 42px;
+    height: 42px;
+    color: var(--edit-entity-primary);
+    font-size: 42px;
+  }
+
+  span,
+  strong {
+    color: var(--edit-entity-text);
+    font-size: 15px;
+    font-weight: 700;
+  }
+}
+
+.edit-entity-title-bar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: start;
+  gap: 16px;
+  min-height: 48px;
+  padding: 8px;
+  margin: 0;
+  border-bottom: 1px solid var(--edit-entity-border);
+  box-sizing: border-box;
+  background: var(--ngx-mat-edit-entity-dialog-header-background, #0f334d);
+  color: var(--ngx-mat-edit-entity-dialog-header-text, #fff);
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  p {
+    margin: 3px 0 0;
+    color: var(--edit-entity-muted);
+    font-size: 13px;
+  }
+}
+
+.edit-entity-title-content {
+  min-width: 0;
+  overflow: hidden;
+
+  h2,
+  p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.edit-entity-title-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+
+  .mat-mdc-icon-button {
+    @include mat.icon-button-overrides(
+      (
+        icon-color: var(--ngx-mat-edit-entity-dialog-header-text, #fff),
+      )
+    );
+  }
+}
+
+.edit-entity-form,
+.edit-entity-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  background: var(--edit-entity-background);
+  box-sizing: border-box;
+}
+
+.edit-entity-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 54px;
+  padding: 8px;
+  border-top: 1px solid var(--edit-entity-border);
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.edit-entity-actions-left,
+.edit-entity-actions-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.edit-entity-component-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 8px;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  &.overflow {
+    overflow: auto;
+  }
+}
+
+.edit-entity-root-tabs {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.edit-entity-root-tab-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  font-size: 18px;
+}
+
+.edit-entity-root-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  margin-left: 8px;
+  border-radius: 999px;
+  background: rgba(15, 51, 77, 0.1);
+  color: var(--edit-entity-primary);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.edit-entity-root-tab-badge--validation {
+  background: #fff3eb;
+
+  &.invalid {
+    background: #fee4e2;
+  }
+
+  &.missing {
+    background: #fff3eb;
+  }
+}
+
+.edit-entity-section-tabs {
+  display: block;
+  flex: 1 1 auto;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.edit-entity-section {
+  display: grid;
+  grid-template-columns: repeat(
+    var(
+      --edit-entity-grid-effective-columns,
+      var(--edit-entity-grid-columns, 1)
+    ),
+    minmax(0, 1fr)
+  );
+  gap: var(--edit-entity-grid-gap, 16px);
+  align-items: start;
+  align-content: start;
+  grid-auto-flow: row;
+  grid-auto-rows: max-content;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: var(--edit-entity-grid-gap, 8px);
+  padding-left: 0;
+}
+
+.edit-entity-section--single-card {
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: 100%;
+  align-items: stretch;
+  align-content: start;
+
+  > .edit-entity-grid-break {
+    display: none;
+  }
+
+  > .edit-entity-card {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+    height: 100% !important;
+    min-height: 0;
+
+    > .edit-entity-component-card,
+    > .edit-entity-field-grid {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+  }
+}
+
+.edit-entity-section--single-card-only {
+  overflow: hidden;
+}
+
+.edit-entity-section--single-card-multiple {
+  overflow: visible;
+}
+
+.edit-entity-component-page ::ng-deep.edit-entity-card,
+.edit-entity-card {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 0;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid #d9e0e7;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.edit-entity-card-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.edit-entity-card-title {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-icon,
+  .mat-icon {
+    flex: 0 0 auto;
+    color: #6b7280;
+  }
+
+  h3 {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.edit-entity-card-header-end {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.edit-entity-card-header-value {
+  white-space: nowrap;
+}
+
+.edit-entity-card-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.edit-entity-card-action {
+  &.mat-mdc-icon-button {
+    padding: 6px;
+    --mat-icon-size: 20px;
+
+    @include mat.icon-button-overrides(
+      (
+        icon-size: 20px,
+        state-layer-size: 32px,
+      )
+    );
+  }
+
+  &.mat-mdc-button {
+    min-width: 0;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 0.85rem;
+    line-height: 32px;
+  }
+}
+
+.edit-entity-component-card {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.edit-entity-field-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    var(
+      --edit-entity-grid-effective-columns,
+      var(--edit-entity-grid-columns, 1)
+    ),
+    minmax(0, 1fr)
+  );
+  align-items: start;
+  align-content: start;
+  gap: var(--edit-entity-grid-gap, 8px);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.edit-entity-section > .edit-entity-card,
+.edit-entity-field-grid > .edit-entity-field-cell {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.edit-entity-field-cell {
+  min-width: 0;
+}
+
+.edit-entity-field-cell--invalid {
+  position: relative;
+}
+
+.edit-entity-grid-break {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.edit-entity-item--break-before {
+  grid-column-start: 1;
+}
+
+.edit-entity-separator {
+  display: flex;
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.edit-entity-separator-line {
+  flex: 1 1 auto;
+  min-width: 16px;
+  border-top: 1px solid #d9e0e7;
+}
+
+.edit-entity-separator-label {
+  flex: 0 0 auto;
+  color: var(--edit-entity-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.edit-entity-completion-chip {
+  flex: 0 0 auto;
+}
+
+.edit-entity-updating {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+:host ::ng-deep .edit-entity-root-tabs > .mat-mdc-tab-body-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+:host ::ng-deep .edit-entity-root-tabs .mat-mdc-tab-body-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+:host ::ng-deep .edit-entity-section-tabs--single .section-tabs {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:host ::ng-deep .edit-entity-section-tabs--single .section-tabs__sidebar {
+  display: none;
+}
+
+:host ::ng-deep .edit-entity-section-tabs--single .section-tabs__content-panel {
+  padding: 0;
+}
+
+.edit-entity-section-tabs--single .edit-entity-section {
+  padding: 8px;
+}
+
+.action-btn,
+.edit-entity-card-action {
+  @include mat.button-overrides(
+    (
+      text-label-text-color: var(--action-color),
+      filled-label-text-color: var(--action-color),
+      filled-container-color: var(--action-background-color),
+      protected-label-text-color: var(--action-color),
+      protected-container-color: var(--action-background-color),
+    )
+  );
+}
+
+:host ::ng-deep mat-form-field {
+  @include mat.form-field-overrides(
+    (
+      outlined-disabled-input-text-color: var(
+          --mat-form-field-outlined-input-text-color
+        ),
+    )
+  );
+
+  .mat-mdc-chip.mat-mdc-chip-row {
+    @include mat.chips-overrides(
+      (
+        disabled-container-opacity: 1,
+        elevated-disabled-container-color: var(
+            --mat-chip-elevated-container-color
+          ),
+      )
+    );
+  }
+}
+
+@media (max-width: 900px) {
+  .edit-entity-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .edit-entity-actions-left,
+  .edit-entity-actions-right {
+    justify-content: flex-end;
+    width: 100%;
+  }
+}
+
+@media (max-width: 1100px) {
+  :host ::ng-deep .edit-entity-section-tabs .section-tabs {
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  :host ::ng-deep .edit-entity-section-tabs .section-tabs__sidebar {
+    max-height: min(240px, 30vh);
+    min-height: 0;
+    display: flex;
+    overflow: hidden;
+  }
+
+  :host ::ng-deep .edit-entity-section-tabs .section-tabs__sidebar-card {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+  }
+
+  :host ::ng-deep .edit-entity-section-tabs .section-tabs__sidebar-list {
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  :host ::ng-deep .edit-entity-section-tabs .section-tabs__content,
+  :host ::ng-deep .edit-entity-section-tabs .section-tabs__content-viewport,
+  :host ::ng-deep .edit-entity-section-tabs .section-tabs__content-panel {
+    height: 100%;
+    min-height: 0;
+  }
+
+  :host ::ng-deep .edit-entity-section-tabs .section-tabs__content,
+  :host ::ng-deep .edit-entity-section-tabs .section-tabs__content-viewport {
+    overflow: hidden;
+  }
+
+  :host ::ng-deep .edit-entity-section-tabs .section-tabs__content-panel {
+    overflow: auto;
+  }
+}

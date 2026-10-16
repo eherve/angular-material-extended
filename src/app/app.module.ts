@@ -6,6 +6,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { MatButtonModule } from '@angular/material/button';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
+import { provideMomentDatetimeAdapter } from '@ng-matero/extensions-moment-adapter';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -41,6 +44,9 @@ class AppDatatableIntl extends NgxMatDatatableIntl {
   providers: [
     provideAnimationsAsync(),
     { provide: LOCALE_ID, useValue: 'fr' },
+    { provide: MAT_DATE_LOCALE, useValue: 'fr' },
+    provideMomentDateAdapter(),
+    provideMomentDatetimeAdapter(),
     { provide: NgxMatDatatableIntl, useClass: AppDatatableIntl },
   ],
   bootstrap: [AppComponent],
