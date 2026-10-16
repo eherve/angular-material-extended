@@ -32,6 +32,17 @@ Les valeurs du record précèdent les defaults du champ, puis les defaults globa
 
 Le payload de création inclut les defaults et les contrôles additionnels ; celui d'update inclut les changements et `alwaysInUpsert`. `metadata` et les champs réellement non éditables d'un record persisté sont exclus. Un champ simplement désactivé reste soumis, y compris `0` et `false`. L'éditabilité en création conserve le comportement source.
 
+## Champs en lecture seule
+
+Un champ `kind: 'display'` affiche uniquement sa valeur présentée, sans montrer la valeur brute du contrôle. `display` (texte HTML ou callback) reste prioritaire. Sans `display`, les valeurs `Date`, Moment et Day.js utilisent par défaut `DD/MM/YYYY HH[h]mm`, par exemple `01/11/2028 16h32`. La propriété `format` personnalise ce format avec les tokens Moment/Day.js ; elle permet aussi de formater une chaîne ISO ou un timestamp. Les valeurs absentes ou les dates invalides affichent une chaîne vide. Les autres valeurs restent du texte. Le formControl conserve sa valeur originale.
+
+```ts
+{ kind: "display", name: "confirmationDate", label: "Date de confirmation", format: "DD/MM/YYYY HH[h]mm" }
+{ kind: "display", name: "birthDate", label: "Date de naissance", format: "DD/MM/YYYY" }
+```
+
+Le format utilise Moment pour les dates natives/chaînes ISO/timestamps, et `.format()` pour les objets Moment/Day.js, en conservant leur locale et leur fuseau. Les valeurs natives/ISO sont affichées dans le fuseau local du navigateur. Les formats des champs éditables `date`/`datetime` restent fournis par leurs adaptateurs Material/Ng-Matero.
+
 ## Hôte, traductions et dates
 
 `EditEntityDialogHost` expose `confirm(options): Promise<boolean>`, `notify(message): void`, `showJson(title, sources): void`, où chaque source a `label` et `value: unknown`. L’implémentation privée par défaut utilise MatDialog pour confirmation et affichage JSON textuel, et MatSnackBar pour les notifications. Pour personnaliser, fournir `{ provide: EDIT_ENTITY_DIALOG_HOST, useClass: MyHost }`. `disableNotifications` désactive les notifications de réussite. Une erreur de mutation conserve la saisie, libère `updating` et signale un message configurable permettant une nouvelle tentative.

@@ -45,7 +45,9 @@ export type DisplayFormField<Record extends { _id?: string }> = {
   width?: string;
   minWidth?: string;
   visible?: ConditionalState<Record>;
-  display: string | ((value?: unknown) => string | null);
+  display?: string | ((value?: unknown) => string | null);
+  /** Moment/Day.js format for date values; defaults to DD/MM/YYYY HH[h]mm. */
+  format?: string;
   component?: Type<unknown>;
   componentInputs?: { [key: string]: unknown };
 };

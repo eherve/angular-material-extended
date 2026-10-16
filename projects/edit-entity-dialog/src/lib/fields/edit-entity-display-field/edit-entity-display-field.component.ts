@@ -1,19 +1,22 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   Input,
   OnChanges,
   OnDestroy,
+  signal,
 } from "@angular/core";
 import { NgComponentOutlet } from "@angular/common";
-import { ReactiveFormsModule } from "@angular/forms";
+import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { EditEntityFormGroup } from "../../classes/edit-entity-form-group";
 import { EditEntityRecord } from "../../edit-entity-dialog.types";
 import { DisplayFormField } from "../edit-entity-field.types";
 import { Subscription } from "rxjs";
+import moment from "moment";
+import dayjs from "dayjs";
+import { toDate } from "../../internal/date/date.helpers";
 @Component({
   selector: "app-edit-entity-display-field",
   standalone: true,
@@ -26,14 +29,18 @@ import { Subscription } from "rxjs";
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `@if (field.component) {
       <ng-container
-        *ngComponentOutlet="field.component; inputs: componentInputs"
+        *ngComponentOutlet="field.component; inputs: componentInputs()"
       ></ng-container>
     } @else {
       <mat-form-field appearance="outline"
         ><mat-label>{{ field.label }}</mat-label
-        ><input matInput [formControl]="control" hidden />
-        <div [innerHTML]="display"></div
-      ></mat-form-field>
+        ><input matInput [formControl]="control" hidden style="display: none" aria-hidden="true" tabindex="-1" />
+        @if (field.display !== undefined) {
+          <div [innerHTML]="display()"></div>
+        } @else {
+          <div>{{ display() }}</div>
+        }
+      </mat-form-field>
     }`,
 })
 export class EditEntityDisplayFieldComponent<
@@ -44,13 +51,12 @@ export class EditEntityDisplayFieldComponent<
   @Input() record?: TRecord;
   @Input({ required: true }) formGroup!: EditEntityFormGroup;
   @Input({ required: true }) field!: DisplayFormField<TRecord>;
-  display = "";
-  componentInputs: Record<string, unknown> = {};
+  readonly display = signal("");
+  readonly componentInputs = signal<Record<string, unknown>>({});
   private sub?: Subscription;
-  get control() {
+  get control(): FormControl {
     return this.formGroup.requireFormControl(this.field.name);
   }
-  constructor(private readonly cdr: ChangeDetectorRef) {}
   ngOnChanges(): void {
     this.sub?.unsubscribe();
     this.refresh(this.control.value);
@@ -63,11 +69,20 @@ export class EditEntityDisplayFieldComponent<
   }
   private refresh(value: unknown): void {
     this.control.disable({ emitEvent: false });
-    this.display =
-      typeof this.field.display === "string"
-        ? this.field.display
-        : (this.field.display(value) ?? "");
-    this.componentInputs = { value, ...(this.field.componentInputs ?? {}) };
-    this.cdr.markForCheck();
+    this.display.set(this.formatValue(value));
+    this.componentInputs.set({ value, ...(this.field.componentInputs ?? {}) });
+  }
+  private formatValue(value: unknown): string {
+    if (typeof this.field.display === "string") return this.field.display;
+    if (this.field.display) return this.field.display(value) ?? "";
+    const format = this.field.format ?? "DD/MM/YYYY HH[h]mm";
+    if (moment.isMoment(value) || dayjs.isDayjs(value)) {
+      return value.isValid() ? value.format(format) : "";
+    }
+    if (value instanceof Date || this.field.format !== undefined) {
+      const date = toDate(value);
+      return date ? moment(date).format(format) : "";
+    }
+    return value == null ? "" : String(value);
   }
 }
