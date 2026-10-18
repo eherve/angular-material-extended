@@ -1,0 +1,81 @@
+<!-- @format -->
+
+<div
+  id="scroll"
+  #scroll
+  [class.dragging]="dragging">
+  @if (tree) {
+    <div id="container" [class.hide-root]="hideRoot">
+      <ng-container
+        *ngTemplateOutlet="
+          nodeBlock;
+          context: { depth: 0, node: tree, class: { top: true, bottom: true, left: true, right: true } }
+        "></ng-container>
+    </div>
+  }
+</div>
+
+<ng-template #nodeBlock let-depth="depth" let-node="node" let-class="class">
+  <div class="node-block" [class.depth-even]="depth % 2">
+    <div class="node-block-top" [class]="class"></div>
+    <div class="node-block-left" [class]="class"></div>
+    <div
+      [id]="node.id"
+      class="node-container"
+      [class]="class"
+      [attr.role]="node.hasChildren || node.onClick || clickHandler ? 'button' : null"
+      [attr.tabindex]="node.hasChildren || node.onClick || clickHandler ? 0 : null"
+      [attr.aria-expanded]="node.hasChildren ? !node.hideChildren : null"
+      [attr.aria-busy]="pendingNodes().has(node)"
+      (mouseenter)="highlightParents(node)"
+      (mouseleave)="highlightParents(null)"
+      (keydown)="onKeydown($event, node)"
+      (click)="onClick(node, $event)">
+      <ng-container *ngTemplateOutlet="nodeTmpl; context: { node: node }"></ng-container>
+      @if (!node.hideChildren && node.children?.length) {
+        <div @toggleTreeNode class="node-container-bottom" [class]="class"></div>
+      }
+    </div>
+    @if (nodeErrors().get(node); as message) {
+      <div class="node-error" role="alert">
+        <span>{{ message }}</span>
+        <button type="button" (click)="onClick(node)">{{ intl.messages().retry }}</button>
+      </div>
+    }
+    @if (!node.hideChildren && node.children?.length) {
+      <div @toggleTreeNode class="node-block-children" [class.depth-even]="depth % 2">
+        <div class="node-block-children-top" [class]="class" [class.multiple-row]="node.children.length > 4"></div>
+        @for (
+          row of node.children | organigramRows: nbChildByRow;
+          track row;
+          let rowIndex = $index;
+          let top = $first;
+          let bottom = $last
+        ) {
+          <div class="node-block-children-row" [class.top]="top" [class.bottom]="bottom">
+            @for (child of row; track child; let index = $index; let left = $first; let right = $last) {
+              <ng-container
+                *ngTemplateOutlet="
+                  nodeBlock;
+                  context: {
+                    depth: depth + 1,
+                    node: child,
+                    class: {
+                      rowIndex: rowIndex,
+                      index: index,
+                      even: index % 2,
+                      top: top,
+                      bottom: bottom,
+                      left: left,
+                      right: right,
+                    },
+                  }
+                ">
+              </ng-container>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+</ng-template>

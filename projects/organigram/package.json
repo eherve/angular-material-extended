@@ -1,0 +1,23 @@
+{
+  "name": "@eherve/angular-material-organigram",
+  "version": "22.0.0",
+  "author": "Eric Herve <eric.herve.95@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eherve/angular-material-extended.git"
+  },
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@angular/animations": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/core": "^22.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "type": "module"
+}

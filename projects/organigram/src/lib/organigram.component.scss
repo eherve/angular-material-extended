@@ -1,0 +1,207 @@
+/** @format */
+
+:host {
+  max-height: 100%;
+  max-width: 100%;
+  height: 100%;
+  width: 100%;
+}
+
+#scroll {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: relative;
+  overflow: auto;
+  height: 100%;
+  width: 100%;
+
+  &.dragging {
+    cursor: move !important;
+    ::ng-deep * {
+      cursor: move !important;
+    }
+  }
+}
+
+#container {
+  position: relative;
+  padding: 8px;
+  margin: 0 auto;
+
+  &.hide-root > .node-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+    & > .node-container,
+    & > .node-block-top,
+    & > .node-block-left {
+      display: none;
+    }
+    & > .node-block-children {
+      & > .node-block-children-top {
+        display: none;
+      }
+      & > .node-block-children-row > .node-block > .node-block-top.left.right.top.bottom {
+        display: none;
+      }
+    }
+  }
+}
+
+.node-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.node-block-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 8px;
+    background-color: var(--ngx-mat-organigram-connector, #09293c);
+  }
+
+  &.left.right::after {
+    top: 0px;
+    height: 8px;
+  }
+
+  &:not(.top.bottom.left.right) {
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--path-horizontal-color, var(--ngx-mat-organigram-connector, #09293c));
+    }
+    &.left.top.bottom::before {
+      left: 50%;
+    }
+    &.right::before {
+      right: 50%;
+    }
+  }
+}
+
+.node-block-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+
+  &.left:not(.bottom) {
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 1px;
+      background-color: var(--ngx-mat-organigram-connector, #09293c);
+    }
+  }
+}
+
+.node-container {
+  position: relative;
+  padding: 8px;
+  width: calc(var(--ngx-mat-organigram-node-width, 200px) + 16px);
+  box-sizing: content-box;
+
+  &:focus-visible {
+    outline: 2px solid var(--ngx-mat-organigram-focus, #09293c);
+    outline-offset: -2px;
+  }
+}
+
+.node-container-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    width: 1px;
+    height: 16px;
+    background-color: var(--ngx-mat-organigram-connector, #09293c);
+  }
+}
+
+.node-block-children {
+  position: relative;
+  background-color: white;
+  border-radius: 8px;
+  padding: 8px;
+  margin: 8px;
+  overflow: hidden;
+
+  &.depth-even {
+    background-color: #f9f9f9;
+  }
+}
+
+.node-block-children-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    width: 1px;
+    height: 8px;
+    background-color: var(--ngx-mat-organigram-connector, #09293c);
+  }
+
+  &.multiple-row:not(.bottom)::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 50%;
+    height: 1px;
+    background: var(--path-horizontal-color, var(--ngx-mat-organigram-connector, #09293c));
+  }
+}
+
+.node-error {
+  max-width: var(--ngx-mat-organigram-node-width, 200px);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--ngx-mat-organigram-error, #e9396b);
+}
+
+.node-block-top.path-vertical::after,
+.node-container-bottom.path-vertical::after,
+.node-block-children-top.path-vertical::after,
+.node-block-left.path-vertical::before {
+  background-color: var(--ngx-mat-organigram-highlight, #e73452);
+}
+
+.node-block-children-row {
+  display: flex;
+  flex-direction: row;
+}

@@ -21,7 +21,11 @@
     "build:tooltip": "ng build NgxMatTooltip",
     "check:tooltip": "npm run test:tooltip && npm run build:tooltip",
     "publish:datatable": "ng build NgxMatDatatable && cd dist/datatable && npm publish && cd -",
-    "publish:tooltip": "ng build NgxMatTooltip && cd dist/tooltip && npm publish && cd -"
+    "publish:tooltip": "ng build NgxMatTooltip && cd dist/tooltip && npm publish && cd -",
+    "test:organigram:model": "node --test projects/organigram/tests/model.test.mjs",
+    "test:organigram": "ng test NgxMatOrganigram --watch=false --browsers=ChromeHeadless",
+    "build:organigram": "ng build NgxMatOrganigram",
+    "check:organigram": "npm run test:organigram:model && npm run test:organigram && npm run build:organigram"
   },
   "private": false,
   "publishConfig": {
