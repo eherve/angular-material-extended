@@ -5,6 +5,7 @@ import { ErrorHandler, provideZonelessChangeDetection } from "@angular/core";
 import { EditEntityComponent } from "./edit-entity-component.component";
 import { EditEntityDialogModule } from "../../edit-entity-dialog.module";
 import { EDIT_ENTITY_DIALOG_HOST } from "../../edit-entity-dialog-host";
+import { EDIT_ENTITY_LOGGER } from "../../edit-entity-logger";
 import { EditEntityDialogIntl } from "../../edit-entity-dialog.intl";
 import { Component, Input } from "@angular/core";
 import {
@@ -74,6 +75,39 @@ describe("EditEntityComponent mutations", () => {
   beforeEach(() => {
     host.confirm.and.resolveTo(true);
     host.notify.calls.reset();
+  });
+  it("logsDetectedChangesWithoutAnUpdateActionAndSkipsUnchangedDiffs", async () => {
+    const debug = spyOn(console, "debug");
+    const { component, fixture } = await setup();
+    expect(debug).toHaveBeenCalledTimes(1);
+    expect(debug.calls.mostRecent().args[1]).toEqual({ name: "new" });
+    const snapshot = debug.calls.mostRecent().args[1];
+    component.formGroup.patchValue({ name: "new" });
+    await new Promise((resolve) => setTimeout(resolve, 170));
+    expect(debug).toHaveBeenCalledTimes(1);
+    component.formGroup.patchValue({ name: "next" });
+    await new Promise((resolve) => setTimeout(resolve, 170));
+    expect(debug).toHaveBeenCalledTimes(2);
+    expect(snapshot).toEqual({ name: "new" });
+    component.formGroup.patchValue({ name: "old" });
+    await new Promise((resolve) => setTimeout(resolve, 170));
+    expect(debug).toHaveBeenCalledTimes(2);
+    component.formGroup.patchValue({ name: "next" });
+    await new Promise((resolve) => setTimeout(resolve, 170));
+    expect(debug).toHaveBeenCalledTimes(3);
+    fixture.destroy();
+  });
+  it("routesDetectedChangesToTheInjectedLogger", async () => {
+    const debug = jasmine.createSpy("debug");
+    const consoleDebug = spyOn(console, "debug");
+    TestBed.configureTestingModule({
+      providers: [{ provide: EDIT_ENTITY_LOGGER, useValue: { debug } }],
+    });
+    const { fixture } = await setup();
+    expect(debug).toHaveBeenCalledTimes(1);
+    expect(debug.calls.mostRecent().args[1]).toEqual({ name: "new" });
+    expect(consoleDebug).not.toHaveBeenCalled();
+    fixture.destroy();
   });
   it("keepsDirtyOnFailedUpdate", async () => {
     let fail = true;

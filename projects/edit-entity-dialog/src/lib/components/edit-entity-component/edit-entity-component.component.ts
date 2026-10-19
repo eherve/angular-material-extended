@@ -15,6 +15,8 @@ import {
   inject,
   signal,
 } from "@angular/core";
+import { cloneDeep, isEqual } from "lodash-es";
+import { EDIT_ENTITY_LOGGER } from "../../edit-entity-logger";
 import { FormControlStatus } from "@angular/forms";
 import {
   firstValueFrom,
@@ -133,6 +135,8 @@ export class EditEntityComponent<
     inject(EDIT_ENTITY_DIALOG_HOST, { optional: true }) ??
     inject(DefaultEditEntityDialogHost);
   private readonly errorHandler = inject(ErrorHandler);
+  private readonly logger = inject(EDIT_ENTITY_LOGGER);
+  private lastLoggedUpdates: Record<string, unknown> = {};
   private readonly conditionalStateService = inject(
     EditEntityConditionalStateService,
   ) as unknown as EditEntityConditionalStateService<TRecord>;
@@ -747,6 +751,7 @@ export class EditEntityComponent<
     this.formGroup.destroy();
     this.completeCardActionEventSubjects();
     this.formGroup = new EditEntityFormGroup();
+    this.lastLoggedUpdates = {};
     this.actions.set([]);
     this.fields = [];
   }
@@ -755,6 +760,7 @@ export class EditEntityComponent<
     this.formStatus = this.formGroup.status;
     this.valid = this.formGroup.valid;
     this.updated = this.formGroup.isUpdated;
+    this.logDetectedChanges();
 
     this.subsink.add(
       this.formGroup.statusChanges
@@ -770,12 +776,22 @@ export class EditEntityComponent<
     this.subsink.add(
       this.formGroup.valueChanges.pipe(debounceTime(100)).subscribe(() => {
         this.updated = this.formGroup.isUpdated;
+        this.logDetectedChanges();
         this.refreshActionStates();
         this.refreshRuntimeState();
         this.refreshTitles();
         this.changeDetectorRef.markForCheck();
       }),
     );
+  }
+
+  private logDetectedChanges(): void {
+    const updates = this.formGroup.isUpdated ? this.formGroup.updatedValue : {};
+    if (isEqual(updates, this.lastLoggedUpdates)) return;
+    this.lastLoggedUpdates = cloneDeep(updates);
+    if (this.formGroup.isUpdated) {
+      this.logger.debug("[EditEntityDialog] Detected changes", cloneDeep(updates));
+    }
   }
 
   private bindConditionalDisplayStates(): void {

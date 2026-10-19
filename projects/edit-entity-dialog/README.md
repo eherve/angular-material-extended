@@ -134,3 +134,24 @@ Variables CSS publiques, héritées dans la page et à fournir aussi dans le con
 | `--ngx-mat-edit-entity-dialog-header-text`       | `#fff`                  |
 
 La démo `src/app/demos/edit-entity-dialog` utilise uniquement l’API npm publique. Elle présente chaque famille de champs, une création et une mise à jour en mémoire, une erreur suivie d’une nouvelle tentative, une connexion par instance, un contrôle et une card locaux, ainsi qu’une ouverture imbriquée.
+
+## Journalisation des modifications
+
+`EDIT_ENTITY_LOGGER` et son interface `EditEntityLogger` sont publics. Le moteur appelle
+`debug(message, updates)` quand `formGroup.isUpdated` est vrai et que le contenu des
+modifications change, indépendamment de la visibilité ou de l’état du bouton de mise
+à jour. Les valeurs transmises sont des copies ; revenir à la valeur initiale ne
+produit pas de log. La détection suit le debounce existant du formulaire.
+
+Par défaut, le logger utilise `console.debug` en mode développement et reste silencieux
+en production. Activer le niveau **Verbose** dans Chrome pour voir ces messages.
+Pour utiliser le logger de l’application, fournir le token dans ses providers :
+
+```ts
+import { EDIT_ENTITY_LOGGER } from '@eherve/angular-material-edit-entity-dialog';
+
+{ provide: EDIT_ENTITY_LOGGER, useExisting: ApplicationLogger }
+```
+
+`ApplicationLogger` doit implémenter `debug(message: string, updates: Readonly<Record<string, unknown>>): void`.
+La politique d’activation du logger fourni est contrôlée par l’application.
