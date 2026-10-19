@@ -1,6 +1,6 @@
 # Extraction des composants sésiO vers Angular Material Extended
 
-Date : 16 octobre 2026. Statut : spécification validée par l’utilisateur, implémentation non commencée. La création des branches et worktrees attend une autorisation explicite.
+Date : 16 octobre 2026. Statut : spécification validée ; implémentation en cours dans les deux branches et worktrees explicitement autorisés par l’utilisateur.
 
 ## Objectif et décisions convenues
 
@@ -176,4 +176,4 @@ La validation navigateur sésiO utilise Chrome DevTools, `list_pages`, sélectio
 
 ## Limites d’exécution
 
-L’utilisateur n’a autorisé ni commit, ni push, ni publication, ni changement de branche. Proposer deux branches/worktrees dédiés avant l’implémentation dans les deux dépôts et attendre leur autorisation. Préserver les modifications non liées dans S. Ne lancer aucun subagent d’implémentation pendant la phase documentaire.
+L’utilisateur a autorisé les deux branches/worktrees dédiés et l’implémentation par subagents après validation documentaire. Il n’a autorisé ni commit, ni push, ni merge, ni rebase, ni publication, ni déploiement. Préserver les modifications non liées dans les checkouts d’origine.

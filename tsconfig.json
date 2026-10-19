@@ -2,6 +2,15 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
+      "@eherve/angular-material-section-tabs": [
+        "./dist/section-tabs"
+      ],
+      "@eherve/angular-material-display-dialog": [
+        "./dist/display-dialog"
+      ],
+      "@eherve/angular-material-edit-entity-dialog": [
+        "./dist/edit-entity-dialog"
+      ],
       "@eherve/angular-material-tooltip": [
         "./dist/tooltip"
       ],

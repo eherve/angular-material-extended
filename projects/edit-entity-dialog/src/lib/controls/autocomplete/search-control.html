@@ -1,0 +1,131 @@
+@if (state) {
+<mat-form-field [appearance]="multiple || sortable ? 'fill' : 'outline'">
+  <mat-label
+    >{{ label }} @if(required()) {
+    <span aria-hidden="true">*</span> }</mat-label
+  >
+  @if (singleSelectionDisplay(); as selected) {
+  <small matPrefix [innerHTML]="selected.prefix"></small>
+  }
+  <input
+    #searchInput
+    matInput
+    [formControl]="inputControl"
+    [style.color]="singleSelectionDisplay()?.color"
+    [matAutocomplete]="auto"
+    editAdaptivePanel
+    [placeholder]="placeholder"
+    [errorStateMatcher]="engineErrorStateMatcher"
+    (input)="inputChanged($event)"
+    (focus)="focus()"
+    (blur)="touched()"
+  />
+  @if (!disabled() && selectedValues().length) {
+  <button
+    matSuffix
+    mat-icon-button
+    type="button"
+    [attr.aria-label]="intl.messages.clear"
+    (click)="clear()"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+  } @if (hint) {
+  <mat-hint>{{ hint }}</mat-hint>
+  } @if (invalid()) { <mat-error>{{intl.messages.required}}</mat-error> } @if
+  (invalidEntity()) { <mat-error>{{intl.messages.invalidEntity}}</mat-error> }
+  @if (otherError()) { <mat-error>{{intl.messages.invalidField}}</mat-error> }
+</mat-form-field>
+<mat-autocomplete
+  #auto="matAutocomplete"
+  [displayWith]="displayInput"
+  (optionSelected)="select($event.option.value)"
+>
+  @if (state.loading()) {
+  <mat-option disabled><span role="status">…</span></mat-option>
+  } @for (group of groups(); track group.name) { @if (group.name) {
+  <mat-optgroup [label]="group.name">
+    @for (option of group.options; track $index) {
+    <mat-option [value]="option"
+      ><small [innerHTML]="service.display(option).prefix"></small
+      ><span [style.color]="service.display(option).color"
+        >{{ display(option) }}</span
+      ></mat-option
+    >
+    }
+  </mat-optgroup>
+  } @else { @for (option of group.options; track $index) {
+  <mat-option [value]="option"
+    ><small [innerHTML]="service.display(option).prefix"></small
+    ><span [style.color]="service.display(option).color"
+      >{{ display(option) }}</span
+    ></mat-option
+  >
+  } } } @if (!state.loading() && state.hasMore() && !state.failed()) {
+  <mat-option disabled
+    ><span (editSearchPage)="state.more()"
+      >{{ intl.messages.loadMore }}</span
+    ></mat-option
+  >
+  }
+</mat-autocomplete>
+@if (state.failed()) {
+<div role="alert">
+  {{ intl.messages.searchFailed }}<button type="button" (click)="focus()">
+    {{ intl.messages.loadMore }}
+  </button>
+</div>
+} @if (multiple || sortable) {
+<div
+  cdkDropList
+  [cdkDropListDisabled]="disabled()"
+  (cdkDropListDropped)="drop($event)"
+  [cdkDropListData]="selectedValues()"
+>
+  @for (value of selectedValues(); track $index) {
+  <div class="selected-item" cdkDrag [cdkDragDisabled]="disabled()">
+    <button
+      mat-icon-button
+      type="button"
+      cdkDragHandle
+      [disabled]="disabled()"
+      [attr.aria-label]="intl.messages.reorder"
+    >
+      <mat-icon>drag_indicator</mat-icon>
+    </button>
+    <span class="selected-name"
+      ><small [innerHTML]="service.display(value).prefix"></small
+      ><span [style.color]="service.display(value).color"
+        >{{ display(value) }}</span
+      ></span
+    >
+    @if (service.open && (!sortable || !disabled())) {
+    <button
+      mat-icon-button
+      type="button"
+      [attr.aria-label]="intl.messages.open"
+      (click)="service.open(value)"
+    >
+      <mat-icon>open_in_new</mat-icon>
+    </button>
+    } @if (!disabled()) {
+    <button
+      data-remove
+      mat-icon-button
+      type="button"
+      [attr.aria-label]="intl.messages.remove"
+      (click)="remove($index)"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
+    }
+  </div>
+  }
+</div>
+@if (sortable && !selectedValues().length) {
+<div>{{intl.messages.emptyList}}</div>
+} } @else { @if (service.open && selectedValues().length) {
+<button mat-button type="button" (click)="service.open(selectedValues()[0])">
+  {{ intl.messages.open }}
+</button>
+} } }

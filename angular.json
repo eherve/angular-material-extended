@@ -32,7 +32,9 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "dist/display-dialog/styles.css",
+              "dist/edit-entity-dialog/styles.css"
             ],
             "scripts": [],
             "browser": "src/main.ts"
@@ -96,7 +98,9 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "dist/display-dialog/styles.css",
+              "dist/edit-entity-dialog/styles.css"
             ],
             "scripts": []
           }
@@ -166,6 +170,105 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/tooltip/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "NgxMatSectionTabs": {
+      "projectType": "library",
+      "root": "projects/section-tabs",
+      "sourceRoot": "projects/section-tabs/src",
+      "prefix": "NgxMat",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/section-tabs/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/section-tabs/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/section-tabs/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/section-tabs/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "NgxMatDisplayDialog": {
+      "projectType": "library",
+      "root": "projects/display-dialog",
+      "sourceRoot": "projects/display-dialog/src",
+      "prefix": "NgxMat",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/display-dialog/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/display-dialog/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/display-dialog/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/display-dialog/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "NgxMatEditEntityDialog": {
+      "projectType": "library",
+      "root": "projects/edit-entity-dialog",
+      "sourceRoot": "projects/edit-entity-dialog/src",
+      "prefix": "NgxMat",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/edit-entity-dialog/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/edit-entity-dialog/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/edit-entity-dialog/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/edit-entity-dialog/tsconfig.spec.json",
             "polyfills": [
               "zone.js",
               "zone.js/testing"

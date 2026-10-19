@@ -1,6 +1,6 @@
 # Spécification de Display Dialog
 
-Statut : spécification validée par l’utilisateur le 16 octobre 2026 ; implémentation non commencée. Les [contraintes communes](2026-10-16-sesio-extraction-design.md) et la [spec sections](2026-10-16-section-tabs-design.md) s’appliquent.
+Statut : spécification validée par l’utilisateur le 16 octobre 2026 ; implémentation autorisée et en cours. Les [contraintes communes](2026-10-16-sesio-extraction-design.md) et la [spec sections](2026-10-16-section-tabs-design.md) s’appliquent.
 
 ## Périmètre
 

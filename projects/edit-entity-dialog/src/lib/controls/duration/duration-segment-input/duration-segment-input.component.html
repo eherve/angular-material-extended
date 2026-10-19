@@ -1,0 +1,29 @@
+<!-- @format -->
+
+<div class="duration-segment-input" [class.duration-segment-input--disabled]="disabled">
+  <input
+    #hoursInput
+    class="duration-segment-input__segment duration-segment-input__segment--hours"
+    [id]="hoursInputId"
+    [formControl]="hoursControl"
+    [placeholder]="visibleHoursPlaceholder"
+    [attr.aria-describedby]="describedByIds"
+    [attr.aria-label]="hoursLabel"
+    autocomplete="off"
+    inputmode="numeric"
+    (keydown)="onSegmentKeydown($event, 'hours')" />
+
+  <span class="duration-segment-input__separator" aria-hidden="true">:</span>
+
+  <input
+    #minutesInput
+    class="duration-segment-input__segment duration-segment-input__segment--minutes"
+    [id]="minutesInputId"
+    [formControl]="minutesControl"
+    [placeholder]="visibleMinutesPlaceholder"
+    [attr.aria-describedby]="describedByIds"
+    [attr.aria-label]="minutesLabel"
+    autocomplete="off"
+    inputmode="numeric"
+    (keydown)="onSegmentKeydown($event, 'minutes')" />
+</div>

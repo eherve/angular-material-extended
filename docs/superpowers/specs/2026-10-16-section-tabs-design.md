@@ -1,6 +1,6 @@
 # Spécification de Section Tabs
 
-Statut : spécification validée par l’utilisateur le 16 octobre 2026 ; implémentation non commencée. Les [contraintes communes](2026-10-16-sesio-extraction-design.md) font partie de cette spécification.
+Statut : spécification validée par l’utilisateur le 16 octobre 2026 ; implémentation autorisée et en cours. Les [contraintes communes](2026-10-16-sesio-extraction-design.md) font partie de cette spécification.
 
 ## Périmètre et sources
 

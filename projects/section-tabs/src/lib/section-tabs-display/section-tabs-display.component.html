@@ -1,0 +1,256 @@
+<!-- @format -->
+
+@if (viewModel.empty) {
+  <div class="section-tabs-display__empty">
+    <strong>{{ intl.messages.emptySections }}</strong>
+  </div>
+} @else {
+  <app-section-tabs
+    class="section-tabs-display"
+    [selectedIndex]="selectedIndex"
+    [queryParamKey]="queryParamKey"
+    (selectedIndexChange)="onSelectedIndexChange($event)">
+    @if (menuHeader) {
+      <ng-template appSectionTabsMenuHeader>
+        <div class="section-tabs-display__menu-header">
+          <span>{{ menuHeader }}</span>
+        </div>
+      </ng-template>
+    }
+
+    @if (showEmptyFieldsToggle) {
+      <ng-template appSectionTabsFooter>
+        <mat-slide-toggle [checked]="showEmptyFieldsState" (change)="onShowEmptyFieldsChange($event.checked)">
+          <span [innerHTML]="showEmptyFieldsLabel"></span>
+        </mat-slide-toggle>
+      </ng-template>
+    }
+
+    @for (section of viewModel.sections; track section.id) {
+      <app-section-tab [done]="section.done" [total]="section.total" [queryParamValue]="section.queryParamValue">
+        <ng-template appSectionTabLabel>
+          @if (section.icon) {
+            <mat-icon [attr.title]="section.tooltip">{{ section.icon }}</mat-icon>
+          }
+          <span [attr.title]="section.tooltip" [innerHTML]="section.label"></span>
+        </ng-template>
+
+        <ng-template appSectionTabContent>
+          <div
+            class="section-tabs-display__section"
+            [class.section-tabs-display__section--single-card]="section.sectionMode === 'single-card'"
+            [class.section-tabs-display__section--single-card-only]="
+              section.sectionMode === 'single-card' && section.cardCount === 1
+            "
+            [class.section-tabs-display__section--single-card-multiple]="
+              section.sectionMode === 'single-card' && section.cardCount > 1
+            "
+            [ngStyle]="section.gridStyles"
+            [appSectionTabsDisplayResponsiveGrid]="section.source.grid"
+            [sectionTabsDisplayResponsiveGridEnabled]="section.responsiveGrid">
+            @for (cardItem of section.items; track cardItem.id) {
+              @if (cardItem.type === 'break') {
+                <div class="section-tabs-display__grid-break" aria-hidden="true"></div>
+              } @else {
+                <article
+                  class="section-tabs-display__card section-tabs-card"
+                  [ngClass]="cardItem.classes"
+                  [ngStyle]="cardItem.styles">
+                  <header class="section-tabs-display__card-header card-header">
+                    <div class="section-tabs-display__card-title">
+                      @if (cardItem.icon) {
+                        <mat-icon [attr.title]="cardItem.tooltip">{{ cardItem.icon }}</mat-icon>
+                      }
+                      <h3 [attr.title]="cardItem.tooltip" [innerHTML]="cardItem.label"></h3>
+                    </div>
+
+                    @if (cardItem.completion.label) {
+                      <span class="section-tabs-display__completion-chip mini-chip">{{
+                        cardItem.completion.label
+                      }}</span>
+                    }
+
+                    @if (cardItem.actions?.length) {
+                      <div class="section-tabs-display__card-actions">
+                        @for (action of cardItem.actions; track action.id || action.label || action.icon || $index) {
+                          @if (action.menuOptions?.length) {
+                            @if (action.type === 'button') {
+                              <button
+                                mat-button
+                                type="button"
+                                class="section-tabs-display__card-action"
+                                [style.--action-color]="action.color"
+                                [disabled]="action.disabled"
+                                [matTooltip]="action.tooltip || ''"
+                                [attr.aria-label]="action.ariaLabel || action.label || action.icon"
+                                [matMenuTriggerFor]="displayCardActionMenu">
+                                @if (action.icon) {
+                                  <mat-icon>{{ action.icon }}</mat-icon>
+                                }
+                                <span>{{ action.label }}</span>
+                              </button>
+                            } @else {
+                              <button
+                                mat-icon-button
+                                type="button"
+                                class="section-tabs-display__card-action"
+                                [style.--action-color]="action.color"
+                                [disabled]="action.disabled"
+                                [matTooltip]="action.tooltip || ''"
+                                [attr.aria-label]="action.ariaLabel || action.label || action.icon"
+                                [matMenuTriggerFor]="displayCardActionMenu">
+                                <mat-icon>{{ action.icon || 'more_vert' }}</mat-icon>
+                              </button>
+                            }
+
+                            <mat-menu #displayCardActionMenu="matMenu">
+                              @for (option of action.menuOptions; track option.id) {
+                                <button
+                                  mat-menu-item
+                                  type="button"
+                                  [disabled]="option.disabled"
+                                  [matTooltip]="option.tooltip || ''"
+                                  [attr.aria-label]="option.ariaLabel || option.label"
+                                  (click)="option.handle()">
+                                  @if (option.icon) {
+                                    <mat-icon>{{ option.icon }}</mat-icon>
+                                  }
+                                  <span>{{ option.label }}</span>
+                                </button>
+                              }
+                            </mat-menu>
+                          } @else if (action.type === 'button') {
+                            <button
+                              mat-button
+                              type="button"
+                              class="section-tabs-display__card-action"
+                              [style.--action-color]="action.color"
+                              [disabled]="action.disabled"
+                              [matTooltip]="action.tooltip || ''"
+                              [attr.aria-label]="action.ariaLabel || action.label || action.icon"
+                              (click)="action.handle()">
+                              @if (action.icon) {
+                                <mat-icon>{{ action.icon }}</mat-icon>
+                              }
+                              <span>{{ action.label }}</span>
+                            </button>
+                          } @else {
+                            <button
+                              mat-icon-button
+                              type="button"
+                              class="section-tabs-display__card-action"
+                              [style.--action-color]="action.color"
+                              [disabled]="action.disabled"
+                              [matTooltip]="action.tooltip || ''"
+                              [attr.aria-label]="action.ariaLabel || action.label || action.icon"
+                              (click)="action.handle()">
+                              <mat-icon>{{ action.icon }}</mat-icon>
+                            </button>
+                          }
+                        }
+                      </div>
+                    }
+                  </header>
+
+                  @if (cardItem.kind === 'component') {
+                    <div class="section-tabs-display__component-card">
+                      @if (cardItem.component) {
+                        <ng-container
+                          *ngComponentOutlet="cardItem.component; inputs: cardItem.componentInputs"></ng-container>
+                      } @else {
+                        <div class="section-tabs-display__empty-state empty-state">
+                          <mat-icon aria-hidden="true">extension_off</mat-icon>
+                          <div>
+                            <strong>{{ intl.messages.emptyComponents }}</strong>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div
+                      class="section-tabs-display__field-grid"
+                      [ngStyle]="cardItem.gridStyles"
+                      [appSectionTabsDisplayResponsiveGrid]="cardItem.source.grid"
+                      [sectionTabsDisplayResponsiveGridEnabled]="cardItem.responsiveGrid">
+                      @for (fieldItem of cardItem.items; track fieldItem.id) {
+                        @if (fieldItem.type === 'break') {
+                          <div class="section-tabs-display__grid-break" aria-hidden="true"></div>
+                        } @else {
+                          <div
+                            class="section-tabs-display__field-cell field-cell"
+                            [ngClass]="fieldItem.classes"
+                            [ngStyle]="fieldItem.styles"
+                            [class.has-click]="!!fieldItem.onClick"
+                            matRipple
+                            [matRippleDisabled]="!fieldItem.onClick"
+                            (click)="onClickFieldItem(fieldItem)">
+                            @if (fieldItem.kind === 'component') {
+                              @if (fieldItem.component) {
+                                <ng-container
+                                  *ngComponentOutlet="
+                                    fieldItem.component;
+                                    inputs: fieldItem.componentInputs
+                                  "></ng-container>
+                              }
+                            } @else {
+                              <span class="section-tabs-display__field-label-row">
+                                <span
+                                  class="section-tabs-display__field-label field-label"
+                                  [innerHTML]="fieldItem.label"></span>
+                                @if (fieldItem.labelAction; as action) {
+                                  <button
+                                    type="button"
+                                    class="section-tabs-display__field-label-action"
+                                    data-field-label-action
+                                    [disabled]="action.disabled"
+                                    [attr.aria-label]="action.ariaLabel"
+                                    [attr.aria-pressed]="action.active"
+                                    (click)="action.onClick(); $event.stopPropagation()">
+                                    {{ action.active ? '★' : '☆' }}
+                                  </button>
+                                }
+                              </span>
+
+                              @if (fieldItem.kind === 'chips') {
+                                <div class="section-tabs-display__chips">
+                                  @for (chip of fieldItem.chipsValue; track chip.trackValue) {
+                                    <span class="section-tabs-display__chip" [style.color]="chip.color">
+                                      @if (chip.icon) {
+                                        <mat-icon aria-hidden="true">{{ chip.icon }}</mat-icon>
+                                      }
+                                      <span [innerHTML]="chip.label"></span>
+                                    </span>
+                                  } @empty {
+                                    <span class="section-tabs-display__field-value field-value">—</span>
+                                  }
+                                </div>
+                              } @else {
+                                <span
+                                  class="section-tabs-display__field-value field-value"
+                                  [style.color]="fieldItem.color"
+                                  [innerHTML]="fieldItem.displayValue">
+                                </span>
+                              }
+                            }
+                          </div>
+                        }
+                      <!-- } @empty {
+                        <div class="section-tabs-display__empty-state empty-state">
+                          <mat-icon aria-hidden="true">visibility_off</mat-icon>
+                          <div>
+                            <strong>{{ intl.messages.emptyFields }}</strong>
+                            <span>{{ intl.messages.emptyFieldsDescription }}</span>
+                          </div>
+                        </div> -->
+                      }
+                    </div>
+                  }
+                </article>
+              }
+            }
+          </div>
+        </ng-template>
+      </app-section-tab>
+    }
+  </app-section-tabs>
+}

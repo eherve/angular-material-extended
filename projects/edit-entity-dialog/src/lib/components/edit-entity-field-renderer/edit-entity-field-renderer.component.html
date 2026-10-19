@@ -1,0 +1,150 @@
+<!-- @format -->
+
+<div
+  class="edit-entity-field-renderer"
+  [attr.data-edit-field-name]="field.name"
+>
+  @switch (field.kind) {
+    @case ("text") {
+      <app-edit-entity-text-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("textarea") {
+      <app-edit-entity-textarea-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("duration") {
+      <app-edit-entity-duration-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("number") {
+      <app-edit-entity-number-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("checkbox") {
+      <app-edit-entity-checkbox-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("radio") {
+      <app-edit-entity-radio-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("select") {
+      <app-edit-entity-select-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("autocomplete") {
+      <app-edit-entity-autocomplete-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("sortable-list") {
+      <app-edit-entity-sortable-list-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("control") {
+      <app-edit-entity-control-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+
+    @case ("date") {
+      <app-edit-entity-date-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("date-range") {
+      <app-edit-entity-date-range-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("datetime") {
+      <app-edit-entity-datetime-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("datetime-range") {
+      <app-edit-entity-datetime-range-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("time") {
+      <app-edit-entity-time-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("time-range") {
+      <app-edit-entity-time-range-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("chips") {
+      <app-edit-entity-chips-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("slider") {
+      <app-edit-entity-slider-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @case ("display") {
+      <app-edit-entity-display-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+    @default {
+      <app-edit-entity-display-field
+        [record]="$any(record)"
+        [formGroup]="formGroup"
+        [field]="$any(field)"
+      />
+    }
+  }
+</div>

@@ -1,0 +1,255 @@
+/** @format */
+
+@use '@angular/material' as mat;
+
+:host {
+  --display-dialog-background: var(--ngx-mat-display-dialog-background, #f4f6f8);
+  --display-dialog-border: var(--ngx-mat-display-dialog-border, rgba(14, 43, 67, 0.12));
+  --display-dialog-text: var(--ngx-mat-display-dialog-text, #102f49);
+  --display-dialog-muted: var(--ngx-mat-display-dialog-muted, #61718a);
+  --display-dialog-primary: var(--ngx-mat-display-dialog-primary, #0f334d);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  color: var(--display-dialog-text);
+}
+
+.display-dialog-loading,
+.display-dialog-empty-state {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 240px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 18px;
+  color: var(--display-dialog-primary);
+}
+
+.display-dialog-empty-state {
+  padding: 24px;
+  color: var(--display-dialog-muted);
+  text-align: center;
+
+  mat-icon {
+    width: 42px;
+    height: 42px;
+    color: var(--display-dialog-primary);
+    font-size: 42px;
+  }
+
+  span {
+    color: var(--display-dialog-text);
+    font-size: 15px;
+    font-weight: 700;
+  }
+}
+
+.display-dialog-title {
+  display: flex;
+  min-height: 48px;
+  padding: 8px 12px;
+  margin: 0;
+  border-bottom: 1px solid var(--display-dialog-border);
+  box-sizing: border-box;
+  background: var(--ngx-mat-display-dialog-header-background, #e9eef2);
+  color: var(--ngx-mat-display-dialog-header-text, #102f49);
+
+  .display-dialog-title-bar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: start;
+    gap: 80px;
+    width: 100%;
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    p {
+      margin: 3px 0 0;
+      color: var(--display-dialog-muted);
+      font-size: 13px;
+    }
+  }
+}
+
+.display-dialog-title-content {
+  min-width: 0;
+  overflow: hidden;
+  --display-dialog-muted: var(--ngx-mat-display-dialog-header-text, #102f49);
+
+  h2,
+  p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.display-dialog-title-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+
+  .mat-mdc-icon-button {
+    @include mat.icon-button-overrides(
+      (
+        icon-color: var(--ngx-mat-display-dialog-header-text, #102f49),
+      )
+    );
+  }
+}
+
+.display-dialog-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  max-height: none;
+  padding: 0 !important;
+  background: var(--display-dialog-background);
+  box-sizing: border-box;
+}
+
+.display-dialog-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 54px;
+  padding: 8px;
+  border-top: 1px solid var(--display-dialog-border);
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.display-dialog-actions-left,
+.display-dialog-actions-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.display-dialog-action-btn {
+  @include mat.button-overrides(
+    (
+      filled-label-text-color: var(--action-color, #fff),
+      filled-container-color: var(--action-background-color, var(--ngx-mat-display-dialog-primary, #0f334d)),
+      protected-label-text-color: var(--action-color, #fff),
+      protected-container-color: var(--action-background-color, var(--ngx-mat-display-dialog-primary, #0f334d)),
+      text-label-text-color: var(--action-color, var(--display-dialog-primary)),
+    )
+  );
+}
+
+.display-dialog-handling-action {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.display-dialog-section-tabs-display {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.display-dialog-component-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 12px 16px 16px;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  &.overflow {
+    overflow: auto;
+  }
+}
+
+:host ::ng-deep .display-dialog-single-section-display .section-tabs {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+:host ::ng-deep .display-dialog-single-section-display .section-tabs__sidebar {
+  display: none;
+}
+
+:host ::ng-deep .display-dialog-single-section-display .section-tabs__content-panel {
+  padding: 0 0 0 8px;
+}
+
+.display-dialog-root-tabs {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.display-dialog-root-tab-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  font-size: 18px;
+}
+
+.display-dialog-root-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  margin-left: 8px;
+  border-radius: 999px;
+  background: rgba(15, 51, 77, 0.1);
+  color: var(--display-dialog-primary);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+:host ::ng-deep .display-dialog-root-tabs > .mat-mdc-tab-body-wrapper {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+:host ::ng-deep .display-dialog-root-tabs > .mat-mdc-tab-body-wrapper > .mat-mdc-tab-body {
+  min-height: 0;
+}
+
+:host ::ng-deep .display-dialog-root-tabs .mat-mdc-tab-body-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .display-dialog-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .display-dialog-actions-left,
+  .display-dialog-actions-right {
+    justify-content: flex-end;
+    width: 100%;
+  }
+}
+
+.display-dialog-action-error { padding: 12px 16px; color: #a01616; background: #fff1f1; }

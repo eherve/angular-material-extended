@@ -1,0 +1,112 @@
+<!-- @format -->
+
+<div class="section-tabs">
+  <aside
+    class="section-tabs__sidebar"
+    [attr.aria-label]="intl.messages.sections"
+  >
+    <div class="section-tabs__sidebar-card">
+      @if (menuHeaderTemplate) {
+        <div class="section-tabs__sidebar-title">
+          <ng-container *ngTemplateOutlet="menuHeaderTemplate"></ng-container>
+        </div>
+      }
+
+      <nav
+        class="section-tabs__sidebar-list"
+        role="tablist"
+        aria-orientation="vertical"
+      >
+        @for (tabItem of tabItems; track tabItem.tab) {
+          @if (tabItem.type === "separator") {
+            <div class="section-tabs__sidebar-separator" role="presentation">
+              @if (tabItem.labelTemplate) {
+                <ng-container
+                  *ngTemplateOutlet="tabItem.labelTemplate"
+                ></ng-container>
+              }
+            </div>
+          } @else {
+            <button
+              type="button"
+              class="section-tabs__sidebar-item"
+              role="tab"
+              [id]="tabItem.buttonId"
+              [class.active]="tabItem.selected"
+              [disabled]="tabItem.disabled"
+              [attr.aria-selected]="tabItem.selected"
+              [attr.aria-controls]="tabItem.panelId"
+              (click)="selectTab(tabItem)"
+            >
+              <div class="section-tabs__label-header">
+                <div class="section-tabs__label-title">
+                  @if (tabItem.labelTemplate) {
+                    <ng-container
+                      *ngTemplateOutlet="tabItem.labelTemplate"
+                    ></ng-container>
+                  }
+                </div>
+
+                @if (tabItem.statusDoneLabel) {
+                  <span
+                    class="section-tabs__mini-chip"
+                    [style.color]="tabItem.tab.statusColor"
+                    [style.--section-tab-done-color]="
+                      tabItem.tab.statusColorDone
+                    "
+                    [style.--section-tab-total-color]="
+                      tabItem.tab.statusColorTotal
+                    "
+                  >
+                    <span class="section-tabs__mini-chip-done">{{
+                      tabItem.statusDoneLabel
+                    }}</span>
+                    @if (tabItem.statusTotalLabel) {
+                      <span class="section-tabs__mini-chip-total">{{
+                        tabItem.statusTotalLabel
+                      }}</span>
+                    }
+                  </span>
+                }
+              </div>
+
+              @if (tabItem.progress !== undefined) {
+                <div class="section-tabs__progress" aria-hidden="true">
+                  <span [style.width.%]="tabItem.progress"></span>
+                </div>
+              }
+            </button>
+          }
+        }
+      </nav>
+
+      @if (footerTemplate) {
+        <footer class="section-tabs__sidebar-footer">
+          <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
+        </footer>
+      }
+    </div>
+  </aside>
+
+  <div class="section-tabs__content">
+    <div
+      class="section-tabs__content-viewport"
+      [@sectionTabsContentTransition]="selectedIndex"
+    >
+      @for (tabItem of activeTabItems; track tabItem.tab) {
+        <section
+          class="section-tabs__content-panel"
+          role="tabpanel"
+          [id]="tabItem.panelId"
+          [attr.aria-labelledby]="tabItem.buttonId"
+        >
+          @if (tabItem.contentTemplate) {
+            <ng-container
+              *ngTemplateOutlet="tabItem.contentTemplate"
+            ></ng-container>
+          }
+        </section>
+      }
+    </div>
+  </div>
+</div>

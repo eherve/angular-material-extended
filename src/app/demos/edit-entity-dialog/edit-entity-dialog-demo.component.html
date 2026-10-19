@@ -1,0 +1,18 @@
+<h1>Dialog d’édition d’entité</h1>
+<p>
+  Champs Material, validation avant rendu des onglets, contrôle et card
+  personnalisés, connexion par ouverture.
+</p>
+<div class="demo-actions">
+  <button mat-flat-button (click)="openCreate()">Créer</button
+  ><button mat-stroked-button (click)="openEdit()">Modifier</button
+  ><button mat-stroked-button (click)="openFailure()">
+    Simuler une erreur puis réessayer
+  </button>
+</div>
+<h2>Résultat de fermeture</h2>
+<pre>{{ lastResult() }}</pre>
+<h2>Cycle des connexions</h2>
+@for (event of connectionEvents(); track $index) {
+  <p>{{ event }}</p>
+}

@@ -1,6 +1,7 @@
 /** @format */
 
 import { CommonModule } from '@angular/common';
+import { provideRouter, RouterModule } from '@angular/router';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -16,8 +17,8 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [AppComponent],
-      imports: [CommonModule, MatButtonModule, MatCardModule, MatProgressSpinnerModule, NgxMatDatatableModule],
-      providers: [provideNoopAnimations()],
+      imports: [RouterModule, CommonModule, MatButtonModule, MatCardModule, MatProgressSpinnerModule, NgxMatDatatableModule],
+      providers: [provideNoopAnimations(), provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);

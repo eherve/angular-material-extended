@@ -1,5 +1,13 @@
 <!-- @format -->
 
+<nav aria-label="Démonstrations" style="display: flex; gap: 12px; padding: 16px">
+  <a mat-button routerLink="/">Datatable</a>
+  <a mat-button routerLink="/sections">Sections</a>
+  <a mat-button routerLink="/display-dialog">Consultation</a>
+  <a mat-button routerLink="/edit-entity-dialog">Édition</a>
+</nav>
+<router-outlet #demoOutlet="outlet"></router-outlet>
+@if (!demoOutlet.isActivated) {
 <mat-card class="test" [style.margin]="'16px auto'" [style.height.px]="800">
   <mat-card-header>
     <mat-card-title>Datatable</mat-card-title>
@@ -33,3 +41,5 @@
     </ngx-mat-datatable>
   </mat-card-content>
 </mat-card>
+
+}
