@@ -1,3 +1,5 @@
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
 import { CommonModule } from "@angular/common";
 import {
   ChangeDetectionStrategy,
@@ -34,7 +36,10 @@ import {
 @Component({
   selector: "app-edit-entity-time-range-field",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
+    MatButtonModule,
+    MatIconModule,
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -64,6 +69,19 @@ import {
           matIconSuffix
           [for]="startPicker"
         /><mat-timepicker #startPicker />
+
+        @if (control.enabled && rangeFormGroup.controls.start.value) {
+          <button
+            mat-icon-button
+            class="form-field-clear-btn"
+            type="button"
+            matSuffix
+            [attr.aria-label]="intl.messages.clear"
+            (click)="clearEndpoint('start'); $event.stopPropagation()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
         @if (rangeFormGroup.controls.start.hasError("matTimepickerParse")) {
           <mat-error>{{ intl.messages.invalidTimeStart }}</mat-error>
         }
@@ -122,6 +140,19 @@ import {
         <mat-timepicker-toggle matIconSuffix [for]="endPicker" /><mat-timepicker
           #endPicker
         />
+
+        @if (control.enabled && rangeFormGroup.controls.end.value) {
+          <button
+            mat-icon-button
+            class="form-field-clear-btn"
+            type="button"
+            matSuffix
+            [attr.aria-label]="intl.messages.clear"
+            (click)="clearEndpoint('end'); $event.stopPropagation()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
         @if (rangeFormGroup.controls.end.hasError("matTimepickerParse")) {
           <mat-error>{{ intl.messages.invalidTimeEnd }}</mat-error>
         }
@@ -305,6 +336,13 @@ export class EditEntityTimeRangeFieldComponent<
     this.syncingControl = true;
     this.control.setValue(next);
     this.syncingControl = false;
+  }
+  clearEndpoint(endpoint: "start" | "end"): void {
+    if (this.control.disabled) return;
+    const child = this.rangeFormGroup.controls[endpoint];
+    child.markAsDirty();
+    child.markAsTouched();
+    child.setValue(null);
   }
   markEngineControlTouched(): void {
     this.control.markAsTouched();

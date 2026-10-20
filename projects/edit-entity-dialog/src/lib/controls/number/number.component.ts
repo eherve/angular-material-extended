@@ -27,6 +27,7 @@ import { Inject, Optional } from "@angular/core";
 @Component({
   selector: "app-form-control-number",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
     MatButtonModule,
     MatFormFieldModule,
@@ -101,7 +102,7 @@ import { Inject, Optional } from "@angular/core";
           control.value !== undefined &&
           !control.disabled
         ) {
-          <button
+          <button class="form-field-clear-btn"
             mat-icon-button
             matSuffix
             type="button"

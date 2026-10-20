@@ -1,3 +1,5 @@
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
 import { CommonModule } from "@angular/common";
 import {
   ChangeDetectionStrategy,
@@ -33,7 +35,10 @@ import {
 @Component({
   selector: "app-edit-entity-datetime-range-field",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
+    MatButtonModule,
+    MatIconModule,
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -68,6 +73,19 @@ import {
           [timeInput]="true"
           [twelvehour]="false"
         />
+
+        @if (control.enabled && rangeFormGroup.controls.start.value) {
+          <button
+            mat-icon-button
+            class="form-field-clear-btn"
+            type="button"
+            matSuffix
+            [attr.aria-label]="intl.messages.clear"
+            (click)="clearEndpoint('start'); $event.stopPropagation()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
         @if (rangeFormGroup.controls.start.hasError("mtxDatetimepickerParse")) {
           <mat-error>{{ intl.messages.invalidDateStart }}</mat-error>
         }
@@ -132,6 +150,19 @@ import {
           [timeInput]="true"
           [twelvehour]="false"
         />
+
+        @if (control.enabled && rangeFormGroup.controls.end.value) {
+          <button
+            mat-icon-button
+            class="form-field-clear-btn"
+            type="button"
+            matSuffix
+            [attr.aria-label]="intl.messages.clear"
+            (click)="clearEndpoint('end'); $event.stopPropagation()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
         @if (rangeFormGroup.controls.end.hasError("mtxDatetimepickerParse")) {
           <mat-error>{{ intl.messages.invalidDateEnd }}</mat-error>
         }
@@ -262,6 +293,13 @@ export class EditEntityDatetimeRangeFieldComponent<
       this.fieldSubscriptions.add(
         child.statusChanges.subscribe(() => this.syncPickerErrors()),
       );
+  }
+  clearEndpoint(endpoint: "start" | "end"): void {
+    if (this.control.disabled) return;
+    const child = this.rangeFormGroup.controls[endpoint];
+    child.markAsDirty();
+    child.markAsTouched();
+    child.setValue(null);
   }
   markEngineControlTouched(): void {
     this.control.markAsTouched();

@@ -143,6 +143,25 @@ describe("Material field control accessors", () => {
     expect(notes.touched).toBeTrue();
   });
 
+  it("clears textarea content and hides its action once empty", () => {
+    const notes = fixture.componentInstance.form.controls.notes;
+    notes.setValue("notes");
+    fixture.detectChanges();
+    const field = fixture.nativeElement.querySelector(
+      "app-form-control-textarea",
+    ) as HTMLElement;
+    const clear = field.querySelector(
+      '[aria-label="Effacer"]',
+    ) as HTMLButtonElement;
+    expect(clear).not.toBeNull();
+    clear?.click();
+    fixture.detectChanges();
+    expect(notes.value).toBeNull();
+    expect(notes.dirty).toBeTrue();
+    expect(notes.touched).toBeTrue();
+    expect(field.querySelector('[aria-label="Effacer"]')).toBeNull();
+  });
+
   it("preserves pre-existing email and required validators across widget changes and destruction", () => {
     const { form } = fixture.componentInstance;
     const emailControl = form.controls.name;

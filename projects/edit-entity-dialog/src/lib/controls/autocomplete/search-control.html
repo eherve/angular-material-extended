@@ -5,7 +5,9 @@
     <span aria-hidden="true">*</span> }</mat-label
   >
   @if (singleSelectionDisplay(); as selected) {
+  @if (selected.prefix) {
   <small matPrefix [innerHTML]="selected.prefix"></small>
+  }
   }
   <input
     #searchInput
@@ -20,8 +22,9 @@
     (focus)="focus()"
     (blur)="touched()"
   />
-  @if (!disabled() && selectedValues().length) {
+  @if (!disabled() && hasInputValue) {
   <button
+    class="form-field-clear-btn"
     matSuffix
     mat-icon-button
     type="button"

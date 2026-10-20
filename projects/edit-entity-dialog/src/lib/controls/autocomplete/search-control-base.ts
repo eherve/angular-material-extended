@@ -177,11 +177,15 @@ export abstract class SearchControlBase implements OnChanges, OnDestroy {
       return;
     this.apply(this.selectedValues().filter((_value, i) => i !== index));
   }
+  get hasInputValue(): boolean {
+    const value = this.inputControl.value;
+    return value !== null && value !== undefined && value !== "";
+  }
   clear(): void {
-    if (!this.control.disabled) {
-      this.apply(this.multiple ? [] : null);
-      this.inputControl.setValue(null, { emitEvent: false });
-    }
+    if (this.control.disabled) return;
+    this.draftText = undefined;
+    if (!this.multiple && !this.sortable) this.apply(null);
+    this.inputControl.setValue(null);
   }
   drop(
     event: Pick<CdkDragDrop<unknown[]>, "previousIndex" | "currentIndex">,

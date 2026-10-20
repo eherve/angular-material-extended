@@ -1,0 +1,25 @@
+@use "@angular/material" as mat;
+
+.form-field-clear-btn {
+  @include mat.icon-button-overrides(
+    (
+      icon-color: var(
+          --ngx-mat-edit-entity-dialog-danger,
+          var(--mat-sys-error, #b3261e)
+        ),
+      icon-size: 18px,
+      state-layer-size: 32px,
+    )
+  );
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 18px;
+    color: var(
+      --ngx-mat-edit-entity-dialog-danger,
+      var(--mat-sys-error, #b3261e)
+    );
+  }
+}

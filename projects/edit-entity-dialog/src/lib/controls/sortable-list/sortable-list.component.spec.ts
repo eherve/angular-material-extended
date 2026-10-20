@@ -25,6 +25,28 @@ describe("sortable list rendered control", () => {
     await fixture.whenStable();
     return { fixture, control };
   }
+  it("only clears the add-field draft and preserves selected items", async () => {
+    const { fixture, control } = await setup();
+    const clearButton = () =>
+      fixture.nativeElement.querySelector(
+        '[aria-label="Effacer"]',
+      ) as HTMLButtonElement | null;
+    expect(clearButton()).toBeNull();
+    const input = fixture.nativeElement.querySelector(
+      "input",
+    ) as HTMLInputElement;
+    input.value = "new item";
+    input.dispatchEvent(new Event("input"));
+    fixture.detectChanges();
+    expect(clearButton()).not.toBeNull();
+    clearButton()?.click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(input.value).toBe("");
+    expect(control.value).toEqual([a, b, c]);
+    expect(control.pristine).toBeTrue();
+    expect(clearButton()).toBeNull();
+  });
   it("persistsReorderedValue", async () => {
     const { fixture, control } = await setup();
     fixture.debugElement

@@ -15,6 +15,7 @@ type QuickOption = { value: number; label: string };
 @Component({
   selector: "app-form-control-duration",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [DurationSegmentInputComponent, MatButtonModule, MatFormFieldModule, MatIconModule, MatMenuModule, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FormControlDurationComponent), multi: true }, { provide: NG_VALIDATORS, useExisting: forwardRef(() => FormControlDurationComponent), multi: true }],
@@ -27,7 +28,7 @@ type QuickOption = { value: number; label: string };
         @for (option of quickOptionItems; track option.value) { <button mat-menu-item type="button" (click)="applyQuickOption(option.value)">{{ option.label }}</button> }
       </mat-menu>
       @if (hint) { <mat-hint>{{ hint }}</mat-hint> }
-      @if (hasValue) { <button mat-icon-button matSuffix type="button" [disabled]="control.disabled" [attr.aria-label]="intl.messages.clear" (click)="clearValue(); $event.stopPropagation()"><mat-icon>clear</mat-icon></button> }
+      @if (hasValue && !control.disabled) { <button class="form-field-clear-btn" mat-icon-button matSuffix type="button" [disabled]="control.disabled" [attr.aria-label]="intl.messages.clear" (click)="clearValue(); $event.stopPropagation()"><mat-icon>clear</mat-icon></button> }
       @if (control.hasError('required')) { <mat-error>{{ intl.messages.required }}</mat-error> }
       @if (control.hasError('min') && minLabel) { <mat-error>{{ intl.messages.durationMinimum.replace('{value}', minLabel) }}</mat-error> }
       @if (control.hasError('max') && maxLabel) { <mat-error>{{ intl.messages.durationMaximum.replace('{value}', maxLabel) }}</mat-error> }

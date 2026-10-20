@@ -23,6 +23,7 @@ import { IFormControlSelectOption } from "../../fields/edit-entity-field.types";
 @Component({
   selector: "app-form-control-select",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
     MatButtonModule,
     MatFormFieldModule,
@@ -54,10 +55,10 @@ import { IFormControlSelectOption } from "../../fields/edit-entity-field.types";
                 track $index;
                 let last = $last
               ) {
-                <span>{{ getOption(value)?.name ?? value }}</span>
-                @if (!last) {
-                  <span>, </span>
-                }
+                <span
+                  >{{ getOption(value)?.name ?? value
+                  }}{{ last ? "" : ", " }}</span
+                >
               }
             } @else {
               {{ getOption(control.value)?.name ?? control.value }}
@@ -101,6 +102,7 @@ import { IFormControlSelectOption } from "../../fields/edit-entity-field.types";
         }
         @if (!control.disabled && hasValue) {
           <button
+            class="form-field-clear-btn"
             mat-icon-button
             matSuffix
             type="button"
@@ -178,7 +180,9 @@ export class FormControlSelectComponent implements OnDestroy {
   get hasValue(): boolean {
     return this.multiple
       ? Array.isArray(this.control?.value) && this.control!.value.length > 0
-      : this.control?.value !== null && this.control?.value !== undefined;
+      : this.control?.value !== null &&
+          this.control?.value !== undefined &&
+          this.control?.value !== "";
   }
   selectedValues(value: unknown): readonly unknown[] {
     return Array.isArray(value) ? value : [];

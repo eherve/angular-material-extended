@@ -1,3 +1,5 @@
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
 import { CommonModule } from "@angular/common";
 import {
   ChangeDetectionStrategy,
@@ -28,7 +30,10 @@ import { isSameDate, toDate } from "../../internal/date/date.helpers";
 @Component({
   selector: "app-edit-entity-date-range-field",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
+    MatButtonModule,
+    MatIconModule,
     CommonModule,
     ReactiveFormsModule,
     MatDatepickerModule,
@@ -58,6 +63,23 @@ import { isSameDate, toDate } from "../../internal/date/date.helpers";
         </mat-date-range-input>
         <mat-datepicker-toggle matIconSuffix [for]="picker" />
         <mat-date-range-picker #picker />
+        @if (
+          control.enabled &&
+          (rangeFormGroup.controls.start.value ||
+            rangeFormGroup.controls.end.value)
+        ) {
+          <button
+            mat-icon-button
+            class="form-field-clear-btn"
+            type="button"
+            matSuffix
+            [attr.aria-label]="intl.messages.clear"
+            (click)="clearValue(); $event.stopPropagation()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+
         @if (rangeFormGroup.controls.start.hasError("matDatepickerParse")) {
           <mat-error>{{ intl.messages.invalidDateStart }}</mat-error>
         }
@@ -137,6 +159,12 @@ export class EditEntityDateRangeFieldComponent<
   >
   implements OnInit, OnChanges, OnDestroy
 {
+  clearValue(): void {
+    if (this.control.disabled) return;
+    this.control.markAsDirty();
+    this.control.markAsTouched();
+    this.rangeFormGroup.setValue({ start: null, end: null });
+  }
   @Input() record?: TRecord;
   @Input({ required: true }) formGroup!: EditEntityFormGroup;
   @Input({ required: true }) field!: DateRangeFormField<TRecord>;

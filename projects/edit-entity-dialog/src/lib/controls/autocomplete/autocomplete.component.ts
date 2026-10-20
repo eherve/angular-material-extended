@@ -12,6 +12,7 @@ import { AdaptiveSearchPanelDirective } from "../../internal/search/adaptive-pan
 @Component({
   selector: "app-form-control-autocomplete",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
     ReactiveFormsModule,
     DragDropModule,

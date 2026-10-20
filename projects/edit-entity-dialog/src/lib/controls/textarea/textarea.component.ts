@@ -12,6 +12,8 @@ import {
   ValidatorFn,
   Validators,
 } from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { TextFieldModule } from "@angular/cdk/text-field";
@@ -21,7 +23,10 @@ import { Subscription } from "rxjs";
 @Component({
   selector: "app-form-control-textarea",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
+    MatButtonModule,
+    MatIconModule,
     MatFormFieldModule,
     MatInputModule,
     ReactiveFormsModule,
@@ -41,6 +46,18 @@ import { Subscription } from "rxjs";
         [placeholder]="placeholder"
         (blur)="control.markAsTouched()"
       ></textarea>
+      @if (control.value && control.enabled) {
+        <button
+          mat-icon-button
+          matSuffix
+          class="form-field-clear-btn"
+          type="button"
+          [attr.aria-label]="intl.messages.clear"
+          (click)="clearValue(); $event.stopPropagation()"
+        >
+          <mat-icon>clear</mat-icon>
+        </button>
+      }
       @if (hint) {
         <mat-hint>{{ hint }}</mat-hint>
       }
@@ -93,6 +110,12 @@ export class FormControlTextareaComponent implements OnDestroy {
     private readonly cdr: ChangeDetectorRef,
   ) {
     this.intlSubscription = intl.changes.subscribe(() => cdr.markForCheck());
+  }
+  clearValue(): void {
+    if (this.control.disabled) return;
+    this.control.markAsDirty();
+    this.control.markAsTouched();
+    this.control.setValue(null);
   }
   ngOnDestroy(): void {
     this.intlSubscription.unsubscribe();

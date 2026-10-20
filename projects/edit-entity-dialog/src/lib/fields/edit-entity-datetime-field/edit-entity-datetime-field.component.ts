@@ -28,6 +28,7 @@ import { toDate } from "../../internal/date/date.helpers";
 @Component({
   selector: "app-edit-entity-datetime-field",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -59,7 +60,7 @@ import { toDate } from "../../internal/date/date.helpers";
         [twelvehour]="false"
       />
       @if (control.value && control.enabled) {
-        <button
+        <button class="form-field-clear-btn"
           mat-icon-button
           matSuffix
           type="button"

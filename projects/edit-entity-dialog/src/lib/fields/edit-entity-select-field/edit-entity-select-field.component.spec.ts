@@ -147,6 +147,43 @@ describe("EditEntitySelectFieldComponent", () => {
     expect(formGroup.invalid).toBeTrue();
   });
 
+  it("hides the clear action for an empty string", () => {
+    formGroup.requireFormControl("choice").setValue("");
+    fixture.detectChanges();
+    expect(
+      fixture.nativeElement.querySelector('[aria-label="Effacer"]'),
+    ).toBeNull();
+  });
+
+  it("renders multi-selection separators in the same text flow as labels", async () => {
+    fixture.componentRef.setInput("field", {
+      kind: "select",
+      name: "choice",
+      label: "Choice",
+      multiple: true,
+      options: [
+        { name: "Maintenance", value: "a" },
+        { name: "Intervention", value: "b" },
+      ],
+    });
+    formGroup.requireFormControl("choice").setValue(["a", "b"]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const trigger = fixture.nativeElement.querySelector(
+      "mat-select-trigger",
+    ) as HTMLElement;
+    expect(trigger.textContent?.trim()).toBe("Maintenance, Intervention");
+    // A flex-column trigger must not place separators in their own flex items.
+    trigger.style.display = "flex";
+    trigger.style.flexDirection = "column";
+    expect(
+      Array.from(trigger.children).some(
+        (child) => child.textContent?.trim() === ",",
+      ),
+    ).toBeFalse();
+  });
+
   it("renders clear action for false and zero values", async () => {
     const field = fixture.componentInstance.field;
     fixture.componentRef.setInput("field", {

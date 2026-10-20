@@ -31,6 +31,7 @@ import {
 @Component({
   selector: "app-edit-entity-date-field",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -55,7 +56,7 @@ import {
       <mat-datepicker-toggle matIconSuffix [for]="picker" />
       <mat-datepicker #picker />
       @if (control.value && control.enabled) {
-        <button
+        <button class="form-field-clear-btn"
           mat-icon-button
           matSuffix
           type="button"

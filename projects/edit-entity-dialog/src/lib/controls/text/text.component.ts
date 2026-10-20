@@ -30,6 +30,7 @@ export type FormControlTextType = "text" | "email" | "tel" | "password";
 @Component({
   selector: "app-form-control-text",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
     MatButtonModule,
     MatFormFieldModule,

@@ -1,3 +1,5 @@
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
 import { CommonModule } from "@angular/common";
 import {
   ChangeDetectionStrategy,
@@ -28,7 +30,10 @@ import { toPickerTime, toTimeString } from "../../internal/date/date.helpers";
 @Component({
   selector: "app-edit-entity-time-field",
   standalone: true,
+  styleUrls: ["../../internal/clear-button.scss"],
   imports: [
+    MatButtonModule,
+    MatIconModule,
     CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -51,6 +56,19 @@ import { toPickerTime, toTimeString } from "../../internal/date/date.helpers";
       <mat-timepicker-toggle matIconSuffix [for]="picker" /><mat-timepicker
         #picker
       />
+
+      @if (control.enabled && timeControl.value) {
+        <button
+          mat-icon-button
+          class="form-field-clear-btn"
+          type="button"
+          matSuffix
+          [attr.aria-label]="intl.messages.clear"
+          (click)="clearValue(); $event.stopPropagation()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      }
       @if (timeControl.hasError("matTimepickerParse")) {
         <mat-error>{{ intl.messages.invalidTime }}</mat-error>
       }
@@ -86,6 +104,12 @@ export class EditEntityTimeFieldComponent<
   >
   implements OnInit, OnChanges, OnDestroy
 {
+  clearValue(): void {
+    if (this.control.disabled) return;
+    this.control.markAsDirty();
+    this.control.markAsTouched();
+    this.control.setValue(null);
+  }
   @Input() record?: TRecord;
   @Input({ required: true }) formGroup!: EditEntityFormGroup;
   @Input({ required: true }) field!: TimeFormField<TRecord>;

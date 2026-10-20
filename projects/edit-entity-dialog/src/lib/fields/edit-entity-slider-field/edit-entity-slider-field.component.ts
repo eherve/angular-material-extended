@@ -1,4 +1,9 @@
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { EditEntityDialogIntl } from "../../edit-entity-dialog.intl";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
 import {
+  inject,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -18,7 +23,14 @@ import { SliderFormField } from "../edit-entity-field.types";
 @Component({
   selector: "app-edit-entity-slider-field",
   standalone: true,
-  imports: [MatFormFieldModule, MatSliderModule, ReactiveFormsModule],
+  styleUrls: ["../../internal/clear-button.scss"],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatSliderModule,
+    ReactiveFormsModule,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
     `
@@ -31,8 +43,14 @@ import { SliderFormField } from "../edit-entity-field.types";
         min-width: unset;
         position: relative;
       }
+      .form-field-clear-btn {
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
       mat-slider {
-        width: calc(100% - 20px);
+        width: calc(100% - 56px);
         margin: 0 10px;
       }
       #container.bare {
@@ -118,6 +136,19 @@ import { SliderFormField } from "../edit-entity-field.types";
           >
         }
       </mat-slider>
+      @if (
+        control.enabled && control.value !== null && control.value !== undefined
+      ) {
+        <button
+          mat-icon-button
+          class="form-field-clear-btn"
+          type="button"
+          [attr.aria-label]="intl.messages.clear"
+          (click)="clearValue(); $event.stopPropagation()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      }
     </div>
   `,
 })
@@ -126,6 +157,13 @@ export class EditEntitySliderFieldComponent<
   >
   implements OnChanges, OnDestroy
 {
+  readonly intl = inject(EditEntityDialogIntl);
+  clearValue(): void {
+    if (this.control.disabled) return;
+    this.control.markAsDirty();
+    this.control.markAsTouched();
+    this.control.setValue(null);
+  }
   @Input() record?: TRecord;
   @Input({ required: true }) formGroup!: EditEntityFormGroup;
   @Input({ required: true }) field!: SliderFormField<TRecord>;
@@ -133,7 +171,11 @@ export class EditEntitySliderFieldComponent<
   valueLabel = "";
   valuePosition: "top" | "bottom" = "top";
   private valueSubscription?: Subscription;
-  constructor(private readonly cdr: ChangeDetectorRef) {}
+  constructor(private readonly cdr: ChangeDetectorRef) {
+    this.intl.changes
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => cdr.markForCheck());
+  }
   get control() {
     return this.formGroup.requireFormControl(this.field.name);
   }
