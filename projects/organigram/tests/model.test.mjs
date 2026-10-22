@@ -40,3 +40,18 @@ test('preserves callbacks and structural presentation state', () => {
   assert.equal(node.selected, true);
   assert.equal(node.hideChildren, true);
 });
+
+test('keyed updates preserve existing nodes and append only new children', () => {
+  const root = new OrganigramTreeNode({ key: 'root', type: 'root', children: [{ key: 'a', type: 'leaf', entity: { name: 'Before' } }] });
+  const first = root.children[0];
+  root.updateFrom({ key: 'root', type: 'root', children: [{ key: 'a', type: 'leaf', entity: { name: 'After' } }, { key: 'b', type: 'leaf' }] });
+  assert.equal(root.children[0], first);
+  assert.equal(first.entity.name, 'After');
+  assert.equal(root.children[1].parent, root);
+  const children = root.children;
+  root.updateFrom({ key: 'root', type: 'root', children: [{ key: 'a', type: 'leaf' }, { key: 'b', type: 'leaf' }] });
+  assert.equal(root.children, children);
+  root.updateFrom({ key: 'root', type: 'root', children: [{ key: 'b', type: 'leaf' }] });
+  assert.equal(root.children.length, 1);
+  assert.equal(root.children[0].key, 'b');
+});

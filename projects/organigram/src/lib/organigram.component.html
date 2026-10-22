@@ -47,7 +47,7 @@
         <div class="node-block-children-top" [class]="class" [class.multiple-row]="node.children.length > 4"></div>
         @for (
           row of node.children | organigramRows: nbChildByRow;
-          track row;
+          track $index;
           let rowIndex = $index;
           let top = $first;
           let bottom = $last

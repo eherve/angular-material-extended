@@ -1,4 +1,5 @@
 export interface OrganigramNode<T = unknown> {
+  key?: string;
   type: string;
   entity?: T | null;
   hasChildren?: boolean;
@@ -12,6 +13,7 @@ let nextNodeId = 0;
 
 export class OrganigramTreeNode<T = unknown> implements OrganigramNode<T> {
   readonly id: string;
+  key?: string;
   type: string;
   entity?: T | null;
   hasChildren?: boolean;
@@ -37,6 +39,27 @@ export class OrganigramTreeNode<T = unknown> implements OrganigramNode<T> {
     child.parent = this;
     child.setDepth(this.depth + 1);
     this.children = [...this.children, child];
+  }
+
+  updateFrom(node: OrganigramNode<T>): void {
+    this.type = node.type;
+    this.entity = node.entity;
+    this.hasChildren = node.hasChildren;
+    this.selected = node.selected;
+    this.onClick = node.onClick;
+    if (node.hideChildren !== undefined) this.hideChildren = node.hideChildren;
+    const previous = new Map(this.children.filter(child => child.key !== undefined).map(child => [child.key!, child]));
+    const children = (node.children ?? []).map(source => {
+      const existing = source.key !== undefined ? previous.get(source.key) : undefined;
+      const child = existing ?? new OrganigramTreeNode(source, this.depth + 1);
+      if (existing) child.updateFrom(source);
+      child.parent = this;
+      child.setDepth(this.depth + 1);
+      return child;
+    });
+    if (children.length !== this.children.length || children.some((child, index) => child !== this.children[index])) {
+      this.children = children;
+    }
   }
 
   private setDepth(depth: number): void {

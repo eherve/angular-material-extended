@@ -1,5 +1,9 @@
 # Changelog
 
+## 22.1.0 — 2026-10-22
+
+- Use the header contrast color for subtitles so they remain readable on themed headers.
+
 ## 22.0.5 — 2026-10-20
 
 - Render the single autocomplete prefix only when provided, preserving Material left padding for values without a prefix.

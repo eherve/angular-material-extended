@@ -94,3 +94,7 @@ npm run build:organigram
 The model tests use Node's native TypeScript stripping. Browser specs use Jasmine/Karma
 and cover asynchronous actions, rendered templates, multi-row layout and connector highlighting.
 README and CHANGELOG are included in the built npm package.
+
+### Incremental structural updates
+
+Supply a stable `key` on the root and each node (unique among siblings). When a new input tree has the same root key, nodes with matching sibling keys retain their identity and DOM; only inserted or removed nodes enter or leave. Omitting keys retains replacement semantics. Keep a root key scoped to the current dataset/account, and change it when switching datasets. A node moved under another parent is recreated in its new branch.

@@ -98,7 +98,11 @@ export class OrganigramComponent<T = unknown> implements OnDestroy {
     this.pendingNodes.set(new Set());
     this.nodeErrors.set(new Map());
     this.highlightParents(null);
-    this.tree = !tree ? null : tree instanceof OrganigramTreeNode ? tree : new OrganigramTreeNode<T>(tree);
+    if (tree?.key !== undefined && this.tree?.key === tree.key) {
+      this.tree.updateFrom(tree);
+    } else {
+      this.tree = !tree ? null : tree instanceof OrganigramTreeNode ? tree : new OrganigramTreeNode<T>(tree);
+    }
   }
   tree: OrganigramTreeNode<T> | null = null;
 

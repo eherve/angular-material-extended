@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -15,7 +15,7 @@ import { OrganigramIntl } from './organigram-intl';
   `,
 })
 class Host {
-  tree = new OrganigramTreeNode<{ name: string }>({ type: 'root', children: [{
+  @Input() tree = new OrganigramTreeNode<{ name: string }>({ type: 'root', children: [{
     type: 'parent', entity: { name: 'Parent' }, hasChildren: true, hideChildren: false,
     children: Array.from({ length: 7 }, (_, i) => ({ type: 'leaf', entity: { name: `Child ${i}` } })),
   }] });
@@ -40,8 +40,50 @@ describe('Organigram rendered contract', () => {
     expect(getComputedStyle(last.closest('.node-block-children-row')!).display).toBe('flex');
   });
 
+  it('uses the same thickness for single-child and branching connectors', async () => {
+    const fixture = TestBed.createComponent(Host);
+    const leaf = fixture.componentInstance.tree.children[0].children[0];
+    leaf.hasChildren = true;
+    leaf.hideChildren = false;
+    leaf.addChild({ type: 'leaf', entity: { name: 'Single child' } });
+    fixture.detectChanges(); await fixture.whenStable();
+    const single = document.getElementById(leaf.children[0].id)!.parentElement!;
+    const incoming = single.querySelector('.node-block-top')!;
+    expect(getComputedStyle(incoming, '::after').width).toBe('2px');
+    const branching = document.getElementById(leaf.id)!.parentElement!.querySelector('.node-block-top')!;
+    expect(getComputedStyle(branching, '::before').height).toBe('2px');
+    for (const connector of fixture.nativeElement.querySelectorAll('.node-container-bottom,.node-block-children-top')) {
+      expect(getComputedStyle(connector, '::after').width).toBe('2px');
+    }
+  });
+
+  it('retains parent and sibling DOM when inserting a keyed child into the same row', async () => {
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.tree = new OrganigramTreeNode({ key: 'root', type: 'root', children: [{
+      key: 'parent', type: 'parent', entity: { name: 'Parent' }, children: [{ key: 'first', type: 'leaf', entity: { name: 'First' } }],
+    }] });
+    fixture.detectChanges(); await fixture.whenStable();
+    const visibleNames = (): HTMLElement[] =>
+      [...fixture.nativeElement.querySelectorAll('.node-name')].filter((element: HTMLElement) => !!element.textContent?.trim());
+    const [firstParent, firstChild] = visibleNames();
+    fixture.componentRef.setInput('tree', new OrganigramTreeNode({ key: 'root', type: 'root', children: [{
+      key: 'parent', type: 'parent', entity: { name: 'Parent' }, children: [
+        { key: 'first', type: 'leaf', entity: { name: 'Updated first' } },
+        { key: 'second', type: 'leaf', entity: { name: 'Second' } },
+      ],
+    }] }));
+    fixture.detectChanges(); await fixture.whenStable();
+    const names = visibleNames();
+    expect(names[0]).toBe(firstParent);
+    expect(names[1]).toBe(firstChild);
+    expect(names[1].textContent).toBe('Updated first');
+    expect(names[2].textContent).toBe('Second');
+  });
+
   it('highlights existing ancestor connectors, isolates instances and clears on leave', async () => {
     const first = TestBed.createComponent(Host), second = TestBed.createComponent(Host);
+    // Angular's test renderer removes earlier fixture roots when creating a new one.
+    document.body.appendChild(first.nativeElement);
     first.detectChanges(); second.detectChanges(); await first.whenStable();
     const leaf = first.componentInstance.tree.children[0].children[6];
     const element = document.getElementById(leaf.id)!;
