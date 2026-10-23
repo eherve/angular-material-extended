@@ -1,3 +1,5 @@
+@use "@angular/material" as mat;
+
 /** @format */
 
 :host {
@@ -6,6 +8,16 @@
 }
 
 mat-form-field {
+  @include mat.form-field-overrides(
+    (
+      filled-focus-active-indicator-color: var(--datatable-accent),
+      filled-focus-label-text-color: var(--datatable-accent),
+      outlined-focus-outline-color: var(--datatable-accent),
+      outlined-focus-label-text-color: var(--datatable-accent),
+      focus-select-arrow-color: var(--datatable-accent),
+    )
+  );
+
   min-width: auto;
   flex: 1 1 100%;
   margin: 6px 0;

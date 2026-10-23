@@ -72,6 +72,31 @@ describe("EditEntityComponent mutations", () => {
     await new Promise((resolve) => setTimeout(resolve, 170));
     return { fixture, component };
   }
+  it("inherits live ancestor card and action styles with package priority", async () => {
+    const { fixture } = await setup();
+    const ancestor = document.createElement("div");
+    fixture.nativeElement.parentNode.insertBefore(ancestor, fixture.nativeElement);
+    ancestor.appendChild(fixture.nativeElement);
+    try {
+      ancestor.style.setProperty("--ngx-mat-extended-space-2", "11px");
+      ancestor.style.setProperty("--ngx-mat-extended-radius", "13px");
+      ancestor.style.setProperty("--ngx-mat-extended-surface", "rgb(10, 20, 30)");
+      const card = fixture.nativeElement.querySelector(".edit-entity-card");
+      const actions = fixture.nativeElement.querySelector(".edit-entity-actions");
+      expect(getComputedStyle(card).borderRadius).toBe("13px");
+      expect(getComputedStyle(card).backgroundColor).toBe("rgb(10, 20, 30)");
+      expect(getComputedStyle(actions).paddingTop).toBe("11px");
+      expect(getComputedStyle(actions).backgroundColor).toBe("rgb(10, 20, 30)");
+      ancestor.style.setProperty("--ngx-mat-extended-space-2", "15px");
+      ancestor.style.setProperty("--ngx-mat-extended-radius", "17px");
+      ancestor.style.setProperty("--ngx-mat-extended-surface", "rgb(40, 50, 60)");
+      expect(getComputedStyle(card).borderRadius).toBe("17px");
+      expect(getComputedStyle(card).backgroundColor).toBe("rgb(40, 50, 60)");
+      expect(getComputedStyle(actions).paddingTop).toBe("15px");
+      ancestor.style.setProperty("--ngx-mat-edit-entity-dialog-background", "rgb(70, 80, 90)");
+      expect(getComputedStyle(fixture.nativeElement.querySelector(".edit-entity-content")).backgroundColor).toBe("rgb(70, 80, 90)");
+    } finally { ancestor.replaceWith(fixture.nativeElement); }
+  });
   beforeEach(() => {
     host.confirm.and.resolveTo(true);
     host.notify.calls.reset();

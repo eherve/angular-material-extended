@@ -1,17 +1,20 @@
 /** @format */
 
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
 .section-tabs-display__field-label-row {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ngx-mat-extended-space-1, 4px);
 }
 
 .section-tabs-display__field-label-action {
   border: 0;
   background: transparent;
-  color: #bb8b14;
+  color: var(
+    --ngx-mat-section-tabs-muted,
+    var(--ngx-mat-extended-muted, #bb8b14)
+  );
   cursor: pointer;
   font-size: 1.1rem;
   line-height: 1;
@@ -44,19 +47,29 @@ app-section-tabs-display {
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  border: 1px dashed #cbd5df;
-  border-radius: 8px;
-  background: #f8fafc;
-  color: #607286;
+  border: 1px dashed
+    var(--ngx-mat-section-tabs-border, var(--ngx-mat-extended-border, #cbd5df));
+  border-radius: var(--ngx-mat-extended-radius, 8px);
+  background: var(--ngx-mat-extended-surface-selected, #f8fafc);
+  color: var(
+    --ngx-mat-section-tabs-muted,
+    var(--ngx-mat-extended-muted, #607286)
+  );
 }
 
 .section-tabs-display__section {
   display: grid;
   grid-template-columns: repeat(
-    var(--section-tabs-display-grid-effective-columns, var(--section-tabs-display-grid-columns, 1)),
+    var(
+      --section-tabs-display-grid-effective-columns,
+      var(--section-tabs-display-grid-columns, 1)
+    ),
     minmax(var(--section-tabs-display-grid-track-min-column-width, 0px), 1fr)
   );
-  gap: var(--section-tabs-display-grid-gap, 12px);
+  gap: var(
+    --section-tabs-display-grid-gap,
+    var(--ngx-mat-extended-space-3, 16px)
+  );
   align-items: start;
   align-content: start;
   grid-auto-flow: row;
@@ -66,7 +79,8 @@ app-section-tabs-display {
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  padding: 8px 8px 8px 0;
+  padding: var(--ngx-mat-extended-space-2, 8px)
+    var(--ngx-mat-extended-space-2, 8px) var(--ngx-mat-extended-space-2, 8px) 0;
 }
 
 .section-tabs-display__section--single-card {
@@ -114,9 +128,16 @@ app-section-tabs-display {
   flex-direction: column;
   overflow: hidden;
   box-sizing: border-box;
-  border: 1px solid #d9e0e7;
-  border-radius: 8px;
-  background: #ffffff;
+  border: 1px solid
+    var(--ngx-mat-section-tabs-border, var(--ngx-mat-extended-border, #d9e0e7));
+  border-radius: var(--ngx-mat-extended-radius, 8px);
+  background: var(
+    --ngx-mat-section-tabs-card-background,
+    var(
+      --ngx-mat-section-tabs-background,
+      var(--ngx-mat-extended-surface, #ffffff)
+    )
+  );
 }
 
 .section-tabs-display__card-header {
@@ -127,13 +148,16 @@ app-section-tabs-display {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
 }
 
 .section-tabs-display__card-title mat-icon,
 .section-tabs-display__card-title .mat-icon {
   flex: 0 0 auto;
-  color: #6b7280;
+  color: var(
+    --ngx-mat-section-tabs-muted,
+    var(--ngx-mat-extended-muted, #6b7280)
+  );
 }
 
 .section-tabs-display__card-title h3 {
@@ -156,12 +180,20 @@ app-section-tabs-display {
 .section-tabs-display__field-grid {
   display: grid;
   grid-template-columns: repeat(
-    var(--section-tabs-display-grid-effective-columns, var(--section-tabs-display-grid-columns, 1)),
+    var(
+      --section-tabs-display-grid-effective-columns,
+      var(--section-tabs-display-grid-columns, 1)
+    ),
     minmax(var(--section-tabs-display-grid-track-min-column-width, 0px), 1fr)
   );
   align-items: start;
   align-content: start;
-  gap: var(--section-tabs-display-grid-gap, 0px);
+  padding: var(--ngx-mat-extended-space-2, 8px);
+  box-sizing: border-box;
+  gap: var(
+    --section-tabs-display-grid-gap,
+    var(--ngx-mat-extended-space-3, 16px)
+  );
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -179,7 +211,10 @@ app-section-tabs-display {
   &.has-click {
     cursor: pointer;
     &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
+      background-color: var(
+        --ngx-mat-extended-surface-hover,
+        rgba(0, 0, 0, 0.04)
+      );
     }
   }
 }
@@ -220,7 +255,7 @@ app-section-tabs-display {
   min-width: 0;
   display: flex;
   flex-flow: row wrap;
-  gap: 8px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
 }
 
 .section-tabs-display__chip {
@@ -228,11 +263,18 @@ app-section-tabs-display {
   max-width: 100%;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 10px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
+  padding: var(--ngx-mat-extended-space-1, 4px)
+    var(--ngx-mat-extended-space-2, 8px);
   border-radius: 999px;
-  background: var(--ngx-mat-section-tabs-display-background, #f3f6f9);
-  color: var(--ngx-mat-section-tabs-display-primary, #123047);
+  background: var(
+    --ngx-mat-section-tabs-display-background,
+    var(--ngx-mat-extended-surface, #f3f6f9)
+  );
+  color: var(
+    --ngx-mat-section-tabs-display-primary,
+    var(--ngx-mat-extended-text, #123047)
+  );
   font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
@@ -254,7 +296,7 @@ app-section-tabs-display {
 .section-tabs-display__card-actions {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ngx-mat-extended-space-1, 4px);
   margin-left: auto;
 }
 
@@ -278,8 +320,86 @@ app-section-tabs-display {
   &.mat-mdc-button {
     min-width: 0;
     height: 32px;
-    padding: 0 10px;
+    padding: 0 var(--ngx-mat-extended-space-2, 8px);
     font-size: 0.85rem;
     line-height: 32px;
   }
+}
+
+.section-tabs-display__field-cell.field-cell {
+  padding: var(--ngx-mat-extended-space-1, 4px)
+    var(--ngx-mat-extended-space-2, 8px);
+  border: 0;
+}
+
+.section-tabs-display__empty-fields-toggle {
+  @include mat.slide-toggle-overrides(
+    (
+      selected-track-color: var(
+          --ngx-mat-extended-accent,
+          var(--mat-sys-primary, #324c60)
+        ),
+      selected-focus-track-color: var(
+          --ngx-mat-extended-accent,
+          var(--mat-sys-primary, #324c60)
+        ),
+      selected-hover-track-color: var(
+          --ngx-mat-extended-accent,
+          var(--mat-sys-primary, #324c60)
+        ),
+      selected-pressed-track-color: var(
+          --ngx-mat-extended-accent,
+          var(--mat-sys-primary, #324c60)
+        ),
+      selected-focus-state-layer-color: var(
+          --ngx-mat-extended-accent,
+          var(--mat-sys-primary, #324c60)
+        ),
+      selected-hover-state-layer-color: var(
+          --ngx-mat-extended-accent,
+          var(--mat-sys-primary, #324c60)
+        ),
+      selected-pressed-state-layer-color: var(
+          --ngx-mat-extended-accent,
+          var(--mat-sys-primary, #324c60)
+        ),
+      selected-icon-color: var(
+          --ngx-mat-extended-accent,
+          var(--mat-sys-primary, #324c60)
+        ),
+      selected-handle-color: var(
+          --ngx-mat-extended-surface,
+          var(--mat-sys-on-primary, #ffffff)
+        ),
+      selected-focus-handle-color: var(
+          --ngx-mat-extended-surface,
+          var(--mat-sys-on-primary, #ffffff)
+        ),
+      selected-hover-handle-color: var(
+          --ngx-mat-extended-surface,
+          var(--mat-sys-on-primary, #ffffff)
+        ),
+      selected-pressed-handle-color: var(
+          --ngx-mat-extended-surface,
+          var(--mat-sys-on-primary, #ffffff)
+        ),
+      touch-target-display: block,
+      track-width: 40px,
+      track-height: 24px,
+      selected-handle-size: 16px,
+      unselected-handle-size: 12px,
+      with-icon-handle-size: 16px,
+      pressed-handle-size: 20px,
+      selected-icon-size: 12px,
+      unselected-icon-size: 12px,
+      selected-handle-horizontal-margin: 0 20px,
+      selected-with-icon-handle-horizontal-margin: 0 20px,
+      selected-pressed-handle-horizontal-margin: 0 18px,
+      unselected-handle-horizontal-margin: 0 6px,
+      unselected-with-icon-handle-horizontal-margin: 0 4px,
+      unselected-pressed-handle-horizontal-margin: 0 2px,
+      label-text-size: var(--mat-sys-body-small-size, 12px),
+      label-text-line-height: var(--mat-sys-body-small-line-height, 16px),
+    )
+  );
 }

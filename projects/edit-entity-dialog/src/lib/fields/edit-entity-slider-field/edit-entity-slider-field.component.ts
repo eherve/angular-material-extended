@@ -51,15 +51,15 @@ import { SliderFormField } from "../edit-entity-field.types";
       }
       mat-slider {
         width: calc(100% - 56px);
-        margin: 0 10px;
+        margin: 0 var(--ngx-mat-extended-space-2, 8px);
       }
       #container.bare {
-        padding: 8px 0;
+        padding: var(--ngx-mat-extended-space-2, 8px) 0;
       }
       #container.outline {
-        margin-top: 5px;
-        margin-bottom: 22px;
-        padding: 8px 0;
+        margin-top: var(--ngx-mat-extended-space-1, 4px);
+        margin-bottom: var(--ngx-mat-extended-space-4, 24px);
+        padding: var(--ngx-mat-extended-space-2, 8px) 0;
         border: 1px solid
           var(--mat-form-field-outlined-outline-color, var(--mat-sys-outline));
         border-radius: var(
@@ -73,7 +73,7 @@ import { SliderFormField } from "../edit-entity-field.types";
         z-index: 2;
         top: -6px;
         left: 10px;
-        padding: 0 4px;
+        padding: 0 var(--ngx-mat-extended-space-1, 4px);
         font-size: 12px;
         line-height: 12px;
         color: var(--mat-form-field-outlined-label-text-color);
@@ -81,7 +81,7 @@ import { SliderFormField } from "../edit-entity-field.types";
       }
       #container.fill > mat-label {
         display: block;
-        padding: 0 16px;
+        padding: 0 var(--ngx-mat-extended-space-2, 8px);
       }
       #value {
         position: absolute;

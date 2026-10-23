@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { SectionTabsDisplayResponsiveGridDirective } from '../directives/section-tabs-display-responsive-grid.directive';
+import { Component, ElementRef, Input } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -31,6 +32,90 @@ function createComponent(options: SectionTabsDisplayOptions): SectionTabsDisplay
 }
 
 describe('SectionTabsDisplayComponent', () => {
+  for (const explicitGap of [undefined, '12px']) {
+    it(`refreshes inherited gap changes on ancestors while preserving ${explicitGap ?? 'the default gap'}`, async () => {
+      const theme = document.createElement('style');
+      theme.textContent = '.responsive-grid-wide-gap { --ngx-mat-extended-space-3: 32px; }';
+      document.head.append(theme);
+      const ancestor = document.createElement('div');
+      ancestor.style.setProperty('--ngx-mat-extended-space-3', '12px');
+      const element = document.createElement('div');
+      element.style.cssText = 'display:grid;width:420px;height:40px;grid-template-columns:repeat(var(--section-tabs-display-grid-effective-columns, 2), 1fr)';
+      element.style.columnGap = explicitGap ?? 'var(--ngx-mat-extended-space-3, 16px)';
+      for (let index = 0; index < 2; index++) {
+        const item = document.createElement('div');
+        item.style.height = '20px';
+        element.append(item);
+      }
+      ancestor.append(element);
+      document.body.append(ancestor);
+      const directive = new SectionTabsDisplayResponsiveGridDirective(new ElementRef(element));
+      directive.grid = { columns: 2, gap: explicitGap ?? 'var(--ngx-mat-extended-space-3, 16px)', minColumnWidth: '200px' };
+      try {
+        directive.ngAfterViewInit();
+        expect(element.style.getPropertyValue('--section-tabs-display-grid-effective-columns')).toBe('2');
+        ancestor.style.setProperty('--ngx-mat-extended-space-3', '32px');
+        await Promise.resolve();
+        expect(element.style.getPropertyValue('--section-tabs-display-grid-effective-columns')).toBe(explicitGap ? '2' : '1');
+        ancestor.style.removeProperty('--ngx-mat-extended-space-3');
+        await Promise.resolve();
+        expect(element.style.getPropertyValue('--section-tabs-display-grid-effective-columns')).toBe('2');
+        ancestor.classList.add('responsive-grid-wide-gap');
+        await Promise.resolve();
+        expect(element.style.getPropertyValue('--section-tabs-display-grid-effective-columns')).toBe(explicitGap ? '2' : '1');
+      } finally { directive.ngOnDestroy(); ancestor.remove(); theme.remove(); }
+    });
+  }
+  for (const gap of ['var(--ngx-mat-extended-space-3, 16px)', '12px']) {
+    it(`uses computed ${gap} spacing for responsive column dimensions`, () => {
+      const ancestor = document.createElement('div');
+      ancestor.style.setProperty('--ngx-mat-extended-space-3', '32px');
+      const element = document.createElement('div');
+      element.style.columnGap = gap;
+      Object.defineProperty(element, 'clientWidth', { value: 420 });
+      ancestor.append(element);
+      document.body.append(ancestor);
+      const directive = new SectionTabsDisplayResponsiveGridDirective(new ElementRef(element));
+      directive.grid = { columns: 2, gap: '12px', minColumnWidth: '200px' };
+      try {
+        directive.ngAfterViewInit();
+        expect(element.style.getPropertyValue('--section-tabs-display-grid-effective-columns')).toBe(gap === '12px' ? '2' : '1');
+      } finally { directive.ngOnDestroy(); ancestor.remove(); }
+    });
+  }
+  it('inherits live theme values from its ancestor and preserves package overrides', async () => {
+    TestBed.configureTestingModule({ imports: [DisplayTestHostComponent, NoopAnimationsModule] });
+    const fixture = TestBed.createComponent(DisplayTestHostComponent);
+    fixture.componentInstance.options = { data: { name: 'Name' }, sections: [{ id: 's', label: 'Section', cards: [{ id: 'c', label: 'Card', fields: [{ kind: 'text', label: 'Name', path: 'name' }] }] }] };
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const ancestor = fixture.nativeElement as HTMLElement;
+    ancestor.style.setProperty('--ngx-mat-extended-space-2', '11px');
+    ancestor.style.setProperty('--ngx-mat-extended-radius', '13px');
+    ancestor.style.setProperty('--ngx-mat-extended-surface', 'rgb(10, 20, 30)');
+    const card = ancestor.querySelector('.section-tabs-display__card')!;
+    const header = ancestor.querySelector('.card-header')!;
+    expect(getComputedStyle(card).backgroundColor).toBe('rgb(10, 20, 30)');
+    expect(getComputedStyle(card).borderRadius).toBe('13px');
+    expect(getComputedStyle(header).paddingTop).toBe('11px');
+    ancestor.style.setProperty('--ngx-mat-extended-space-2', '15px');
+    ancestor.style.setProperty('--ngx-mat-extended-radius', '17px');
+    ancestor.style.setProperty('--ngx-mat-extended-surface', 'rgb(40, 50, 60)');
+    expect(getComputedStyle(card).backgroundColor).toBe('rgb(40, 50, 60)');
+    expect(getComputedStyle(card).borderRadius).toBe('17px');
+    expect(getComputedStyle(header).paddingTop).toBe('15px');
+    ancestor.style.setProperty('--ngx-mat-section-tabs-background', 'rgb(70, 80, 90)');
+    expect(getComputedStyle(ancestor.querySelector('.section-tabs')!).backgroundColor).toBe('rgb(70, 80, 90)');
+  });
+  for (const gap of [undefined, '12px']) {
+    it(`preserves ${gap ?? 'inherited default'} grid gaps in sections and cards`, () => {
+      const component = createComponent({ data: {}, sections: [{ id: 's', label: 'Section', grid: gap ? { columns: 1, gap, minColumnWidth: "0px" } : undefined, cards: [{ id: 'c', label: 'Card', grid: gap ? { columns: 1, gap, minColumnWidth: "0px" } : undefined, fields: [] }] }] });
+      const section = component.viewModel.sections[0];
+      expect(section.gridStyles['--section-tabs-display-grid-gap']).toBe(gap ?? 'var(--ngx-mat-extended-space-3, 16px)');
+      expect((section.items[0] as { gridStyles: Record<string, string> }).gridStyles['--section-tabs-display-grid-gap']).toBe(gap ?? 'var(--ngx-mat-extended-space-3, 16px)');
+    });
+  }
+
   it('carries a field label action into its render model', () => {
     const action = { active: true, disabled: true, ariaLabel: 'Favori', onClick: jasmine.createSpy('toggle') };
     const component = createComponent({ data: { value: 'Test' }, sections: [{ id: 'main', label: 'Main', cards: [{ id: 'card', label: 'Card', fields: [{ kind: 'text', label: 'Champ', path: 'value', labelAction: action }] }] }] });

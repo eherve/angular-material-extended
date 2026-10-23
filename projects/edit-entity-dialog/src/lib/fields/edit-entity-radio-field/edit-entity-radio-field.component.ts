@@ -33,7 +33,7 @@ import {
         position: absolute;
         top: -7px;
         left: 10px;
-        padding: 0 4px;
+        padding: 0 var(--ngx-mat-extended-space-1, 4px);
         background: var(--mat-sys-surface, white);
         font-size: 12px;
         line-height: 12px;
@@ -43,12 +43,12 @@ import {
         display: flex;
         flex-direction: row;
         align-items: center;
-        gap: 16px;
+        gap: var(--ngx-mat-extended-space-3, 16px);
         min-height: 56px;
-        margin-top: 5px;
-        padding: 2px 8px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+        margin-top: var(--ngx-mat-extended-space-1, 4px);
+        padding: var(--ngx-mat-extended-space-1, 4px) var(--ngx-mat-extended-space-2, 8px);
+        border: 1px solid var(--ngx-mat-extended-border, #ccc);
+        border-radius: var(--ngx-mat-extended-radius, 8px);
       }
       .mat-mdc-radio-group.column {
         flex-direction: column;

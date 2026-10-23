@@ -28,6 +28,16 @@ describe("EditEntityRenderService", () => {
     );
   });
 
+  for (const gap of [undefined, "12px"]) {
+    it(`preserves ${gap ?? "inherited default"} grid gaps in sections and cards`, () => {
+      const state = service.buildRenderState({ displayOptions: { section: { id: "s", label: "Section", grid: { gap }, cards: [{ id: "c", label: "Card", grid: { gap }, fields: [] }] } } }, new EditEntityFormGroup(), true);
+      const section = state.sections![0];
+      expect(section.gridStyles["--edit-entity-grid-gap"]).toBe(gap ?? "var(--ngx-mat-extended-space-3, 16px)");
+      const card = section.items[0];
+      if (card.type !== "card") throw new Error("Missing card");
+      expect(card.gridStyles["--edit-entity-grid-gap"]).toBe(gap ?? "var(--ngx-mat-extended-space-3, 16px)");
+    });
+  }
   it("exposes single-card section mode with the visible card count", () => {
     const options = {
       displayOptions: {

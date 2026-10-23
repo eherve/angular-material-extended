@@ -874,7 +874,7 @@ export class EditEntityRenderService<
     return {
       "--edit-entity-grid-columns": `${grid.columns}`,
       "--edit-entity-grid-effective-columns": `${grid.columns}`,
-      "--edit-entity-grid-gap": grid.gap || "12px",
+      "--edit-entity-grid-gap": grid.gap || "var(--ngx-mat-extended-space-3, 16px)",
       "--edit-entity-grid-min-column-width": grid.minColumnWidth || "0px",
     };
   }
@@ -882,7 +882,7 @@ export class EditEntityRenderService<
   private resolveGrid(grid?: EditEntityGridOptions): EditEntityGridOptions {
     return {
       columns: this.normalizePositiveInteger(grid?.columns, 1),
-      gap: grid?.gap || "12px",
+      gap: grid?.gap || "var(--ngx-mat-extended-space-3, 16px)",
       minColumnWidth: grid?.minColumnWidth || "0px",
     };
   }
@@ -902,7 +902,7 @@ export class EditEntityRenderService<
 
     return {
       columns,
-      gap: card.grid?.gap ?? "12px",
+      gap: card.grid?.gap ?? "var(--ngx-mat-extended-space-3, 16px)",
       minColumnWidth: card.grid?.minColumnWidth ?? "0px",
     };
   }

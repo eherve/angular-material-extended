@@ -113,3 +113,27 @@ All message keys and French defaults:
 | `emptyContentLabel` | `Aucun contenu à afficher.` |
 
 The host receives the caller's confirmation options with optional labels intact. Its default Material implementation applies the Intl defaults; an application host may supply its own translated defaults.
+
+## Inherited theme contract
+
+Declare these optional CSS custom properties on an ancestor (including an overlay container when needed). The components do not declare common tokens on their hosts, so changing an ancestor updates existing instances without changing their inputs.
+
+| Token | Standalone default / role |
+| --- | --- |
+| `--ngx-mat-extended-space-1` | `4px`, small spacing |
+| `--ngx-mat-extended-space-2` | `8px`, compact surface padding and control spacing |
+| `--ngx-mat-extended-space-3` | `16px`, group and default grid gaps |
+| `--ngx-mat-extended-space-4` | `24px`, larger separation |
+| `--ngx-mat-extended-space-5` | `32px`, reserved larger separation |
+| `--ngx-mat-extended-radius` | `8px`, surface corners |
+| `--ngx-mat-extended-surface` | Surface background, with the component's existing standalone color fallback |
+| `--ngx-mat-extended-surface-hover` | Hover background |
+| `--ngx-mat-extended-surface-selected` | Selected / highlighted background |
+| `--ngx-mat-extended-border` | Surface separators and outlines |
+| `--ngx-mat-extended-border-selected` | Selected outline |
+| `--ngx-mat-extended-text` | Main text |
+| `--ngx-mat-extended-muted` | Secondary text and icons |
+
+Existing package-specific public color variables take precedence over the corresponding common role, which takes precedence over the standalone fallback. Action-specific colors keep their priority. Tokens only affect spacing and appearance: functional dimensions, circular controls and pill shapes remain unchanged. Material components inherit their theme; renderer headings use public Material typography roles with standalone fallbacks.
+
+Omitting a section/card grid `gap` uses `var(--ngx-mat-extended-space-3, 16px)`. An explicit value such as `12px` is retained. Responsive grids read the computed column gap when calculating available tracks and item widths.

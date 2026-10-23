@@ -19,6 +19,7 @@ export class SectionTabsDisplayResponsiveGridDirective implements AfterViewInit,
   private initialized = false;
   private resizeObserver?: ResizeObserver;
   private mutationObserver?: MutationObserver;
+  private ancestorThemeObserver?: MutationObserver;
 
   constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
 
@@ -38,9 +39,11 @@ export class SectionTabsDisplayResponsiveGridDirective implements AfterViewInit,
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
     this.mutationObserver?.disconnect();
+    this.ancestorThemeObserver?.disconnect();
   }
 
   private refreshObserver(): void {
+    this.ancestorThemeObserver?.disconnect();
     this.resizeObserver?.disconnect();
     this.mutationObserver?.disconnect();
     this.resizeObserver = undefined;
@@ -56,6 +59,11 @@ export class SectionTabsDisplayResponsiveGridDirective implements AfterViewInit,
     if (typeof MutationObserver !== 'undefined') {
       this.mutationObserver = new MutationObserver((): void => this.applyLayout());
       this.observeMutations();
+      this.ancestorThemeObserver = new MutationObserver((): void => this.applyLayout());
+      // Observe only the inheritance chain; layout writes target the grid and its children.
+      for (let ancestor = this.elementRef.nativeElement.parentElement; ancestor; ancestor = ancestor.parentElement) {
+        this.ancestorThemeObserver.observe(ancestor, { attributes: true, attributeFilter: ['style', 'class'] });
+      }
     }
   }
 

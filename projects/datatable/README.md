@@ -51,3 +51,18 @@ A datasource response contains `draw`, `recordsFiltered`, `data`, optional `face
 ## Runtime dependencies
 
 Angular framework packages and the external libraries used directly by this package are declared as peer dependencies so the consuming Angular application keeps a single compatible runtime instance.
+
+## Theme tokens
+
+Set inherited CSS custom properties on the datatable or an application ancestor. The library uses Angular Material's public Sass override APIs and does not depend on application-specific colors.
+
+| Token | Default | Purpose |
+| --- | --- | --- |
+| `--ngx-mat-extended-control-height` | `32px` | Shared toolbar icon button and records counter height. Material touch targets retain the application theme size. |
+| `--ngx-mat-extended-radius` | `8px` | Toolbar icon button corner radius. |
+| `--ngx-mat-extended-space-1` | `4px` | Records count separation. |
+| `--ngx-mat-extended-space-2` | `8px` | Records counter horizontal padding. |
+| `--ngx-mat-extended-accent` | Material primary | Selected header checkbox and focused header search control color. |
+| `--ngx-mat-extended-on-accent` | Material on-primary | Selected header checkbox checkmark color. |
+
+The counter sizes to its content and shares the toolbar button height; long counts remain fully visible. Header checkbox overrides include selected, focused, hovered, pressed and indeterminate states; disabled colors retain the Material theme defaults. Existing `--ngx-mat-datatable-*` color and sticky positioning properties remain supported.

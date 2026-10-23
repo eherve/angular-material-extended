@@ -88,3 +88,32 @@ export class MemorySectionSelectionHandler implements SectionSelectionHandler {
 Styles retain the source `section-tabs-display__*` classes and use the `app-section-tabs-display` host selector. Section tabs provide `--ngx-mat-section-tabs-primary`, `--ngx-mat-section-tabs-background`, and `--ngx-mat-section-tabs-text` defaults. Display chips use `--ngx-mat-section-tabs-display-primary` and `--ngx-mat-section-tabs-display-background`.
 
 `SectionTabsIntl.messages` is a complete typed dictionary for fixed labels. Defaults are `sections: 'Sections'`, `emptySections: 'Aucune section à afficher'`, `emptyComponents: 'Aucun composant configuré'`, `emptyFields: 'Aucun champ renseigné'`, `emptyFieldsDescription: "Activez l'affichage des champs vides pour voir les informations attendues."`, and `showEmptyFields: 'Afficher les champs vides'`. Replace messages and emit `changes` to refresh an existing view; an explicit `showEmptyFieldsLabel` option remains in effect. `sections` is the accessible navigation label.
+
+## Inherited theme contract
+
+Declare these optional CSS custom properties on an ancestor (including an overlay container when needed). The components do not declare common tokens on their hosts, so changing an ancestor updates existing instances without changing their inputs.
+
+| Token | Standalone default / role |
+| --- | --- |
+| `--ngx-mat-extended-space-1` | `4px`, small spacing |
+| `--ngx-mat-extended-space-2` | `8px`, compact surface padding and control spacing |
+| `--ngx-mat-extended-space-3` | `16px`, group and default grid gaps |
+| `--ngx-mat-extended-space-4` | `24px`, larger separation |
+| `--ngx-mat-extended-space-5` | `32px`, reserved larger separation |
+| `--ngx-mat-extended-radius` | `8px`, surface corners |
+| `--ngx-mat-extended-surface` | Surface background and selected empty-fields toggle handle, with existing standalone fallbacks |
+| `--ngx-mat-extended-surface-hover` | Hover background |
+| `--ngx-mat-extended-surface-selected` | Selected / highlighted background |
+| `--ngx-mat-extended-border` | Surface separators and outlines |
+| `--ngx-mat-extended-border-selected` | Selected outline |
+| `--ngx-mat-extended-accent` | Selected empty-fields toggle track and interaction color; falls back to Material primary |
+| `--ngx-mat-extended-text` | Main text |
+| `--ngx-mat-extended-muted` | Secondary text and icons |
+
+Existing package-specific public color variables take precedence over the corresponding common role, which takes precedence over the standalone fallback. Action-specific colors keep their priority. Tokens only affect spacing and appearance: functional dimensions, circular controls and pill shapes remain unchanged. Material components inherit their theme; renderer headings use public Material typography roles with standalone fallbacks.
+
+Omitting a section/card grid `gap` uses `var(--ngx-mat-extended-space-3, 16px)`. An explicit value such as `12px` is retained. Responsive grids read the computed column gap when calculating available tracks and item widths.
+
+Readonly field grids use borderless cells with compact padding and an 8px inherited spacing-token inset, preserving configured gaps and responsive spans. The empty-fields toggle uses a compact 40×24px visual track while retaining Material’s 48px touch target. Its selected track and checkmark inherit the accent token; the selected handle uses the surface token in normal, focus, hover and pressed states.
+
+`--ngx-mat-section-tabs-background` controls the section container. Set `--ngx-mat-section-tabs-card-background` separately for sidebar and content cards (for example, white cards on a gray container). Cards fall back to the existing section background, then `--ngx-mat-extended-surface`, then white.

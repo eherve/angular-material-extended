@@ -1,1 +1,11 @@
-.edit-entity-dialog-panel .mat-mdc-dialog-surface { overflow: hidden; background: var(--ngx-mat-edit-entity-dialog-background, #f4f6f8); color: var(--ngx-mat-edit-entity-dialog-text, #102f49); }
+.edit-entity-dialog-panel .mat-mdc-dialog-surface {
+  overflow: hidden;
+  background: var(
+    --ngx-mat-edit-entity-dialog-background,
+    var(--ngx-mat-extended-surface, #f4f6f8)
+  );
+  color: var(
+    --ngx-mat-edit-entity-dialog-text,
+    var(--ngx-mat-extended-text, #102f49)
+  );
+}

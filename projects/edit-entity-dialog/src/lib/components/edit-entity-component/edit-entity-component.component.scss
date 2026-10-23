@@ -5,14 +5,20 @@
 :host {
   --edit-entity-background: var(
     --ngx-mat-edit-entity-dialog-background,
-    #f4f6f8
+    var(--ngx-mat-extended-surface, #f4f6f8)
   );
   --edit-entity-border: var(
     --ngx-mat-edit-entity-dialog-border,
-    rgba(14, 43, 67, 0.12)
+    var(--ngx-mat-extended-border, rgba(14, 43, 67, 0.12))
   );
-  --edit-entity-text: var(--ngx-mat-edit-entity-dialog-text, #102f49);
-  --edit-entity-muted: var(--ngx-mat-edit-entity-dialog-muted, #61718a);
+  --edit-entity-text: var(
+    --ngx-mat-edit-entity-dialog-text,
+    var(--ngx-mat-extended-text, #102f49)
+  );
+  --edit-entity-muted: var(
+    --ngx-mat-edit-entity-dialog-muted,
+    var(--ngx-mat-extended-muted, #61718a)
+  );
   --edit-entity-primary: var(--ngx-mat-edit-entity-dialog-primary, #0f334d);
 
   position: relative;
@@ -32,12 +38,12 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--ngx-mat-extended-space-3, 16px);
   color: var(--edit-entity-primary);
 }
 
 .edit-entity-empty-state {
-  padding: 24px;
+  padding: var(--ngx-mat-extended-space-4, 24px);
   color: var(--edit-entity-muted);
   text-align: center;
 
@@ -61,26 +67,35 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: start;
-  gap: 16px;
+  gap: var(--ngx-mat-extended-space-3, 16px);
   min-height: 48px;
-  padding: 8px;
+  padding: var(--ngx-mat-extended-space-2, 8px);
   margin: 0;
   border-bottom: 1px solid var(--edit-entity-border);
   box-sizing: border-box;
-  background: var(--ngx-mat-edit-entity-dialog-header-background, #0f334d);
-  color: var(--ngx-mat-edit-entity-dialog-header-text, #fff);
+  background: var(
+    --ngx-mat-edit-entity-dialog-header-background,
+    var(--ngx-mat-extended-surface, #0f334d)
+  );
+  color: var(
+    --ngx-mat-edit-entity-dialog-header-text,
+    var(--ngx-mat-extended-text, #fff)
+  );
 
   h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: var(--mat-sys-title-medium-size, 18px);
     font-weight: 700;
     line-height: 1.2;
   }
 
   p {
-    margin: 3px 0 0;
-    color: var(--ngx-mat-edit-entity-dialog-header-text, #fff);
-    font-size: 13px;
+    margin: var(--ngx-mat-extended-space-1, 4px) 0 0;
+    color: var(
+      --ngx-mat-edit-entity-dialog-header-text,
+      var(--ngx-mat-extended-text, #fff)
+    );
+    font-size: var(--mat-sys-body-small-size, 13px);
   }
 }
 
@@ -100,13 +115,16 @@
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 8px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
   margin-left: auto;
 
   .mat-mdc-icon-button {
     @include mat.icon-button-overrides(
       (
-        icon-color: var(--ngx-mat-edit-entity-dialog-header-text, #fff),
+        icon-color: var(
+            --ngx-mat-edit-entity-dialog-header-text,
+            var(--ngx-mat-extended-text, #fff)
+          ),
       )
     );
   }
@@ -131,11 +149,14 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
   min-height: 54px;
-  padding: 8px;
+  padding: var(--ngx-mat-extended-space-2, 8px);
   border-top: 1px solid var(--edit-entity-border);
-  background: #ffffff;
+  background: var(
+    --ngx-mat-edit-entity-dialog-background,
+    var(--ngx-mat-extended-surface, #ffffff)
+  );
   box-sizing: border-box;
 }
 
@@ -143,14 +164,14 @@
 .edit-entity-actions-right {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
   min-width: 0;
 }
 
 .edit-entity-component-page {
   flex: 1 1 auto;
   min-height: 0;
-  padding: 8px;
+  padding: var(--ngx-mat-extended-space-2, 8px);
   overflow: hidden;
   box-sizing: border-box;
 
@@ -169,7 +190,7 @@
 .edit-entity-root-tab-icon {
   width: 18px;
   height: 18px;
-  margin-right: 6px;
+  margin-right: var(--ngx-mat-extended-space-1, 4px);
   font-size: 18px;
 }
 
@@ -179,8 +200,8 @@
   justify-content: center;
   min-width: 20px;
   height: 20px;
-  padding: 0 6px;
-  margin-left: 8px;
+  padding: 0 var(--ngx-mat-extended-space-1, 4px);
+  margin-left: var(--ngx-mat-extended-space-2, 8px);
   border-radius: 999px;
   background: rgba(15, 51, 77, 0.1);
   color: var(--edit-entity-primary);
@@ -193,7 +214,7 @@
   background: #fff3eb;
 
   &.invalid {
-    background: #fee4e2;
+    background: var(--mat-sys-error-container, #fee4e2);
   }
 
   &.missing {
@@ -218,7 +239,7 @@
     ),
     minmax(0, 1fr)
   );
-  gap: var(--edit-entity-grid-gap, 16px);
+  gap: var(--edit-entity-grid-gap, var(--ngx-mat-extended-space-3, 16px));
   align-items: start;
   align-content: start;
   grid-auto-flow: row;
@@ -228,7 +249,7 @@
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  padding: var(--edit-entity-grid-gap, 8px);
+  padding: var(--ngx-mat-extended-space-2, 8px);
   padding-left: 0;
 }
 
@@ -278,29 +299,43 @@
   flex-direction: column;
   overflow: hidden;
   box-sizing: border-box;
-  border: 1px solid #d9e0e7;
-  border-radius: 8px;
-  background: #ffffff;
+  border: 1px solid
+    var(
+      --ngx-mat-edit-entity-dialog-border,
+      var(--ngx-mat-extended-border, #d9e0e7)
+    );
+  border-radius: var(--ngx-mat-extended-radius, 8px);
+  background: var(
+    --ngx-mat-edit-entity-dialog-card-background,
+    var(
+      --ngx-mat-edit-entity-dialog-background,
+      var(--ngx-mat-extended-surface, #ffffff)
+    )
+  );
 }
 
 .edit-entity-card-header {
+  padding: var(--ngx-mat-extended-space-2, 8px);
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
 }
 
 .edit-entity-card-title {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--ngx-mat-extended-space-1, 4px);
 
   mat-icon,
   .mat-icon {
     flex: 0 0 auto;
-    color: #6b7280;
+    color: var(
+      --ngx-mat-edit-entity-dialog-muted,
+      var(--ngx-mat-extended-muted, #6b7280)
+    );
   }
 
   h3 {
@@ -316,7 +351,7 @@
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 8px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
 }
 
 .edit-entity-card-header-value {
@@ -326,7 +361,7 @@
 .edit-entity-card-actions {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--ngx-mat-extended-space-1, 4px);
 }
 
 .edit-entity-card-action {
@@ -345,7 +380,7 @@
   &.mat-mdc-button {
     min-width: 0;
     height: 32px;
-    padding: 0 10px;
+    padding: 0 var(--ngx-mat-extended-space-2, 8px);
     font-size: 0.85rem;
     line-height: 32px;
   }
@@ -368,11 +403,11 @@
   );
   align-items: start;
   align-content: start;
-  gap: var(--edit-entity-grid-gap, 8px);
+  gap: var(--edit-entity-grid-gap, var(--ngx-mat-extended-space-3, 16px));
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  padding: 8px;
+  padding: var(--ngx-mat-extended-space-2, 8px);
   box-sizing: border-box;
 }
 
@@ -408,14 +443,18 @@
   width: 100%;
   min-width: 0;
   align-items: center;
-  gap: 10px;
-  padding: 4px 0;
+  gap: var(--ngx-mat-extended-space-2, 8px);
+  padding: var(--ngx-mat-extended-space-1, 4px) 0;
 }
 
 .edit-entity-separator-line {
   flex: 1 1 auto;
   min-width: 16px;
-  border-top: 1px solid #d9e0e7;
+  border-top: 1px solid
+    var(
+      --ngx-mat-edit-entity-dialog-border,
+      var(--ngx-mat-extended-border, #d9e0e7)
+    );
 }
 
 .edit-entity-separator-label {
@@ -466,7 +505,7 @@
 }
 
 .edit-entity-section-tabs--single .edit-entity-section {
-  padding: 8px;
+  padding: var(--ngx-mat-extended-space-2, 8px);
 }
 
 .action-btn,

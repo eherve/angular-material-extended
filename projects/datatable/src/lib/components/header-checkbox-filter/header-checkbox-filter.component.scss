@@ -1,3 +1,5 @@
+@use "@angular/material" as mat;
+
 :host {
   display: flex;
   flex: 1 1 100%;
@@ -29,4 +31,19 @@ mat-form-field {
   place-content: center start;
   align-items: center;
   flex-direction: row;
+}
+
+mat-checkbox {
+  @include mat.checkbox-overrides(
+    (
+      selected-icon-color: var(--datatable-accent),
+      selected-focus-icon-color: var(--datatable-accent),
+      selected-hover-icon-color: var(--datatable-accent),
+      selected-pressed-icon-color: var(--datatable-accent),
+      selected-focus-state-layer-color: var(--datatable-accent),
+      selected-hover-state-layer-color: var(--datatable-accent),
+      selected-pressed-state-layer-color: var(--datatable-accent),
+      selected-checkmark-color: var(--datatable-on-accent),
+    )
+  );
 }

@@ -1,18 +1,31 @@
 /** @format */
 
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
 :host {
   display: flex;
   position: relative;
   max-height: 100%;
 
+  --datatable-control-height: var(--ngx-mat-extended-control-height, 32px);
+  --datatable-accent: var(--ngx-mat-extended-accent, var(--mat-sys-primary));
+  --datatable-on-accent: var(
+    --ngx-mat-extended-on-accent,
+    var(--mat-sys-on-primary)
+  );
+
   --datatable-background: var(--ngx-mat-datatable-background, #ffffff);
   --datatable-color: var(--ngx-mat-datatable-color, var(--mat-sys-primary,));
   --datatable-border-color: var(--ngx-mat-datatable-border-color, #ccc);
   --datatable-sticky-top: var(--ngx-mat-datatable-sticky-top, 0);
-  --datatable-sticky-background: var(--ngx-mat-datatable-sticky-background, var(--datatable-background));
-  --datatable-sticky-border: var(--ngx-mat-datatable-sticky-border, 1px dashed #e6a93a);
+  --datatable-sticky-background: var(
+    --ngx-mat-datatable-sticky-background,
+    var(--datatable-background)
+  );
+  --datatable-sticky-border: var(
+    --ngx-mat-datatable-sticky-border,
+    1px dashed #e6a93a
+  );
 
   @include mat.table-overrides(
     (
@@ -39,7 +52,7 @@
   display: flex;
   box-sizing: border-box;
   place-content: end space-between;
-  align-items: end;
+  align-items: center;
   flex-direction: row;
   border-bottom: 1px solid var(--datatable-border-color);
 
@@ -48,7 +61,7 @@
   #head-end {
     display: flex;
     box-sizing: border-box;
-    align-items: end;
+    align-items: center;
     flex-direction: row;
   }
   #head-start {
@@ -61,7 +74,18 @@
     place-content: end end;
   }
 
+  button[mat-icon-button] {
+    @include mat.icon-button-overrides(
+      (
+        state-layer-size: var(--datatable-control-height),
+        container-shape: var(--ngx-mat-extended-radius, 8px),
+      )
+    );
+  }
+
   .action {
+    display: flex;
+    align-items: center;
     position: relative;
     .action-loader {
       position: absolute;
@@ -71,7 +95,7 @@
     }
 
     &.user-action {
-      .mat-mdc-icon-button {
+      button[mat-icon-button] {
         @include mat.icon-button-overrides(
           (
             icon-color: var(--action-color, var(--mat-sys-primary)),
@@ -82,11 +106,17 @@
   }
 
   #records-count {
-    min-width: 72px;
-    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--ngx-mat-extended-space-1, 4px);
+    box-sizing: border-box;
+    min-width: 0;
+    height: var(--datatable-control-height);
+    padding: 0 var(--ngx-mat-extended-space-2, 8px);
     color: var(--datatable-color);
     font-size: 14px;
-    line-height: 48px;
+    line-height: 1;
     text-align: right;
     white-space: nowrap;
   }
@@ -112,8 +142,8 @@
 
 #table-container {
   flex: 1 1 100%;
-  overflow-y: var(--datatable-container-overflow-y, 'inherit');
-  overflow-x: var(--datatable-container-overflow-x, 'inherit');
+  overflow-y: var(--datatable-container-overflow-y, "inherit");
+  overflow-x: var(--datatable-container-overflow-x, "inherit");
   width: 100%;
   scrollbar-width: thin;
 }
@@ -129,7 +159,10 @@
       // TODO not working if multiple row are sticky (option not provided yet)
       top: var(--datatable-sticky-top) !important;
       opacity: 1;
-      background: var(--datatable-sticky-background, var(--datatable-background, #ffffff));
+      background: var(
+        --datatable-sticky-background,
+        var(--datatable-background, #ffffff)
+      );
       &.mat-mdc-table-sticky-border-elem-left {
         border-right: var(--datatable-sticky-border);
       }
@@ -179,7 +212,10 @@
 
       .mat-mdc-footer-cell {
         padding: 0;
-        border-bottom-color: var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));
+        border-bottom-color: var(
+          --mat-table-row-item-outline-color,
+          var(--mat-sys-outline, rgba(0, 0, 0, 0.12))
+        );
         border-bottom-width: var(--mat-table-row-item-outline-width, 1px);
         border-bottom-style: solid;
       }
@@ -196,8 +232,14 @@
 
         &:hover {
           .mat-mdc-cell {
-            --datatable-hover-color: var(--ngx-mat-datatable-hover-color, var(--mat-sys-on-primary));
-            --datatable-hover-bgcolor: var(--ngx-mat-datatable-hover-bgcolor, var(--mat-sys-primary));
+            --datatable-hover-color: var(
+              --ngx-mat-datatable-hover-color,
+              var(--mat-sys-on-primary)
+            );
+            --datatable-hover-bgcolor: var(
+              --ngx-mat-datatable-hover-bgcolor,
+              var(--mat-sys-primary)
+            );
             color: var(--datatable-hover-color) !important;
             background-color: var(--datatable-hover-bgcolor) !important;
           }
@@ -211,7 +253,10 @@
 
       &:last-child {
         .mat-mdc-cell {
-          border-bottom-color: var(--mat-table-row-item-outline-color, var(--mat-sys-outline, rgba(0, 0, 0, 0.12)));
+          border-bottom-color: var(
+            --mat-table-row-item-outline-color,
+            var(--mat-sys-outline, rgba(0, 0, 0, 0.12))
+          );
           border-bottom-width: var(--mat-table-row-item-outline-width, 1px);
           border-bottom-style: solid;
         }
@@ -339,7 +384,7 @@
 }
 
 ::ng-deep {
-  .mat-mdc-icon-button[mat-icon-button][size='small'] {
+  .mat-mdc-icon-button[mat-icon-button][size="small"] {
     --mat-icon-button-state-layer-size: 30px;
     --mat-icon-button-icon-size: 18px;
 
@@ -486,7 +531,10 @@
       }
       .chip-facet-key {
         background-color: var(--mat-chip-label-text-color);
-        color: var(--facet-label-color, var(--mat-chip-elevated-container-color));
+        color: var(
+          --facet-label-color,
+          var(--mat-chip-elevated-container-color)
+        );
       }
       .chip-facet-value {
         color: var(--facet-value-color, var(--mat-chip-label-text-color));

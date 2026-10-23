@@ -29,6 +29,7 @@ export class EditEntityResponsiveGridDirective
   private initialized = false;
   private resizeObserver?: ResizeObserver;
   private mutationObserver?: MutationObserver;
+  private ancestorThemeObserver?: MutationObserver;
 
   constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
 
@@ -48,9 +49,11 @@ export class EditEntityResponsiveGridDirective
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
     this.mutationObserver?.disconnect();
+    this.ancestorThemeObserver?.disconnect();
   }
 
   private refreshObservers(): void {
+    this.ancestorThemeObserver?.disconnect();
     this.resizeObserver?.disconnect();
     this.mutationObserver?.disconnect();
 
@@ -64,6 +67,11 @@ export class EditEntityResponsiveGridDirective
         this.applyLayout(),
       );
       this.observeMutations();
+      this.ancestorThemeObserver = new MutationObserver((): void => this.applyLayout());
+      // Observe only the inheritance chain; layout writes target the grid and its children.
+      for (let ancestor = this.elementRef.nativeElement.parentElement; ancestor; ancestor = ancestor.parentElement) {
+        this.ancestorThemeObserver.observe(ancestor, { attributes: true, attributeFilter: ['style', 'class'] });
+      }
     }
   }
 

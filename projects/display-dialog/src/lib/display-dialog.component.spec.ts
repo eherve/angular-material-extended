@@ -27,6 +27,33 @@ describe('DisplayDialog lifecycle and actions', () => {
     fixture = TestBed.createComponent(DisplayDialog<R>);
   });
   const settle = async () => {await fixture.whenStable(); fixture.detectChanges();};
+  it('inherits live ancestor surfaces and spacing while retaining package priority', async () => {
+    fixture.componentRef.setInput('data', {...direct('Themed'), actions: [{label: 'Action', handle: () => {}}]});
+    fixture.detectChanges(); await settle();
+    const ancestor = document.createElement('div');
+    fixture.nativeElement.parentNode.insertBefore(ancestor, fixture.nativeElement);
+    ancestor.appendChild(fixture.nativeElement);
+    try {
+      ancestor.style.setProperty('--ngx-mat-extended-space-2', '11px');
+      ancestor.style.setProperty('--ngx-mat-extended-radius', '13px');
+      ancestor.style.setProperty('--ngx-mat-extended-surface', 'rgb(10, 20, 30)');
+      const actions = fixture.nativeElement.querySelector('.display-dialog-actions');
+      const card = fixture.nativeElement.querySelector('.section-tabs-display__card');
+      expect(getComputedStyle(card).borderRadius).toBe('13px');
+      expect(getComputedStyle(card).backgroundColor).toBe('rgb(10, 20, 30)');
+      expect(getComputedStyle(actions).paddingTop).toBe('11px');
+      expect(getComputedStyle(actions).backgroundColor).toBe('rgb(10, 20, 30)');
+      ancestor.style.setProperty('--ngx-mat-extended-space-2', '15px');
+      ancestor.style.setProperty('--ngx-mat-extended-radius', '17px');
+      ancestor.style.setProperty('--ngx-mat-extended-surface', 'rgb(40, 50, 60)');
+      expect(getComputedStyle(card).borderRadius).toBe('17px');
+      expect(getComputedStyle(card).backgroundColor).toBe('rgb(40, 50, 60)');
+      expect(getComputedStyle(actions).paddingTop).toBe('15px');
+      expect(getComputedStyle(actions).backgroundColor).toBe('rgb(40, 50, 60)');
+      ancestor.style.setProperty('--ngx-mat-display-dialog-background', 'rgb(70, 80, 90)');
+      expect(getComputedStyle(fixture.nativeElement.querySelector('.display-dialog-content')).backgroundColor).toBe('rgb(70, 80, 90)');
+    } finally { ancestor.replaceWith(fixture.nativeElement); }
+  });
   const button = () => fixture.componentInstance.getActions('bottom')[0] as DisplayDialogRuntimeActionButton<R>;
   it('ignoresStaleLoader', async () => {
     const old = deferred<R>(); const records: string[] = [];

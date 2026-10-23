@@ -26,7 +26,7 @@ import { AdaptiveSearchPanelDirective } from "../../internal/search/adaptive-pan
   ],
   templateUrl: "../autocomplete/search-control.html",
   styles: [
-    ":host, mat-form-field {display:block;width:100%} .selected-item {display:flex;align-items:center;gap:8px} .selected-name {flex:1} small {display:block;opacity:.7} .error {color:var(--mat-sys-error)}",
+    ":host, mat-form-field {display:block;width:100%} .selected-item {display:flex;align-items:center;gap:var(--ngx-mat-extended-space-2, 8px)} .selected-name {flex:1} small {display:block;opacity:.7} .error {color:var(--mat-sys-error)}",
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

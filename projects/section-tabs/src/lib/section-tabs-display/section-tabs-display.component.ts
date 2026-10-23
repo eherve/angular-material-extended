@@ -432,7 +432,7 @@ export class SectionTabsDisplayComponent implements OnChanges {
 
     return {
       '--section-tabs-display-grid-columns': `${columns}`,
-      '--section-tabs-display-grid-gap': grid?.gap || '12px',
+      '--section-tabs-display-grid-gap': grid?.gap || 'var(--ngx-mat-extended-space-3, 16px)',
       '--section-tabs-display-grid-min-column-width': minColumnWidth,
       '--section-tabs-display-grid-track-min-column-width': preserveRows ? minColumnWidth : '0px',
     };

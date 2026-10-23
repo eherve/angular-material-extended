@@ -1,12 +1,24 @@
 /** @format */
 
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
 
 :host {
-  --display-dialog-background: var(--ngx-mat-display-dialog-background, #f4f6f8);
-  --display-dialog-border: var(--ngx-mat-display-dialog-border, rgba(14, 43, 67, 0.12));
-  --display-dialog-text: var(--ngx-mat-display-dialog-text, #102f49);
-  --display-dialog-muted: var(--ngx-mat-display-dialog-muted, #61718a);
+  --display-dialog-background: var(
+    --ngx-mat-display-dialog-background,
+    var(--ngx-mat-extended-surface, #f4f6f8)
+  );
+  --display-dialog-border: var(
+    --ngx-mat-display-dialog-border,
+    var(--ngx-mat-extended-border, rgba(14, 43, 67, 0.12))
+  );
+  --display-dialog-text: var(
+    --ngx-mat-display-dialog-text,
+    var(--ngx-mat-extended-text, #102f49)
+  );
+  --display-dialog-muted: var(
+    --ngx-mat-display-dialog-muted,
+    var(--ngx-mat-extended-muted, #61718a)
+  );
   --display-dialog-primary: var(--ngx-mat-display-dialog-primary, #0f334d);
 
   position: relative;
@@ -25,12 +37,12 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--ngx-mat-extended-space-3, 16px);
   color: var(--display-dialog-primary);
 }
 
 .display-dialog-empty-state {
-  padding: 24px;
+  padding: var(--ngx-mat-extended-space-4, 24px);
   color: var(--display-dialog-muted);
   text-align: center;
 
@@ -51,32 +63,39 @@
 .display-dialog-title {
   display: flex;
   min-height: 48px;
-  padding: 8px 12px;
+  padding: var(--ngx-mat-extended-space-2, 8px)
+    var(--ngx-mat-extended-space-2, 8px);
   margin: 0;
   border-bottom: 1px solid var(--display-dialog-border);
   box-sizing: border-box;
-  background: var(--ngx-mat-display-dialog-header-background, #e9eef2);
-  color: var(--ngx-mat-display-dialog-header-text, #102f49);
+  background: var(
+    --ngx-mat-display-dialog-header-background,
+    var(--ngx-mat-extended-surface, #e9eef2)
+  );
+  color: var(
+    --ngx-mat-display-dialog-header-text,
+    var(--ngx-mat-extended-text, #102f49)
+  );
 
   .display-dialog-title-bar {
     display: flex;
     flex: 0 0 auto;
     align-items: center;
     justify-content: start;
-    gap: 80px;
+    gap: var(--ngx-mat-extended-space-3, 16px);
     width: 100%;
 
     h2 {
       margin: 0;
-      font-size: 18px;
+      font-size: var(--mat-sys-title-medium-size, 18px);
       font-weight: 700;
       line-height: 1.2;
     }
 
     p {
-      margin: 3px 0 0;
+      margin: var(--ngx-mat-extended-space-1, 4px) 0 0;
       color: var(--display-dialog-muted);
-      font-size: 13px;
+      font-size: var(--mat-sys-body-small-size, 13px);
     }
   }
 }
@@ -84,7 +103,10 @@
 .display-dialog-title-content {
   min-width: 0;
   overflow: hidden;
-  --display-dialog-muted: var(--ngx-mat-display-dialog-header-text, #102f49);
+  --display-dialog-muted: var(
+    --ngx-mat-display-dialog-header-text,
+    var(--ngx-mat-extended-text, #102f49)
+  );
 
   h2,
   p {
@@ -98,13 +120,16 @@
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 8px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
   margin-left: auto;
 
   .mat-mdc-icon-button {
     @include mat.icon-button-overrides(
       (
-        icon-color: var(--ngx-mat-display-dialog-header-text, #102f49),
+        icon-color: var(
+            --ngx-mat-display-dialog-header-text,
+            var(--ngx-mat-extended-text, #102f49)
+          ),
       )
     );
   }
@@ -126,11 +151,14 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
   min-height: 54px;
-  padding: 8px;
+  padding: var(--ngx-mat-extended-space-2, 8px);
   border-top: 1px solid var(--display-dialog-border);
-  background: #ffffff;
+  background: var(
+    --ngx-mat-display-dialog-background,
+    var(--ngx-mat-extended-surface, #ffffff)
+  );
   box-sizing: border-box;
 }
 
@@ -138,7 +166,7 @@
 .display-dialog-actions-right {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--ngx-mat-extended-space-2, 8px);
   min-width: 0;
 }
 
@@ -146,9 +174,15 @@
   @include mat.button-overrides(
     (
       filled-label-text-color: var(--action-color, #fff),
-      filled-container-color: var(--action-background-color, var(--ngx-mat-display-dialog-primary, #0f334d)),
+      filled-container-color: var(
+          --action-background-color,
+          var(--ngx-mat-display-dialog-primary, #0f334d)
+        ),
       protected-label-text-color: var(--action-color, #fff),
-      protected-container-color: var(--action-background-color, var(--ngx-mat-display-dialog-primary, #0f334d)),
+      protected-container-color: var(
+          --action-background-color,
+          var(--ngx-mat-display-dialog-primary, #0f334d)
+        ),
       text-label-text-color: var(--action-color, var(--display-dialog-primary)),
     )
   );
@@ -172,7 +206,8 @@
 .display-dialog-component-page {
   flex: 1 1 auto;
   min-height: 0;
-  padding: 12px 16px 16px;
+  padding: var(--ngx-mat-extended-space-2, 8px)
+    var(--ngx-mat-extended-space-2, 8px) var(--ngx-mat-extended-space-2, 8px);
   overflow: hidden;
   box-sizing: border-box;
 
@@ -189,8 +224,11 @@
   display: none;
 }
 
-:host ::ng-deep .display-dialog-single-section-display .section-tabs__content-panel {
-  padding: 0 0 0 8px;
+:host
+  ::ng-deep
+  .display-dialog-single-section-display
+  .section-tabs__content-panel {
+  padding: 0 0 0 var(--ngx-mat-extended-space-2, 8px);
 }
 
 .display-dialog-root-tabs {
@@ -203,7 +241,7 @@
 .display-dialog-root-tab-icon {
   width: 18px;
   height: 18px;
-  margin-right: 6px;
+  margin-right: var(--ngx-mat-extended-space-1, 4px);
   font-size: 18px;
 }
 
@@ -213,8 +251,8 @@
   justify-content: center;
   min-width: 20px;
   height: 20px;
-  padding: 0 6px;
-  margin-left: 8px;
+  padding: 0 var(--ngx-mat-extended-space-1, 4px);
+  margin-left: var(--ngx-mat-extended-space-2, 8px);
   border-radius: 999px;
   background: rgba(15, 51, 77, 0.1);
   color: var(--display-dialog-primary);
@@ -228,7 +266,11 @@
   min-height: 0;
 }
 
-:host ::ng-deep .display-dialog-root-tabs > .mat-mdc-tab-body-wrapper > .mat-mdc-tab-body {
+:host
+  ::ng-deep
+  .display-dialog-root-tabs
+  > .mat-mdc-tab-body-wrapper
+  > .mat-mdc-tab-body {
   min-height: 0;
 }
 
@@ -252,4 +294,8 @@
   }
 }
 
-.display-dialog-action-error { padding: 12px 16px; color: #a01616; background: #fff1f1; }
+.display-dialog-action-error {
+  padding: var(--ngx-mat-extended-space-2, 8px);
+  color: var(--mat-sys-on-error-container, #a01616);
+  background: var(--mat-sys-error-container, #fff1f1);
+}

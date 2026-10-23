@@ -20,7 +20,7 @@
 
     @if (showEmptyFieldsToggle) {
       <ng-template appSectionTabsFooter>
-        <mat-slide-toggle [checked]="showEmptyFieldsState" (change)="onShowEmptyFieldsChange($event.checked)">
+        <mat-slide-toggle class="section-tabs-display__empty-fields-toggle" [checked]="showEmptyFieldsState" (change)="onShowEmptyFieldsChange($event.checked)">
           <span [innerHTML]="showEmptyFieldsLabel"></span>
         </mat-slide-toggle>
       </ng-template>
