@@ -1,9 +1,13 @@
 <!-- @format -->
 
 @if (selectControl) {
-  <mat-form-field appearance="fill">
+  <mat-form-field
+    appearance="fill"
+    [class.label-resting]="!filterSelect.shouldLabelFloat"
+  >
     <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
     <mat-select
+      #filterSelect="matSelect"
       [formControl]="selectControl"
       [placeholder]="column.placeholder!"
       [multiple]="column.multiple"

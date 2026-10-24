@@ -14,11 +14,13 @@
       <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
 
       <lib-operator-select
-        matPrefix
+        matTextPrefix
+        [class.label-resting]="!rangeInput.shouldLabelFloat"
         [formControl]="operatorControl"
       ></lib-operator-select>
 
       <mat-date-range-input
+        #rangeInput="matDateRangeInput"
         [formGroup]="rangeGroup"
         [rangePicker]="rangePicker"
       >
@@ -68,11 +70,13 @@
       <mat-label [innerHTML]="column.header | safeHtml"></mat-label>
 
       <lib-operator-select
-        matPrefix
+        matTextPrefix
+        [class.label-resting]="!dateInput.shouldLabelFloat"
         [formControl]="operatorControl"
       ></lib-operator-select>
 
       <input
+        #dateInput="matInput"
         matInput
         [matDatepicker]="datePicker"
         [formControl]="selectControl"

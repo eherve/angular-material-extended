@@ -18,6 +18,20 @@ mat-form-field {
     )
   );
 
+  @include mat.select-overrides(
+    (
+      arrow-transform: none,
+    )
+  );
+
+  &.label-resting {
+    @include mat.select-overrides(
+      (
+        arrow-transform: translateY(-0.5lh),
+      )
+    );
+  }
+
   min-width: auto;
   flex: 1 1 100%;
   margin: 6px 0;

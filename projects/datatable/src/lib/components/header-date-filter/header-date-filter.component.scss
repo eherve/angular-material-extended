@@ -27,6 +27,16 @@ mat-form-field {
   --mat-form-field-filled-container-color: var(--datatable-background);
 
   ::ng-deep {
+    // Material has no label-width override. Keep the filled label inside the
+    // infix so that long headers cannot overlap the calendar or clear button.
+    .mat-mdc-floating-label {
+      max-width: 100%;
+    }
+
+    .mdc-floating-label--float-above {
+      max-width: calc(100% / 0.75);
+    }
+
     .mat-mdc-form-field-bottom-align {
       display: none;
     }

@@ -11,12 +11,31 @@
   width: 26px;
   height: 26px;
   padding: 6px;
-  
+
   ::ng-deep {
     .mat-mdc-button-touch-target {
       height: 36px;
       width: 36px;
     }
+  }
+}
+
+:host([matTextPrefix]) {
+  margin-inline-end: 4px;
+
+  .ngx-mat-datatable-operator-button {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    font-size: 14px;
+  }
+
+  &:not(.label-resting) .ngx-mat-datatable-operator-button {
+    vertical-align: 2px;
+  }
+
+  &.label-resting .ngx-mat-datatable-operator-button {
+    transform: translateY(-0.5lh);
   }
 }
 
