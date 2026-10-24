@@ -1,0 +1,64 @@
+:host {
+  display: block;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.graph-viewport {
+  position: relative;
+  max-height: inherit;
+  overflow: auto;
+
+  &.dragging {
+    cursor: grabbing;
+    user-select: none;
+  }
+}
+
+.graph-canvas {
+  position: relative;
+  margin: 0 auto;
+}
+
+.graph-connectors {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.graph-edge {
+  fill: none;
+  stroke: var(--ngx-mat-organigram-connector, #09293c);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+
+  &.highlighted {
+    stroke: var(--ngx-mat-organigram-highlight, #e73452);
+  }
+}
+
+.graph-node {
+  position: absolute;
+  display: flow-root;
+  width: var(--ngx-mat-organigram-node-width, var(--graph-node-width, 250px));
+  box-sizing: border-box;
+
+  &:focus-visible,
+  &.selected {
+    outline: 2px solid var(--ngx-mat-organigram-focus, #09293c);
+    outline-offset: 3px;
+  }
+}
+
+.graph-state {
+  padding: 16px;
+  text-align: center;
+}
+
+.graph-error {
+  color: var(--ngx-mat-organigram-error, #e9396b);
+}

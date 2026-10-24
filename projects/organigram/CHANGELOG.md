@@ -1,5 +1,13 @@
 # Changelog
 
+## 22.2.0 — 2026-10-24
+
+- Add standalone `OrganigramGraphComponent` for directed acyclic graphs with shared multi-parent nodes.
+- Validate graph IDs, edges, dimensions and cycles before deterministic Dagre layout.
+- Render custom Angular cards once, measure their size and route SVG connectors between all parents.
+- Support ancestor highlighting across every incoming path, keyboard activation and drag scrolling.
+- Export graph types, layout helpers and configurable graph messages; preserve the hierarchical tree API.
+
 ## 22.1.0 — 2026-10-22
 
 - Reconcile structural updates by stable node keys and retain existing row/card DOM when adding nodes.

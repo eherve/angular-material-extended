@@ -1,0 +1,51 @@
+<div
+  #viewport
+  class="graph-viewport"
+  [class.dragging]="dragging()"
+  role="region"
+  [attr.aria-label]="ariaLabel()"
+  [style.--graph-node-width.px]="options().nodeWidth ?? 250"
+>
+  @if (error()) {
+    <p class="graph-state graph-error" role="alert">
+      {{ intl.messages().invalidGraph }}
+    </p>
+  } @else if (!layout().nodes.length) {
+    <p class="graph-state">{{ intl.messages().empty }}</p>
+  } @else {
+    <div class="graph-canvas" [style.width.px]="layout().width" [style.height.px]="layout().height">
+      <svg class="graph-connectors" [attr.width]="layout().width" [attr.height]="layout().height" aria-hidden="true">
+        @for (edge of layout().edges; track edge.id) {
+          <path
+            class="graph-edge"
+            [class.highlighted]="highlightedEdges().has(edge.id)"
+            [attr.d]="edge.path"
+            [attr.data-source]="edge.source"
+            [attr.data-target]="edge.target"
+          />
+        }
+      </svg>
+      @for (node of layout().nodes; track node.id) {
+        <div
+          #graphNode
+          class="graph-node"
+          [class.selected]="node.selected"
+          [style.left.px]="node.x"
+          [style.top.px]="node.y"
+          [attr.data-node-id]="node.id"
+          [attr.aria-label]="node.label ?? null"
+          role="button"
+          tabindex="0"
+          (mouseenter)="hoveredId.set(node.id)"
+          (mouseleave)="hoveredId.set(null)"
+          (focusin)="focusedId.set(node.id)"
+          (focusout)="focusOut($event)"
+          (keydown)="activate(node, $event)"
+          (click)="activate(node, $event)"
+        >
+          <ng-container [ngTemplateOutlet]="nodeTmpl()" [ngTemplateOutletContext]="{ node }" />
+        </div>
+      }
+    </div>
+  }
+</div>

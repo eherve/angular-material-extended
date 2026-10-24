@@ -3,6 +3,8 @@
 Angular 22 template-driven organization trees with lazy branches, multi-row connectors,
 keyboard activation, drag scrolling and ancestor highlighting.
 
+The package also provides a separate multi-parent renderer for directed acyclic graphs (DAGs).
+
 ## Installation
 
 ```sh
@@ -80,6 +82,52 @@ Messages are French by default. Inject `OrganigramIntl` and update its `messages
 ```ts
 intl.messages.set({ loadError: 'Loading failed.', retry: 'Retry' });
 ```
+
+## Multi-parent graphs
+
+Import standalone `OrganigramGraphComponent`, or use `OrganigramModule`. Supply flat arrays with globally unique node IDs and explicit directed edges. Each node is rendered once, including nodes reached through several parents. Existing tree APIs remain available for hierarchical organigrams.
+
+```ts
+import { OrganigramGraphComponent, OrganigramGraphNode, OrganigramGraphEdge } from '@eherve/angular-material-organigram';
+
+readonly nodes: OrganigramGraphNode<{ name: string }>[] = [
+  { id: 'planned', entity: { name: 'Planifiée' } },
+  { id: 'alice', entity: { name: 'Alice' } },
+  { id: 'bob', entity: { name: 'Bob' } },
+  { id: 'finished', entity: { name: 'À finaliser' } },
+];
+readonly edges: OrganigramGraphEdge[] = [
+  { source: 'planned', target: 'alice' },
+  { source: 'planned', target: 'bob' },
+  { source: 'alice', target: 'finished' },
+  { source: 'bob', target: 'finished' },
+];
+```
+
+```html
+<app-organigram-graph [nodes]="nodes" [edges]="edges" [nodeTmpl]="card" />
+<ng-template #card let-node="node"><article>{{ node.entity?.name }}</article></ng-template>
+```
+
+Graph inputs:
+
+- `nodes`: readonly `OrganigramGraphNode<T>[]`; `id` is required, `entity`, `label`, `type` and `selected` are optional. `label` supplies the accessible node name.
+- `edges`: readonly `OrganigramGraphEdge[]`; `source` and `target` are node IDs. Optional `id` supplies the stable edge identity; otherwise the endpoint pair identifies it. Parallel duplicate links are rejected.
+- `nodeTmpl`: required template receiving `{ node }`. Layout nodes also expose their measured `width`, `height`, `x` and `y`.
+- `options`: `OrganigramGraphOptions`, with `direction` (`TB` default; `BT`, `LR`, `RL` supported), `nodeWidth` (250), initial `nodeHeight` (64), `horizontalGap` (40), `verticalGap` (36), and `margin` (16), all dimensions in CSS pixels.
+- `ariaLabel`: accessible graph-region name, default `Graphe`.
+
+`nodeClick` emits the node on direct click or Enter/Space. Projected controls keep their own events. DOM and keyboard order follow the configured graph direction from sources to sinks. Hover and keyboard focus highlight all incoming ancestor paths. Dragging blank space scrolls the graph; native scroll and touch scrolling remain available. Set a height or max-height on the component to constrain its viewport.
+
+Dagre computes the layout; SVG draws the connectors behind the Angular cards. ResizeObserver updates placement when a card's content or width changes. The renderer retains card DOM by node ID during immutable updates and data reorder. It never mutates supplied nodes or edges. Node IDs must remain globally unique in the supplied graph; change them when switching unrelated datasets.
+
+The graph shares the organigram connector/highlight/focus/error color tokens and `--ngx-mat-organigram-node-width`. CSS width overrides are measured before the next layout. Custom cards own their appearance and tooltip behavior.
+
+Invalid node/edge IDs, duplicates, missing endpoints, self links, cycles and invalid dimensions produce an accessible error and clear the previous graph. The component's readonly `error()` signal exposes the diagnostic; validation errors are `OrganigramGraphError` with a `code`. Corrected inputs recover automatically. Empty inputs show a configurable empty message. Inject `OrganigramGraphIntl` and replace its `messages` signal (`empty`, `invalidGraph`) to localize these states.
+
+Graph data is declarative. Loading, editing and application state are owned by the host. The graph component has no tree-collapse or lazy-child mutation API.
+
+`layoutOrganigramGraph(nodes, edges, options?, sizes?)` and `collectOrganigramAncestorEdges(edges, nodeId)` are also exported for framework-independent layout and ancestor queries. The layout helper returns positioned node copies, SVG paths and canvas dimensions.
 
 ## Development
 

@@ -28,7 +28,7 @@
     "build:edit-entity-dialog": "ng build NgxMatEditEntityDialog",
     "test:edit-entity-dialog": "ng test NgxMatEditEntityDialog --watch=false --browsers=ChromeHeadless",
     "check:tooltip": "npm run test:tooltip && npm run build:tooltip",
-    "test:organigram:model": "node --test projects/organigram/tests/model.test.mjs",
+    "test:organigram:model": "node --test projects/organigram/tests/*.test.mjs",
     "test:organigram": "ng test NgxMatOrganigram --watch=false --browsers=ChromeHeadless",
     "build:organigram": "ng build NgxMatOrganigram",
     "check:organigram": "npm run test:organigram:model && npm run test:organigram && npm run build:organigram"
@@ -49,6 +49,7 @@
     "@angular/platform-browser": "^22.2.1",
     "@angular/platform-browser-dynamic": "^22.2.1",
     "@angular/router": "^22.2.1",
+    "@dagrejs/dagre": "3.1.1",
     "@ng-matero/extensions": "^22.1.1",
     "@ng-matero/extensions-moment-adapter": "^22.0.0",
     "dayjs": "^1.11.20",

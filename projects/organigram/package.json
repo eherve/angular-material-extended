@@ -1,6 +1,6 @@
 {
   "name": "@eherve/angular-material-organigram",
-  "version": "22.1.0",
+  "version": "22.2.0",
   "author": "Eric Herve <eric.herve.95@gmail.com>",
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
     "@angular/core": "^22.0.0"
   },
   "dependencies": {
+    "@dagrejs/dagre": "3.1.1",
     "tslib": "^2.3.0"
   },
   "sideEffects": false,

@@ -4,8 +4,6 @@
   "lib": {
     "entryFile": "src/public-api.ts"
   },
-  "assets": [
-    "README.md",
-    "CHANGELOG.md"
-  ]
+  "allowedNonPeerDependencies": ["@dagrejs/dagre"],
+  "assets": ["README.md", "CHANGELOG.md"]
 }
