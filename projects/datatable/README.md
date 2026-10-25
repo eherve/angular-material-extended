@@ -66,3 +66,25 @@ Set inherited CSS custom properties on the datatable or an application ancestor.
 | `--ngx-mat-extended-on-accent` | Material on-primary | Selected header checkbox checkmark color. |
 
 The counter sizes to its content and shares the toolbar button height; long counts remain fully visible. Header checkbox overrides include selected, focused, hovered, pressed and indeterminate states; disabled colors retain the Material theme defaults. Existing `--ngx-mat-datatable-*` color and sticky positioning properties remain supported.
+
+## Restored autocomplete filters
+
+Searchable autocomplete columns can supply `resolveOption(value: unknown): Promise<DatatableSearchListOption | null>`
+to recover the display option for a restored filter containing only its stored value. The application owns the lookup
+(API, cache or in-memory list); the table does not assume an endpoint. Return an option whose `value` matches the
+requested value, including its label and optional color/group, or `null` when unavailable.
+
+```ts
+resolveOption: async (value) => {
+  if (typeof value !== 'string') return null;
+  const item = await service.get(value);
+  return item ? { value: item._id, name: item.name } : null;
+},
+```
+
+Resolution runs after initialization or a programmatic value update, when the selected option is unknown. It does not
+run for each search keystroke or for empty values. Known option labels are retained across suggestion searches. Late
+responses after editing, clearing, replacing the filter or destroying the control are ignored. Lookup failures leave
+the stored filter unchanged; successful resolution refreshes the input without emitting a filter change.
+For columns with a resolver, an unresolved value is never displayed as raw text: the input stays blank until its label
+is known, including when lookup fails or returns no option. Columns without a resolver keep their existing display.

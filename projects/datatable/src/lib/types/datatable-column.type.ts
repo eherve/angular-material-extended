@@ -133,6 +133,7 @@ export type DatatableSearchAutocompleteColumn<Record> = DatatableAutocompleteCol
     hasGroup?: boolean;
     options: (limit: number, skip: number, search: string, filter: any) => Promise<DatatableSearchListOption[]>;
     searchValueOptions?: DatatableSearchListOption[];
+    resolveOption?: (value: unknown) => Promise<DatatableSearchListOption | null>;
   };
 
 // CHECKBOX

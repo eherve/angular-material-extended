@@ -109,15 +109,17 @@ export class HeaderAutocompleteFilterComponent<Record>
   private changeDetectorRef = inject(ChangeDetectorRef);
 
   private subsink = new Subscription();
+  private viewInitialized = false;
+  private resolutionVersion = 0;
+  private selectedOption?: DatatableSearchListOption;
 
   writeValue(value: { value: any; name?: string }): void {
     if (value?.value !== this.selectControl.value) {
-      if (value?.name) {
-        if (!this.options.find((o) => o.value === value.value)) {
-          this.options.push({ value: value.value, name: value.name });
-        }
-      }
+      this.selectedOption =
+        this.options.find((option) => option.value === value?.value) ??
+        (value?.name ? { value: value.value, name: value.name } : undefined);
       this.selectControl.setValue(value?.value, { emitEvent: false });
+      if (this.viewInitialized) void this.resolveSelectedOption();
     }
     this.changeDetectorRef.markForCheck();
   }
@@ -144,6 +146,10 @@ export class HeaderAutocompleteFilterComponent<Record>
     this.control = ngControl.control as UntypedFormControl;
     this.subsink.add(
       this.selectControl.valueChanges.subscribe((value: any) => {
+        this.resolutionVersion++;
+        this.selectedOption =
+          this.options.find((option) => option.value === value) ??
+          this.selectedOption;
         if (value === undefined) {
           if (this.control.value !== undefined) this.onChange(undefined);
         } else if (
@@ -156,10 +162,14 @@ export class HeaderAutocompleteFilterComponent<Record>
       }),
     );
     this.buildOptions();
+    this.viewInitialized = true;
+    void this.resolveSelectedOption();
     this.changeDetectorRef.detectChanges();
   }
 
   ngOnDestroy(): void {
+    this.viewInitialized = false;
+    this.resolutionVersion++;
     this.subsink.unsubscribe();
   }
 
@@ -180,16 +190,64 @@ export class HeaderAutocompleteFilterComponent<Record>
   }
 
   filter(): void {
+    this.resolutionVersion++;
     const search = this.input.nativeElement.value;
     this.filter$.next(search);
   }
 
   displayWith = (value: any): string => {
-    let val;
-    if (!this.options) val = value;
-    else val = this.options.find((o) => o.value === value)?.name ?? value;
-    return stripHtml(val);
+    const option =
+      this.options.find((option) => option.value === value) ??
+      (this.selectedOption?.value === value ? this.selectedOption : undefined);
+    return stripHtml(option?.name ?? (this.column?.resolveOption ? "" : value));
   };
+
+  private async resolveSelectedOption(): Promise<void> {
+    const version = ++this.resolutionVersion;
+    const value = this.selectControl.value;
+    if (this.isEmptyValue(value)) return;
+
+    const known =
+      this.options.find((option) => option.value === value) ??
+      (this.selectedOption?.value === value ? this.selectedOption : undefined);
+    if (known) {
+      this.applyResolvedOption(known);
+      return;
+    }
+    if (!this.column.resolveOption) return;
+
+    try {
+      const option = await this.column.resolveOption(value);
+      if (
+        !this.viewInitialized ||
+        version !== this.resolutionVersion ||
+        this.selectControl.value !== value ||
+        !option ||
+        option.value !== value
+      )
+        return;
+      this.applyResolvedOption(option);
+    } catch {
+      // Keep the restored filter value when its display option is unavailable.
+    }
+  }
+
+  private applyResolvedOption(option: DatatableSearchListOption): void {
+    this.selectedOption = option;
+    this.addOption(option);
+    this.selectControl.setValue(option.value, { emitEvent: false });
+    this.changeDetectorRef.markForCheck();
+  }
+
+  private addOption(option: DatatableSearchListOption): void {
+    if (!this.options.some((existing) => existing.value === option.value))
+      this.options.push(option);
+    const name = option.group ?? "";
+    const group = this.groups.find((group) => group.name === name);
+    if (!group) this.groups.push({ name, options: [option] });
+    else if (!group.options.some((existing) => existing.value === option.value))
+      group.options.push(option);
+  }
 
   private getGlobalSearchValue(): any {
     if (!this.control.parent) return null;
@@ -239,13 +297,7 @@ export class HeaderAutocompleteFilterComponent<Record>
                 Array.isArray(data),
               ),
               map((data) => {
-                data.forEach((d) => {
-                  this.options.push(d);
-                  const name = d.group ?? "";
-                  const group = this.groups.find((g) => g.name === name);
-                  if (!group) this.groups.push({ name, options: [d] });
-                  else group.options.push(d);
-                });
+                data.forEach((option) => this.addOption(option));
                 skip += this.column.limit || 10;
                 this.hasMore = data.length === (this.column.limit || 10);
               }),
