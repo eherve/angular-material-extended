@@ -1,0 +1,44 @@
+<!-- @format -->
+
+<main class="range-selector-demo">
+  <h1>Sélecteur de période</h1>
+  <p>Deux instances autonomes : thème Material et charte personnalisée héritée du conteneur.</p>
+
+  <section aria-labelledby="standard-heading">
+    <h2 id="standard-heading">Thème Material · carte</h2>
+    <app-range-selector (stateChanged)="state.set($event)">
+      <button rangeActions mat-stroked-button (click)="refreshed.set(!refreshed())">Actualiser</button>
+      <div class="demo-content">
+        <h3>Rapport projeté</h3>
+        @if (state()?.allDates) {
+          <p>Toutes les dates sont affichées.</p>
+        } @else {
+          <p>
+            Du {{ state()?.dateRange?.start | date: 'dd/MM/yyyy' }} au
+            {{ state()?.dateRange?.end | date: 'dd/MM/yyyy' }}
+          </p>
+        }
+        <p role="status">{{ refreshed() ? 'Données actualisées.' : 'Le contenu suit la période sélectionnée.' }}</p>
+      </div>
+    </app-range-selector>
+  </section>
+
+  <section class="brand-theme" aria-labelledby="brand-heading">
+    <h2 id="brand-heading">Charte personnalisée · barre d’outils</h2>
+    <app-range-selector display="toolbar" [ranges]="ranges" (stateChanged)="customState.set($event)">
+      <span rangeActions>Activité</span>
+      <div class="demo-content">
+        <h3>Périodes personnalisées</h3>
+        @if (customState()?.allDates) {
+          <p>Toutes les dates sont affichées.</p>
+        } @else {
+          <p>
+            Du {{ customState()?.dateRange?.start | date: 'dd/MM/yyyy' }} au
+            {{ customState()?.dateRange?.end | date: 'dd/MM/yyyy' }}
+          </p>
+        }
+        <p>Couleurs, arrondis et espacements sont définis sur le conteneur.</p>
+      </div>
+    </app-range-selector>
+  </section>
+</main>

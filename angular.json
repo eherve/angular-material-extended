@@ -309,6 +309,39 @@
           }
         }
       }
+    },
+    "NgxMatRangeSelector": {
+      "projectType": "library",
+      "root": "projects/range-selector",
+      "sourceRoot": "projects/range-selector/src",
+      "prefix": "NgxMat",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/range-selector/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/range-selector/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/range-selector/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/range-selector/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
     }
   },
   "schematics": {

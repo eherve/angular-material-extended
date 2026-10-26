@@ -16,6 +16,9 @@
       ],
       "@eherve/angular-material-organigram": [
         "./dist/organigram"
+      ],
+      "@eherve/angular-material-range-selector": [
+        "./dist/range-selector"
       ]
     },
     "outDir": "./dist/out-tsc",

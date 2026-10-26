@@ -31,7 +31,10 @@
     "test:organigram:model": "node --test projects/organigram/tests/*.test.mjs",
     "test:organigram": "ng test NgxMatOrganigram --watch=false --browsers=ChromeHeadless",
     "build:organigram": "ng build NgxMatOrganigram",
-    "check:organigram": "npm run test:organigram:model && npm run test:organigram && npm run build:organigram"
+    "check:organigram": "npm run test:organigram:model && npm run test:organigram && npm run build:organigram",
+    "build:range-selector": "ng build NgxMatRangeSelector",
+    "test:range-selector": "ng test NgxMatRangeSelector --watch=false --browsers=ChromeHeadless",
+    "check:range-selector": "npm run test:range-selector && npm run build:range-selector"
   },
   "private": false,
   "publishConfig": {

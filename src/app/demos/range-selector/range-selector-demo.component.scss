@@ -1,0 +1,30 @@
+/** @format */
+
+.range-selector-demo {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  color: var(--mat-sys-on-surface);
+
+  section {
+    margin-block: 24px;
+    padding: 16px;
+    border: 1px solid var(--mat-sys-outline-variant);
+    border-radius: 12px;
+  }
+
+  .demo-content {
+    padding: 16px;
+    background: var(--mat-sys-surface-container-low);
+    border-radius: 8px;
+  }
+
+  .brand-theme {
+    --ngx-mat-range-selector-header-background: #254b3e;
+    --ngx-mat-range-selector-header-text: #ffffff;
+    --ngx-mat-range-selector-selected-background: #f3d17a;
+    --ngx-mat-range-selector-selected-text: #302910;
+    --ngx-mat-extended-radius: 12px;
+    --ngx-mat-extended-space-2: 12px;
+  }
+}

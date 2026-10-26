@@ -1,0 +1,378 @@
+/** @format */
+
+@use '@angular/material' as mat;
+
+app-range-selector {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+
+  > #range-selector > mat-card-title > #header {
+    width: 100%;
+  }
+
+  > #range-selector {
+    gap: var(--range-selector-content-gap, var(--ngx-mat-extended-space-2, 8px));
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    > mat-card-title {
+      flex: 0 0 auto;
+    }
+
+    > mat-card-content {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    &.card-display {
+      margin: var(--card-margin, var(--ngx-mat-extended-space-2, 8px));
+      @include mat.card-overrides(
+        (
+          elevated-container-shape: var(--ngx-mat-extended-radius, 8px),
+          elevated-container-color: var(--ngx-mat-extended-surface, var(--mat-sys-surface, white)),
+        )
+      );
+      color: var(--ngx-mat-extended-text, var(--mat-sys-on-surface, black));
+      height: calc(100% - 2 * var(--card-margin, 8px));
+      overflow: hidden;
+
+      > mat-card-title {
+        padding: 0 var(--ngx-mat-extended-space-2, 8px);
+      }
+    }
+
+    &.toolbar-display {
+      margin: var(--card-margin, var(--ngx-mat-range-selector-toolbar-margin, 0px));
+      border: 0;
+      @include mat.card-overrides(
+        (
+          elevated-container-shape: 0px,
+          elevated-container-color: transparent,
+          elevated-container-elevation: none,
+        )
+      );
+
+      > mat-card-title {
+        padding: 0;
+        font: inherit;
+      }
+
+      > mat-card-content {
+        padding: 0;
+        overflow: visible;
+      }
+    }
+  }
+
+  > #range-selector > mat-card-title > .app-period-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ngx-mat-extended-space-2, 8px) var(--ngx-mat-extended-space-3, 16px);
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 52px;
+    padding: var(--ngx-mat-extended-space-2, 8px);
+    border-radius: var(--ngx-mat-extended-radius, 8px);
+    background: var(--ngx-mat-range-selector-header-background, var(--mat-sys-primary, #005cbb));
+    color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white));
+    font-size: 14px;
+    font-weight: 400;
+
+    mat-button-toggle-group,
+    .app-period-view-modes mat-button-toggle,
+    .app-period-view-modes mat-button-toggle:hover {
+      @include mat.button-toggle-overrides(
+        (
+          height: var(--ngx-mat-range-selector-control-height, var(--ngx-mat-extended-control-height, 32px)),
+          shape: 4px,
+          text-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          background-color: transparent,
+          selected-state-text-color: var(
+              --ngx-mat-range-selector-selected-text,
+              var(--ngx-mat-extended-on-accent, var(--mat-sys-on-primary-container, #001b3f))
+            ),
+          selected-state-background-color: var(
+              --ngx-mat-range-selector-selected-background,
+              var(--ngx-mat-extended-accent, var(--mat-sys-primary-container, #d7e3ff))
+            ),
+          divider-color: var(
+              --ngx-mat-range-selector-control-border,
+              color-mix(
+                in srgb,
+                var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)) 35%,
+                transparent
+              )
+            ),
+          state-layer-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+        )
+      );
+    }
+    .app-period-view-modes mat-pseudo-checkbox {
+      @include mat.pseudo-checkbox-overrides(
+        (
+          minimal-selected-checkmark-color: var(
+              --ngx-mat-range-selector-selected-text,
+              var(--ngx-mat-extended-on-accent, var(--mat-sys-on-primary-container, #001b3f))
+            ),
+        )
+      );
+    }
+
+    button[mat-stroked-button],
+    button[mat-button] {
+      @include mat.button-overrides(
+        (
+          outlined-container-height: var(
+              --ngx-mat-range-selector-control-height,
+              var(--ngx-mat-extended-control-height, 32px)
+            ),
+          outlined-container-shape: 4px,
+          outlined-horizontal-padding: 12px,
+          outlined-icon-spacing: 0px,
+          outlined-icon-offset: 0px,
+          outlined-touch-target-size: var(
+              --ngx-mat-range-selector-control-height,
+              var(--ngx-mat-extended-control-height, 32px)
+            ),
+          outlined-label-text-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          outlined-state-layer-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          outlined-ripple-color: color-mix(
+              in srgb,
+              var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)) 12%,
+              transparent
+            ),
+          outlined-outline-color: var(
+              --ngx-mat-range-selector-control-border,
+              color-mix(
+                in srgb,
+                var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)) 35%,
+                transparent
+              )
+            ),
+          outlined-disabled-label-text-color: color-mix(
+              in srgb,
+              var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)) 38%,
+              transparent
+            ),
+          outlined-disabled-outline-color: color-mix(
+              in srgb,
+              var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)) 20%,
+              transparent
+            ),
+          text-label-text-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          text-state-layer-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+        )
+      );
+    }
+    button[mat-icon-button] {
+      @include mat.icon-button-overrides(
+        (
+          icon-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          state-layer-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          disabled-icon-color: color-mix(
+              in srgb,
+              var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)) 38%,
+              transparent
+            ),
+        )
+      );
+    }
+    mat-slide-toggle {
+      @include mat.slide-toggle-overrides(
+        (
+          label-text-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          unselected-track-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          unselected-hover-track-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          unselected-focus-track-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          unselected-pressed-track-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          unselected-handle-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          unselected-hover-handle-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          unselected-focus-handle-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          unselected-pressed-handle-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          unselected-icon-color: var(--ngx-mat-range-selector-header-background, var(--mat-sys-primary, #005cbb)),
+        )
+      );
+    }
+
+    mat-button-toggle-group {
+      max-width: 100%;
+      overflow-x: auto;
+      border: 1px solid
+        var(
+          --ngx-mat-range-selector-control-border,
+          color-mix(
+            in srgb,
+            var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)) 35%,
+            transparent
+          )
+        );
+      border-radius: 4px;
+    }
+
+    [mat-stroked-button] {
+      min-width: 0;
+      flex-shrink: 0;
+      background: transparent;
+    }
+
+    button.app-period-selected {
+      background: var(
+        --ngx-mat-range-selector-selected-background,
+        var(--ngx-mat-extended-accent, var(--mat-sys-primary-container, #d7e3ff))
+      );
+      color: var(
+        --ngx-mat-range-selector-selected-text,
+        var(--ngx-mat-extended-on-accent, var(--mat-sys-on-primary-container, #001b3f))
+      );
+      @include mat.button-overrides(
+        (
+          outlined-label-text-color: var(
+              --ngx-mat-range-selector-selected-text,
+              var(--ngx-mat-extended-on-accent, var(--mat-sys-on-primary-container, #001b3f))
+            ),
+          outlined-state-layer-color: var(
+              --ngx-mat-range-selector-selected-text,
+              var(--ngx-mat-extended-on-accent, var(--mat-sys-on-primary-container, #001b3f))
+            ),
+          outlined-ripple-color: color-mix(
+              in srgb,
+              var(
+                  --ngx-mat-range-selector-selected-text,
+                  var(--ngx-mat-extended-on-accent, var(--mat-sys-on-primary-container, #001b3f))
+                )
+                12%,
+              transparent
+            ),
+        )
+      );
+    }
+
+    .app-period-actions,
+    .app-period-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--ngx-mat-extended-space-2, 8px) var(--ngx-mat-extended-space-3, 16px);
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .app-period-controls {
+      margin-left: auto;
+      justify-content: flex-end;
+    }
+
+    .app-period-presets {
+      display: flex;
+      align-items: center;
+      gap: var(--ngx-mat-extended-space-2, 8px);
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .app-period-navigation {
+      display: flex;
+      flex-shrink: 0;
+
+      [mat-stroked-button] {
+        padding: 0 4px;
+        width: var(--ngx-mat-range-selector-control-height, var(--ngx-mat-extended-control-height, 32px));
+        border-radius: 0;
+
+        &:first-child {
+          border-radius: 4px 0 0 4px;
+        }
+
+        &:last-child {
+          border-left: 0;
+          border-radius: 0 4px 4px 0;
+        }
+      }
+    }
+
+    .app-period-value {
+      margin: 0;
+      color: inherit;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: var(--ngx-mat-range-selector-control-height, var(--ngx-mat-extended-control-height, 32px));
+      text-transform: capitalize;
+    }
+
+    mat-form-field {
+      @include mat.form-field-overrides(
+        (
+          container-height: 36px,
+          container-vertical-padding: 6px,
+          filled-label-text-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          filled-focus-label-text-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          filled-disabled-label-text-color: color-mix(
+              in srgb,
+              var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)) 38%,
+              transparent
+            ),
+          filled-container-color: transparent,
+          filled-input-text-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          filled-input-text-placeholder-color: var(
+              --ngx-mat-range-selector-header-text,
+              var(--mat-sys-on-primary, white)
+            ),
+          filled-active-indicator-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          filled-hover-active-indicator-color: var(
+              --ngx-mat-range-selector-header-text,
+              var(--mat-sys-on-primary, white)
+            ),
+          filled-focus-active-indicator-color: var(
+              --ngx-mat-range-selector-header-text,
+              var(--mat-sys-on-primary, white)
+            ),
+          filled-caret-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          filled-disabled-container-color: transparent,
+          filled-disabled-input-text-color: color-mix(
+              in srgb,
+              var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)) 38%,
+              transparent
+            ),
+        )
+      );
+    }
+
+    .app-period-dates {
+      width: 272px;
+      max-width: 100%;
+      font-size: 16px;
+      @include mat.datepicker-overrides(
+        (
+          toggle-icon-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          toggle-active-state-icon-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+          range-input-separator-color: var(--ngx-mat-range-selector-header-text, var(--mat-sys-on-primary, white)),
+        )
+      );
+      button[mat-icon-button],
+      button[matIconButton] {
+        @include mat.icon-button-overrides(
+          (
+            state-layer-size: 36px,
+            touch-target-size: 36px,
+            icon-size: 24px,
+          )
+        );
+        padding: 6px;
+      }
+    }
+  }
+
+  > #range-selector > .app-range-content > * {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+}

@@ -1,0 +1,88 @@
+<!-- @format -->
+
+<mat-card id="range-selector" [class.card-display]="display === 'card'" [class.toolbar-display]="display === 'toolbar'">
+  <mat-card-title>
+    <div id="header" class="app-period-toolbar">
+      <div id="actions" class="app-period-actions">
+        <ng-content select="[rangeActions]"></ng-content>
+      </div>
+
+      <ng-container [ngTemplateOutlet]="toolbarTemplate"></ng-container>
+    </div>
+  </mat-card-title>
+
+  <mat-card-content class="app-range-content">
+    <ng-content />
+  </mat-card-content>
+</mat-card>
+
+<ng-template #toolbarTemplate>
+  <div id="toolbar" class="app-period-controls">
+    <div class="app-period-presets">
+      <mat-button-toggle-group
+        class="app-period-view-modes"
+        [value]="navigation()?.selectedId ?? selectedKey"
+        hideSingleSelectionIndicator
+        (change)="onSelectedChanged($event)">
+        @for (range of rangeOptions; track range.key) {
+          <mat-button-toggle [value]="range.key" type="button">
+            <span [innerHTML]="range.label"></span>
+          </mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+
+      @if (allowAllDates && !navigation()) {
+        <div>
+          <button mat-stroked-button type="button" [class.app-period-selected]="allDates" (click)="showAllDates()">
+            <span>{{ intl.messages.allDates }}</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (showToday) {
+      <div>
+        <button
+          mat-stroked-button
+          type="button"
+          (click)="today()"
+          [disabled]="navigation()?.disableToday ?? disableToday">
+          <span>{{ intl.messages.today }}</span>
+        </button>
+      </div>
+    }
+
+    <div class="app-period-navigation">
+      <button
+        mat-stroked-button
+        type="button"
+        [attr.aria-label]="intl.messages.previousPeriod"
+        (click)="prev()"
+        [disabled]="!navigation() && allDates">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button
+        mat-stroked-button
+        type="button"
+        [attr.aria-label]="intl.messages.nextPeriod"
+        (click)="next()"
+        [disabled]="!navigation() && allDates">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+
+    @if (navigation(); as calendarNavigation) {
+      <span class="app-period-value">{{ calendarNavigation.title }}</span>
+    } @else {
+      <mat-form-field subscriptSizing="dynamic" id="title" class="app-period-dates">
+        <mat-date-range-input [formGroup]="rangeFormGroup" [rangePicker]="picker">
+          <input matStartDate formControlName="start" [placeholder]="intl.messages.startDate" />
+          <input matEndDate formControlName="end" [placeholder]="intl.messages.endDate" />
+        </mat-date-range-input>
+
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker [panelClass]="datepickerPanelClass()"></mat-date-range-picker>
+      </mat-form-field>
+    }
+  </div>
+</ng-template>

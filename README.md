@@ -62,3 +62,8 @@ For more information on using the Angular CLI, including detailed command refere
 
 See [@eherve/angular-material-organigram](projects/organigram/README.md) for the Angular 22
 organization-tree renderer, its examples, theme tokens and tests.
+
+## Range selector
+
+See [@eherve/angular-material-range-selector](projects/range-selector/README.md) for the
+standalone period selector, projected content, public theme tokens and `/range-selector` demo.
