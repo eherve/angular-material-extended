@@ -89,6 +89,10 @@ describe('OrganigramGraphComponent', () => {
     (element.querySelector('[data-node-id="b2"]') as HTMLElement).focus();
     first.detectChanges();
     expect(element.querySelectorAll('path.highlighted').length).toBe(2);
+    const paths = [...element.querySelectorAll('path.graph-edge')];
+    expect(paths.findIndex((path) => path.classList.contains('highlighted'))).toBeGreaterThan(
+      paths.map((path) => path.classList.contains('highlighted')).lastIndexOf(false),
+    );
   });
 
   it('keeps keyed cards during immutable updates and rejects invalid replacement graphs', async () => {

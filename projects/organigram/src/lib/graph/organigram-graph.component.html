@@ -18,11 +18,15 @@
         @for (edge of layout().edges; track edge.id) {
           <path
             class="graph-edge"
-            [class.highlighted]="highlightedEdges().has(edge.id)"
             [attr.d]="edge.path"
             [attr.data-source]="edge.source"
             [attr.data-target]="edge.target"
           />
+        }
+        @for (edge of layout().edges; track edge.id) {
+          @if (highlightedEdges().has(edge.id)) {
+            <path class="graph-edge highlighted" [attr.d]="edge.path" />
+          }
         }
       </svg>
       @for (node of layout().nodes; track node.id) {

@@ -1,5 +1,10 @@
 # Changelog
 
+## 22.2.1 — 2026-10-27
+
+- Route graph connectors through centered orthogonal branches and keep ancestor highlights above shared segments.
+- Add optional numeric node order for chronological graph ranks with uniform spacing and straight branch axes.
+
 ## 22.2.0 — 2026-10-24
 
 - Add standalone `OrganigramGraphComponent` for directed acyclic graphs with shared multi-parent nodes.

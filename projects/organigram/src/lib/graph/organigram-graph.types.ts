@@ -4,6 +4,7 @@ export interface OrganigramGraphNode<T = unknown> {
   label?: string;
   type?: string;
   selected?: boolean;
+  order?: number;
 }
 
 export interface OrganigramGraphEdge {
@@ -14,6 +15,7 @@ export interface OrganigramGraphEdge {
 
 export interface OrganigramGraphOptions {
   direction?: 'TB' | 'BT' | 'LR' | 'RL';
+  rankBy?: 'topology' | 'order';
   nodeWidth?: number;
   nodeHeight?: number;
   horizontalGap?: number;
@@ -48,4 +50,5 @@ export type OrganigramGraphErrorCode =
   | 'duplicate-edge'
   | 'self-edge'
   | 'cycle'
+  | 'invalid-order'
   | 'invalid-options';
