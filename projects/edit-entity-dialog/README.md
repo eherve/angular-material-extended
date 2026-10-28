@@ -26,6 +26,8 @@ Une durée est en **minutes** : `90` signifie une heure trente. Les dates ne son
 
 Avec `lockedProperty`, le builder crée immédiatement le contrôle booléen de verrouillage. `canToggleLock` vaut `false` par défaut ; une date verrouillée sans permission est désactivée. Les permissions métier sont fournies par l'hôte.
 
+Les propriétés `hint` et `tooltip` des champs du moteur acceptent une chaîne, un Observable ou un callback `(record, formGroup) => string | undefined`. Les callbacks sont réévalués lorsque le record, les valeurs du formulaire ou les signaux lus changent, y compris après une réponse asynchrone. Les abonnements aux Observables sont libérés au remplacement du champ et à la destruction du renderer.
+
 ## Formulaire
 
 Tous les contrôles déclarés dans les cards sont construits avant le rendu, y compris les cards `component` d'un onglet non visité. Une card composant doit déclarer ses contrôles dans `fields` et les réutiliser. Ses champs contribuent aux compteurs sans être rendus une seconde fois.
