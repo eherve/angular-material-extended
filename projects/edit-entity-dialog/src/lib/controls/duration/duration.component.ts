@@ -15,7 +15,7 @@ type QuickOption = { value: number; label: string };
 @Component({
   selector: "app-form-control-duration",
   standalone: true,
-  styleUrls: ["../../internal/clear-button.scss"],
+  styleUrls: ["../../internal/clear-button.scss", "./duration.component.scss"],
   imports: [DurationSegmentInputComponent, MatButtonModule, MatFormFieldModule, MatIconModule, MatMenuModule, ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FormControlDurationComponent), multi: true }, { provide: NG_VALIDATORS, useExisting: forwardRef(() => FormControlDurationComponent), multi: true }],
