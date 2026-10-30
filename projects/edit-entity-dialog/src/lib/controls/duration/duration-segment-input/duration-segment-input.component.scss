@@ -67,3 +67,17 @@
   width: 1ch;
   user-select: none;
 }
+
+.duration-segment-input__segment--days {
+  width: 3ch;
+  min-width: 2ch;
+}
+
+.duration-segment-input__unit {
+  margin-inline-end: 0.5ch;
+  user-select: none;
+}
+
+.duration-segment-input__segment--minutes + .duration-segment-input__unit {
+  margin-inline-start: 0.5ch;
+}

@@ -65,6 +65,8 @@ import { EditEntityFormBuilderService } from "../../services/edit-entity-form-bu
 import { EditEntityRenderService } from "../../services/edit-entity-render.service";
 import { EditEntitySubmitValueService } from "../../services/edit-entity-submit-value.service";
 
+let nextEditEntityComponentId = 0;
+
 @Component({
   selector: "app-edit-entity-component",
   templateUrl: "./edit-entity-component.component.html",
@@ -152,6 +154,8 @@ export class EditEntityComponent<
   private subsink = new SubSink();
   private initializeVersion = 0;
   private readonly loadCancelled = new Subject<void>();
+  private readonly cardBodyPrefix = `edit-entity-${nextEditEntityComponentId++}-card-`;
+  private readonly expandedCards = new Map<string, boolean>();
   private focusTimer?: ReturnType<typeof setTimeout>;
   private readonly cardActionEventSubjects = new Map<
     string,
@@ -642,6 +646,7 @@ export class EditEntityComponent<
 
   private async initialize(): Promise<void> {
     const version = ++this.initializeVersion;
+    this.expandedCards.clear();
     this.loadCancelled.next();
     clearTimeout(this.focusTimer);
     this.destroyConnection();
@@ -976,14 +981,29 @@ export class EditEntityComponent<
     return renderState;
   }
 
+  toggleCard(card: EditEntityRuntimeCard<TRecord>): void {
+    if (!card.source.expandable || !card.cardActionEventsKey) return;
+    this.expandedCards.set(card.cardActionEventsKey, !card.expanded);
+    this.refreshRuntimeState();
+  }
+
   private filterRuntimeCardComponentInputs(
     items: EditEntityRuntimeCardItem<TRecord>[] | undefined,
     path: string,
   ): EditEntityRuntimeCardItem<TRecord>[] {
     return (items ?? []).map((item) => {
-      if (item.type === "break" || item.kind !== "component") return item;
+      if (item.type === "break") return item;
 
       const cardActionEventsKey = `${path}/card:${item.id ?? ""}`;
+      const cardState = {
+        cardActionEventsKey,
+        bodyId: `${this.cardBodyPrefix}${encodeURIComponent(cardActionEventsKey)}`,
+        expanded:
+          !item.source.expandable ||
+          (this.expandedCards.get(cardActionEventsKey) ??
+            item.source.initiallyExpanded !== false),
+      };
+      if (item.kind !== "component") return { ...item, ...cardState };
       const componentInputs = {
         ...(item.componentInputs ?? {}),
         cardActionEvents$: this.getCardActionEvents$(cardActionEventsKey),
@@ -991,7 +1011,7 @@ export class EditEntityComponent<
 
       return {
         ...item,
-        cardActionEventsKey,
+        ...cardState,
         componentInputs: this.renderService.filterDeclaredComponentInputs(
           item.component,
           componentInputs,
@@ -1369,6 +1389,14 @@ export class EditEntityComponent<
     const focusableElement = this.findFocusableElement(fieldElement);
     if (!focusableElement) return false;
 
+    const cardBody = fieldElement.closest<HTMLElement>("[data-edit-card-key]");
+    if (cardBody?.hidden) {
+      const key = cardBody.dataset["editCardKey"];
+      if (key) this.expandedCards.set(key, true);
+      this.refreshRuntimeState();
+      cardBody.hidden = false;
+      this.changeDetectorRef.markForCheck();
+    }
     focusableElement.focus();
     return true;
   }

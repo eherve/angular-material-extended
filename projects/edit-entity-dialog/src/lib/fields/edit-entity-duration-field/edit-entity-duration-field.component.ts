@@ -10,7 +10,7 @@ import { DurationFormField } from "../edit-entity-field.types";
   standalone: true,
   imports: [ReactiveFormsModule, FormControlDurationComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<app-form-control-duration [formControl]="control" [label]="field.label" [hint]="field.hint" [placeholder]="field.placeholder" [min]="field.min" [max]="field.max" [quickOptions]="field.quickOptions" [required]="control.hasValidator(requiredValidator)" />`,
+  template: `<app-form-control-duration [showDays]="field.showDays ?? false" [formControl]="control" [label]="field.label" [hint]="field.hint" [placeholder]="field.placeholder" [min]="field.min" [max]="field.max" [quickOptions]="field.quickOptions" [required]="control.hasValidator(requiredValidator)" />`,
 })
 export class EditEntityDurationFieldComponent<TRecord extends EditEntityRecord = EditEntityRecord> {
   @Input() record?: TRecord;

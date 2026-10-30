@@ -16,6 +16,9 @@ import {
 class ConnectionAction {
   @Input() recordName = "";
 }
+@Component({ selector: "test-mounted-card", template: "Mounted card content" })
+class MountedCard {}
+
 interface RecordValue {
   _id?: string;
   name: string;
@@ -75,28 +78,295 @@ describe("EditEntityComponent mutations", () => {
   it("inherits live ancestor card and action styles with package priority", async () => {
     const { fixture } = await setup();
     const ancestor = document.createElement("div");
-    fixture.nativeElement.parentNode.insertBefore(ancestor, fixture.nativeElement);
+    fixture.nativeElement.parentNode.insertBefore(
+      ancestor,
+      fixture.nativeElement,
+    );
     ancestor.appendChild(fixture.nativeElement);
     try {
       ancestor.style.setProperty("--ngx-mat-extended-space-2", "11px");
       ancestor.style.setProperty("--ngx-mat-extended-radius", "13px");
-      ancestor.style.setProperty("--ngx-mat-extended-surface", "rgb(10, 20, 30)");
+      ancestor.style.setProperty(
+        "--ngx-mat-extended-surface",
+        "rgb(10, 20, 30)",
+      );
       const card = fixture.nativeElement.querySelector(".edit-entity-card");
-      const actions = fixture.nativeElement.querySelector(".edit-entity-actions");
+      const actions = fixture.nativeElement.querySelector(
+        ".edit-entity-actions",
+      );
       expect(getComputedStyle(card).borderRadius).toBe("13px");
       expect(getComputedStyle(card).backgroundColor).toBe("rgb(10, 20, 30)");
       expect(getComputedStyle(actions).paddingTop).toBe("11px");
       expect(getComputedStyle(actions).backgroundColor).toBe("rgb(10, 20, 30)");
       ancestor.style.setProperty("--ngx-mat-extended-space-2", "15px");
       ancestor.style.setProperty("--ngx-mat-extended-radius", "17px");
-      ancestor.style.setProperty("--ngx-mat-extended-surface", "rgb(40, 50, 60)");
+      ancestor.style.setProperty(
+        "--ngx-mat-extended-surface",
+        "rgb(40, 50, 60)",
+      );
       expect(getComputedStyle(card).borderRadius).toBe("17px");
       expect(getComputedStyle(card).backgroundColor).toBe("rgb(40, 50, 60)");
       expect(getComputedStyle(actions).paddingTop).toBe("15px");
-      ancestor.style.setProperty("--ngx-mat-edit-entity-dialog-background", "rgb(70, 80, 90)");
-      expect(getComputedStyle(fixture.nativeElement.querySelector(".edit-entity-content")).backgroundColor).toBe("rgb(70, 80, 90)");
-    } finally { ancestor.replaceWith(fixture.nativeElement); }
+      ancestor.style.setProperty(
+        "--ngx-mat-edit-entity-dialog-background",
+        "rgb(70, 80, 90)",
+      );
+      expect(
+        getComputedStyle(
+          fixture.nativeElement.querySelector(".edit-entity-content"),
+        ).backgroundColor,
+      ).toBe("rgb(70, 80, 90)");
+    } finally {
+      ancestor.replaceWith(fixture.nativeElement);
+    }
   });
+  it("renders a live header badge once before the expandable chevron", async () => {
+    const { fixture, component } = await setup({}, undefined, {
+      displayOptions: {
+        section: {
+          id: "s",
+          label: "Main",
+          cards: [
+            {
+              id: "c",
+              label: "Integration",
+              expandable: true,
+              initiallyExpanded: false,
+              headerValue: {
+                appearance: "badge",
+                value: (_record, form) =>
+                  form.get("name")?.value === "enabled" ? "Active" : "Disabled",
+              },
+              fields: [{ kind: "text", name: "name", label: "Name" }],
+            },
+          ],
+        },
+      },
+    });
+    const toggle = fixture.nativeElement.querySelector(
+      ".edit-entity-card-toggle",
+    ) as HTMLButtonElement;
+    const badge = toggle.querySelector(
+      ".edit-entity-card-header-value",
+    ) as HTMLElement;
+    expect(badge.textContent?.trim()).toBe("Disabled");
+    expect(
+      badge.classList.contains("edit-entity-card-header-value--badge"),
+    ).toBeTrue();
+    expect(badge.nextElementSibling).toBe(toggle.lastElementChild);
+    expect(toggle.lastElementChild?.textContent?.trim()).toBe("expand_more");
+    expect(
+      fixture.nativeElement.querySelectorAll(".edit-entity-card-header-value")
+        .length,
+    ).toBe(1);
+    component.formGroup.patchValue({ name: "enabled" });
+    await new Promise((resolve) => setTimeout(resolve, 170));
+    fixture.detectChanges();
+    expect(
+      toggle
+        .querySelector(".edit-entity-card-header-value")
+        ?.textContent?.trim(),
+    ).toBe("Active");
+  });
+  it("keeps a nonexpandable header value as trailing text by default", async () => {
+    const { fixture } = await setup({}, undefined, {
+      displayOptions: {
+        section: {
+          id: "s",
+          label: "Main",
+          cards: [
+            {
+              id: "c",
+              label: "Plain",
+              headerValue: { value: "Existing text" },
+              fields: [{ kind: "text", name: "name", label: "Name" }],
+            },
+          ],
+        },
+      },
+    });
+    const value = fixture.nativeElement.querySelector(
+      ".edit-entity-card-header-value",
+    ) as HTMLElement;
+    expect(value.textContent?.trim()).toBe("Existing text");
+    expect(
+      value.classList.contains("edit-entity-card-header-value--badge"),
+    ).toBeFalse();
+    expect(
+      value.parentElement?.classList.contains("edit-entity-card-header-end"),
+    ).toBeTrue();
+    expect(
+      fixture.nativeElement.querySelector(".edit-entity-card-toggle"),
+    ).toBeNull();
+  });
+  function expandableOptions(
+    initiallyExpanded = false,
+  ): Partial<EditEntityComponentOptions<RecordValue>> {
+    const card = {
+      id: "c",
+      label: "Expandable",
+      expandable: true,
+      initiallyExpanded,
+      fields: [
+        { kind: "text" as const, name: "name", label: "Name", required: true },
+      ],
+      actions: [
+        {
+          type: "button" as const,
+          id: "action",
+          label: "Action",
+          handler: () => {},
+        },
+      ],
+    };
+    return {
+      displayOptions: { section: { id: "s", label: "Main", cards: [card] } },
+    };
+  }
+
+  it("keeps existing cards open without a toggle", async () => {
+    const { fixture } = await setup();
+    expect(
+      fixture.nativeElement.querySelector(".edit-entity-card-toggle"),
+    ).toBeNull();
+    expect(
+      fixture.nativeElement.querySelector("input").closest("[hidden]"),
+    ).toBeNull();
+  });
+
+  it("collapses without unmounting or disabling invalid controls and links its native toggle", async () => {
+    const { fixture, component } = await setup(
+      {},
+      undefined,
+      expandableOptions(),
+    );
+    const toggle: HTMLButtonElement = fixture.nativeElement.querySelector(
+      ".edit-entity-card-toggle",
+    );
+    expect(toggle).not.toBeNull();
+    if (!toggle) return;
+    const body = document.getElementById(toggle.getAttribute("aria-controls")!);
+    const input = fixture.nativeElement.querySelector("input");
+    expect(toggle.tagName).toBe("BUTTON");
+    expect(toggle.type).toBe("button");
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(body?.hidden).toBeTrue();
+    component.formGroup.get("name")!.setValue("");
+    expect(component.formGroup.invalid).toBeTrue();
+    expect(component.formGroup.get("name")!.enabled).toBeTrue();
+    toggle.click();
+    fixture.detectChanges();
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(body?.hidden).toBeFalse();
+    expect(fixture.nativeElement.querySelector("input")).toBe(input);
+    const action: HTMLButtonElement = fixture.nativeElement.querySelector(
+      ".edit-entity-card-action",
+    );
+    expect(toggle.contains(action)).toBeFalse();
+    action.click();
+    fixture.detectChanges();
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("defaults expandable cards open and preserves a toggle across presentation rebuilds and resets fresh options", async () => {
+    const options = expandableOptions();
+    const card = (
+      options.displayOptions as {
+        section: { cards: { initiallyExpanded?: boolean }[] };
+      }
+    ).section.cards[0];
+    delete card.initiallyExpanded;
+    const { fixture, component } = await setup({}, undefined, options);
+    let toggle: HTMLButtonElement = fixture.nativeElement.querySelector(
+      ".edit-entity-card-toggle",
+    );
+    expect(toggle).not.toBeNull();
+    if (!toggle) return;
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    toggle.click();
+    component.refreshPresentation();
+    fixture.detectChanges();
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    fixture.componentRef.setInput("options", { ...component.options });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    toggle = fixture.nativeElement.querySelector(".edit-entity-card-toggle");
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("keeps a component card instance mounted while toggling", async () => {
+    const card = {
+      id: "c",
+      label: "Component",
+      component: MountedCard,
+      expandable: true,
+    };
+    const { fixture } = await setup({}, undefined, {
+      displayOptions: { section: { id: "s", label: "Section", cards: [card] } },
+    });
+    const mounted = fixture.nativeElement.querySelector("test-mounted-card");
+    const toggle: HTMLButtonElement = fixture.nativeElement.querySelector(
+      ".edit-entity-card-toggle",
+    );
+    expect(mounted).not.toBeNull();
+    toggle.click();
+    fixture.detectChanges();
+    expect(mounted.closest("[hidden]")).not.toBeNull();
+    toggle.click();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector("test-mounted-card")).toBe(
+      mounted,
+    );
+  });
+
+  it("keeps same-id cards independent across tabs", async () => {
+    const card = { id: "same", label: "Card", expandable: true, fields: [] };
+    const section = { id: "same", label: "Section", cards: [card] };
+    const { fixture, component } = await setup({}, undefined, {
+      displayOptions: {
+        tabs: [
+          { label: "First", displayOptions: { section } },
+          { label: "Second", displayOptions: { section } },
+        ],
+      },
+    });
+    const firstToggle: HTMLButtonElement = fixture.nativeElement.querySelector(
+      ".edit-entity-card-toggle",
+    );
+    firstToggle.click();
+    fixture.detectChanges();
+    const tabs: NodeListOf<HTMLButtonElement> =
+      fixture.nativeElement.querySelectorAll("[role=tab]");
+    tabs[1].click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const state = component.renderState();
+    const first = state.tabs![0].renderState.sections![0].items[0];
+    const second = state.tabs![1].renderState.sections![0].items[0];
+    if (first.type !== "card" || second.type !== "card")
+      throw new Error("Expected cards");
+    expect(first.expanded).toBeFalse();
+    expect(second.expanded).toBeTrue();
+    expect(first.bodyId).not.toBe(second.bodyId);
+    const secondBody = document.getElementById(second.bodyId!);
+    expect(secondBody?.hidden).toBeFalse();
+  });
+
+  it("opens the card requested by focusOn before focusing its mounted field", async () => {
+    const { fixture } = await setup({}, undefined, {
+      ...expandableOptions(),
+      focusOn: "name",
+    });
+    const toggle = fixture.nativeElement.querySelector(
+      ".edit-entity-card-toggle",
+    );
+    expect(toggle?.getAttribute("aria-expanded")).toBe("true");
+    expect(document.activeElement).toBe(
+      fixture.nativeElement.querySelector("input"),
+    );
+  });
+
   beforeEach(() => {
     host.confirm.and.resolveTo(true);
     host.notify.calls.reset();

@@ -120,6 +120,7 @@ export type DurationFormField<Record extends { _id?: string }> = BaseFormField<
   number
 > & {
   kind: "duration";
+  showDays?: boolean;
   hint?: string;
   placeholder?: string;
   min?: number;

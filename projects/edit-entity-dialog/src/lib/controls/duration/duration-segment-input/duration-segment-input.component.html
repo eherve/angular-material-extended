@@ -1,6 +1,20 @@
 <!-- @format -->
 
 <div class="duration-segment-input" [class.duration-segment-input--disabled]="disabled">
+  @if (showDays()) {
+    <input
+      #daysInput
+      class="duration-segment-input__segment duration-segment-input__segment--days"
+      [id]="daysInputId"
+      [formControl]="daysControl"
+      [placeholder]="focused ? '0' : ''"
+      [attr.aria-describedby]="describedByIds"
+      [attr.aria-label]="daysLabel"
+      autocomplete="off"
+      inputmode="numeric"
+      (keydown)="onSegmentKeydown($event, 'days')" />
+    <span class="duration-segment-input__unit" aria-hidden="true">{{ daysUnit }}</span>
+  }
   <input
     #hoursInput
     class="duration-segment-input__segment duration-segment-input__segment--hours"
@@ -13,7 +27,11 @@
     inputmode="numeric"
     (keydown)="onSegmentKeydown($event, 'hours')" />
 
-  <span class="duration-segment-input__separator" aria-hidden="true">:</span>
+  @if (showDays()) {
+    <span class="duration-segment-input__unit" aria-hidden="true">{{ hoursUnit }}</span>
+  } @else {
+    <span class="duration-segment-input__separator" aria-hidden="true">:</span>
+  }
 
   <input
     #minutesInput
@@ -26,4 +44,7 @@
     autocomplete="off"
     inputmode="numeric"
     (keydown)="onSegmentKeydown($event, 'minutes')" />
+  @if (showDays()) {
+    <span class="duration-segment-input__unit" aria-hidden="true">{{ minutesUnit }}</span>
+  }
 </div>

@@ -51,6 +51,10 @@ export interface EditEntityDialogMessages {
   remove: string;
   clear: string;
   loadMore: string;
+  durationDaysLabel: string;
+  durationDaysUnit: string;
+  durationHoursUnit: string;
+  durationMinutesUnit: string;
   durationHoursLabel: string;
   durationMinutesLabel: string;
   invalidDate: string;
@@ -139,6 +143,10 @@ export class EditEntityDialogIntl {
     remove: "Supprimer",
     clear: "Effacer",
     loadMore: "Charger plus",
+    durationDaysLabel: "Jours",
+    durationDaysUnit: "j",
+    durationHoursUnit: "h",
+    durationMinutesUnit: "min",
     durationHoursLabel: "Heures",
     durationMinutesLabel: "Minutes",
     invalidDate: "Date invalide",

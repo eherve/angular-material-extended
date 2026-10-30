@@ -350,6 +350,7 @@ export interface EditEntityCardHeaderValue<
 > {
   value: EditEntityValueProvider<TRecord, string | number | null | undefined>;
   format?: "raw" | "percentage";
+  appearance?: "text" | "badge";
 }
 
 export interface EditEntityCard<
@@ -360,6 +361,8 @@ export interface EditEntityCard<
   icon?: string;
   tooltip?: string;
   kind?: EditEntityCardKind;
+  expandable?: boolean;
+  initiallyExpanded?: boolean;
   grid?: EditEntityGridOptions;
   layout?: EditEntityLayout;
   visible?: EditEntityConditionalState<TRecord>;
@@ -660,6 +663,8 @@ export interface EditEntityRuntimeCard<
   type: "card";
   source: EditEntityCard<TRecord>;
   cardActionEventsKey?: string;
+  bodyId?: string;
+  expanded?: boolean;
   label: string;
   icon?: string;
   tooltip?: string;

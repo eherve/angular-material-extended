@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, forwardRef } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnChanges, input, forwardRef } from "@angular/core";
 import { AbstractControl, ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NG_VALIDATORS, ReactiveFormsModule, ValidationErrors, Validator, ValidatorFn, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldAppearance, MatFormFieldModule } from "@angular/material/form-field";
@@ -22,7 +22,7 @@ type QuickOption = { value: number; label: string };
   template: `
     <mat-form-field [appearance]="appearance">
       <mat-label>{{ label }}</mat-label>
-      <app-duration-segment-input [formControl]="control" [placeholder]="placeholder" [hoursLabel]="intl.messages.durationHoursLabel" [minutesLabel]="intl.messages.durationMinutesLabel" (focusout)="onTouched()" />
+      <app-duration-segment-input [showDays]="showDays()" [daysLabel]="intl.messages.durationDaysLabel" [daysUnit]="intl.messages.durationDaysUnit" [hoursUnit]="intl.messages.durationHoursUnit" [minutesUnit]="intl.messages.durationMinutesUnit" [formControl]="control" [placeholder]="placeholder" [hoursLabel]="intl.messages.durationHoursLabel" [minutesLabel]="intl.messages.durationMinutesLabel" (focusout)="onTouched()" />
       <button mat-icon-button matSuffix type="button" [disabled]="control.disabled" [matMenuTriggerFor]="quickMenu"><mat-icon>schedule</mat-icon></button>
       <mat-menu #quickMenu="matMenu">
         @for (option of quickOptionItems; track option.value) { <button mat-menu-item type="button" (click)="applyQuickOption(option.value)">{{ option.label }}</button> }
@@ -35,7 +35,9 @@ type QuickOption = { value: number; label: string };
     </mat-form-field>
   `,
 })
-export class FormControlDurationComponent implements ControlValueAccessor, OnDestroy, Validator {
+export class FormControlDurationComponent implements ControlValueAccessor, OnDestroy, OnChanges, Validator {
+  readonly showDays = input(false);
+  ngOnChanges(): void { this.refreshLabels(); }
   @Input() label = "";
   @Input() hint?: string;
   @Input() appearance: MatFormFieldAppearance = "outline";
@@ -59,7 +61,7 @@ export class FormControlDurationComponent implements ControlValueAccessor, OnDes
   private requiredValue = false;
   private placeholderValue = "00:00";
   private onChange: (value: DurationValue) => void = () => undefined;
-  private onTouched: () => void = () => undefined;
+  protected onTouched: () => void = () => undefined;
   private onValidatorChange: () => void = () => undefined;
   private readonly subscriptions = new Subscription();
 
@@ -69,7 +71,7 @@ export class FormControlDurationComponent implements ControlValueAccessor, OnDes
       this.onChange(value);
       this.cdr.markForCheck();
     }));
-    this.subscriptions.add(this.intl.changes.subscribe(() => this.cdr.markForCheck()));
+    this.subscriptions.add(this.intl.changes.subscribe(() => { this.refreshLabels(); this.cdr.markForCheck(); }));
   }
 
   writeValue(value: DurationValue): void { this.control.setValue(value, { emitEvent: false }); this.hasValue = value !== null; this.cdr.markForCheck(); }
@@ -108,5 +110,16 @@ export class FormControlDurationComponent implements ControlValueAccessor, OnDes
     const numeric = Number(raw);
     return Number.isFinite(numeric) && numeric >= 0 ? Math.trunc(numeric) : null;
   }
-  private format(value: number): string { return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`; }
+  private refreshLabels(): void {
+    this.quickOptionItems = this.quickOptionItems.map(option => ({ value: option.value, label: this.format(option.value) }));
+    this.minLabel = this.minValue === null ? null : this.format(this.minValue);
+    this.maxLabel = this.maxValue === null ? null : this.format(this.maxValue);
+  }
+  private format(value: number): string {
+    const hours = Math.floor((this.showDays() ? value % 1440 : value) / 60);
+    const minutes = String(value % 60).padStart(2, "0");
+    if (!this.showDays()) return `${String(hours).padStart(2, "0")}:${minutes}`;
+    const messages = this.intl.messages;
+    return `${Math.floor(value / 1440)} ${messages.durationDaysUnit} ${String(hours).padStart(2, "0")} ${messages.durationHoursUnit} ${minutes} ${messages.durationMinutesUnit}`;
+  }
 }

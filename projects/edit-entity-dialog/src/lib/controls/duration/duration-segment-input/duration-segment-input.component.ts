@@ -7,6 +7,8 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  OnChanges,
+  input,
   Optional,
   Self,
   ViewChild,
@@ -18,9 +20,19 @@ import { MatFormFieldControl } from '@angular/material/form-field';
 import { Subject, Subscription } from 'rxjs';
 
 type DurationControlValue = number | null;
-type DurationSegmentName = 'hours' | 'minutes';
+type DurationSegmentName = 'days' | 'hours' | 'minutes';
 
-const AllowedEditingKeys = new Set<string>(['Backspace', 'Delete', 'End', 'Enter', 'Escape', 'Home', 'Tab']);
+const AllowedEditingKeys = new Set<string>([
+  'ArrowLeft',
+  'ArrowRight',
+  'Backspace',
+  'Delete',
+  'End',
+  'Enter',
+  'Escape',
+  'Home',
+  'Tab',
+]);
 const DigitKeyPattern = /^\d$/;
 
 let nextDurationSegmentInputId = 0;
@@ -46,16 +58,19 @@ let nextDurationSegmentInputId = 0;
   },
 })
 export class DurationSegmentInputComponent
-  implements ControlValueAccessor, DoCheck, MatFormFieldControl<DurationControlValue>, OnDestroy, OnInit
+  implements ControlValueAccessor, DoCheck, MatFormFieldControl<DurationControlValue>, OnDestroy, OnInit, OnChanges
 {
+  readonly showDays = input(false);
+  @Input() daysLabel = 'Jours';
+  @Input() hoursLabel = 'Heures';
+  @Input() minutesLabel = 'Minutes';
+  @Input() daysUnit = 'j';
+  @Input() hoursUnit = 'h';
+  @Input() minutesUnit = 'min';
+
+  @ViewChild('daysInput') daysInput!: ElementRef<HTMLInputElement>;
   @ViewChild('hoursInput') hoursInput!: ElementRef<HTMLInputElement>;
   @ViewChild('minutesInput') minutesInput!: ElementRef<HTMLInputElement>;
-
-  @Input()
-  hoursLabel = 'Heures';
-
-  @Input()
-  minutesLabel = 'Minutes';
 
   @Input('placeholder')
   set setPlaceholder(placeholder: string | undefined) {
@@ -80,6 +95,7 @@ export class DurationSegmentInputComponent
   readonly controlType = 'app-duration-segment-input';
   readonly disableAutomaticLabeling = true;
   readonly id = `app-duration-segment-input-${nextDurationSegmentInputId++}`;
+  readonly daysInputId = `${this.id}-days`;
   readonly hoursInputId = `${this.id}-hours`;
   readonly minutesInputId = `${this.id}-minutes`;
 
@@ -97,6 +113,7 @@ export class DurationSegmentInputComponent
   visibleHoursPlaceholder = '';
   visibleMinutesPlaceholder = '';
 
+  daysControl = new FormControl<string>('', { nonNullable: true });
   hoursControl = new FormControl<string>('', { nonNullable: true });
   minutesControl = new FormControl<string>('', { nonNullable: true });
 
@@ -116,7 +133,16 @@ export class DurationSegmentInputComponent
     }
   }
 
+  ngOnChanges(): void {
+    this.syncSegmentsFromValue(this.value);
+    this.refreshViewState();
+    this.stateChanges.next();
+  }
+
   ngOnInit(): void {
+    this.subscriptions.add(
+      this.daysControl.valueChanges.subscribe((value: string): void => this.onSegmentControlValueChange('days', value)),
+    );
     this.subscriptions.add(
       this.hoursControl.valueChanges.subscribe((value: string): void =>
         this.onSegmentControlValueChange('hours', value),
@@ -166,9 +192,11 @@ export class DurationSegmentInputComponent
 
     this.disabled = isDisabled;
     if (this.disabled) {
+      this.daysControl.disable({ emitEvent: false });
       this.hoursControl.disable({ emitEvent: false });
       this.minutesControl.disable({ emitEvent: false });
     } else {
+      this.daysControl.enable({ emitEvent: false });
       this.hoursControl.enable({ emitEvent: false });
       this.minutesControl.enable({ emitEvent: false });
     }
@@ -206,21 +234,19 @@ export class DurationSegmentInputComponent
   onSegmentKeydown(event: KeyboardEvent, segment: DurationSegmentName): void {
     const input = event.target instanceof HTMLInputElement ? event.target : null;
 
-    if (event.key === ':' && segment === 'hours') {
+    const segments: DurationSegmentName[] = this.showDays() ? ['days', 'hours', 'minutes'] : ['hours', 'minutes'];
+    const index = segments.indexOf(segment);
+    if (
+      (event.key === ':' || (event.key === 'ArrowRight' && input && this.isCursorAtEnd(input))) &&
+      index < segments.length - 1
+    ) {
       event.preventDefault();
-      this.focusSegment('minutes');
+      this.focusSegment(segments[index + 1]);
       return;
     }
-
-    if (event.key === 'ArrowRight' && segment === 'hours' && input && this.isCursorAtEnd(input)) {
+    if (event.key === 'ArrowLeft' && input && this.isCursorAtBeginning(input) && index > 0) {
       event.preventDefault();
-      this.focusSegment('minutes');
-      return;
-    }
-
-    if (event.key === 'ArrowLeft' && segment === 'minutes' && input && this.isCursorAtBeginning(input)) {
-      event.preventDefault();
-      this.focusSegment('hours');
+      this.focusSegment(segments[index - 1]);
       return;
     }
 
@@ -268,22 +294,25 @@ export class DurationSegmentInputComponent
   }
 
   private buildValueFromSegments(): DurationControlValue {
+    const daysText = this.showDays() ? this.daysControl.value.trim() : '';
     const hoursText = this.hoursControl.value.trim();
     const minutesText = this.minutesControl.value.trim();
-    if (!hoursText.length && !minutesText.length) return null;
+    if (!daysText.length && !hoursText.length && !minutesText.length) return null;
 
+    const days = daysText.length ? Number(daysText) : 0;
+    if (!Number.isInteger(days) || days < 0) return null;
     const hours = hoursText.length ? Number(hoursText) : 0;
     const minutes = minutesText.length ? Number(minutesText) : 0;
     if (!Number.isInteger(hours) || hours < 0) return null;
     if (!Number.isInteger(minutes) || minutes < 0) return null;
 
-    return hours * 60 + minutes;
+    return days * 1440 + hours * 60 + minutes;
   }
 
   private normalizeSegments(): void {
     const normalizedValue = this.normalizeDurationValue(this.buildValueFromSegments());
     if (normalizedValue === null) {
-      this.setSegmentTexts('', '');
+      this.setSegmentTexts('', '', '');
       this.updateValue(null);
       return;
     }
@@ -296,31 +325,36 @@ export class DurationSegmentInputComponent
     this.syncingSegments = true;
     try {
       if (value === null) {
-        this.setSegmentTexts('', '');
+        this.setSegmentTexts('', '', '');
         return;
       }
 
-      const hours = Math.floor(value / 60);
+      const days = this.showDays() ? Math.floor(value / 1440) : 0;
+      const hours = Math.floor((this.showDays() ? value % 1440 : value) / 60);
       const minutes = value % 60;
-      this.setSegmentTexts(this.formatHours(hours), this.formatMinutes(minutes));
+      this.setSegmentTexts(this.showDays() ? String(days) : '', this.formatHours(hours), this.formatMinutes(minutes));
     } finally {
       this.syncingSegments = false;
     }
   }
 
-  private setSegmentTexts(hours: string, minutes: string): void {
+  private setSegmentTexts(days: string, hours: string, minutes: string): void {
+    this.daysControl.setValue(days, { emitEvent: false });
     this.hoursControl.setValue(hours, { emitEvent: false });
     this.minutesControl.setValue(minutes, { emitEvent: false });
   }
 
   private setSegmentText(segment: DurationSegmentName, value: string): void {
-    const control = segment === 'hours' ? this.hoursControl : this.minutesControl;
+    const control =
+      segment === 'days' ? this.daysControl
+      : segment === 'hours' ? this.hoursControl
+      : this.minutesControl;
     control.setValue(value, { emitEvent: false });
   }
 
   private sanitizeSegmentValue(segment: DurationSegmentName, value: string): string {
     const digits = value.replace(/\D/g, '');
-    if (segment === 'hours') return digits;
+    if (segment !== 'minutes') return digits;
     return this.sanitizeMinutesValue(digits);
   }
 
@@ -337,7 +371,7 @@ export class DurationSegmentInputComponent
     const currentValue = this.readSegmentNumber(segment);
     const adjustedValue =
       segment === 'minutes' ? this.clampMinuteStepValue(currentValue + delta) : Math.max(0, currentValue + delta);
-    const displayValue = segment === 'minutes' ? this.formatMinutes(adjustedValue) : this.formatHours(adjustedValue);
+    const displayValue = segment === 'days' ? String(adjustedValue) : this.formatHours(adjustedValue);
 
     this.setSegmentText(segment, displayValue);
     this.updateValueFromSegments();
@@ -345,7 +379,10 @@ export class DurationSegmentInputComponent
   }
 
   private readSegmentNumber(segment: DurationSegmentName): number {
-    const control = segment === 'hours' ? this.hoursControl : this.minutesControl;
+    const control =
+      segment === 'days' ? this.daysControl
+      : segment === 'hours' ? this.hoursControl
+      : this.minutesControl;
     const value = Number(control.value || 0);
     if (!Number.isFinite(value) || value < 0) return 0;
     return Math.trunc(value);
@@ -369,7 +406,10 @@ export class DurationSegmentInputComponent
   }
 
   private focusDefaultSegment(): void {
-    const segment = this.hoursControl.value.length ? 'minutes' : 'hours';
+    const segment =
+      this.showDays() ? 'days'
+      : this.hoursControl.value.length ? 'minutes'
+      : 'hours';
     this.focusSegment(segment);
   }
 
@@ -382,7 +422,10 @@ export class DurationSegmentInputComponent
   }
 
   private resolveSegmentInput(segment: DurationSegmentName): HTMLInputElement | null {
-    const input = segment === 'hours' ? this.hoursInput : this.minutesInput;
+    const input =
+      segment === 'days' ? this.daysInput
+      : segment === 'hours' ? this.hoursInput
+      : this.minutesInput;
     return input?.nativeElement ?? null;
   }
 
@@ -406,7 +449,10 @@ export class DurationSegmentInputComponent
   }
 
   private refreshViewState(): void {
-    this.empty = !this.hoursControl.value.length && !this.minutesControl.value.length;
+    this.empty =
+      (!this.showDays() || !this.daysControl.value.length) &&
+      !this.hoursControl.value.length &&
+      !this.minutesControl.value.length;
     this.shouldLabelFloat = this.focused || !this.empty;
     this.visibleHoursPlaceholder = this.focused ? this.hoursPlaceholder : '';
     this.visibleMinutesPlaceholder = this.focused ? this.minutesPlaceholder : '';

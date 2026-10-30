@@ -356,6 +356,7 @@
                     [ngStyle]="cardItem.styles"
                   >
                     @if (
+                      cardItem.source.expandable ||
                       cardItem.label ||
                       cardItem.icon ||
                       cardItem.runtimeActions.length ||
@@ -363,17 +364,55 @@
                       cardItem.headerValueLabel !== undefined
                     ) {
                       <header class="edit-entity-card-header card-header">
-                        <div class="edit-entity-card-title">
-                          @if (cardItem.icon) {
-                            <mat-icon [attr.title]="cardItem.tooltip">{{
-                              cardItem.icon
-                            }}</mat-icon>
-                          }
-                          <h3
-                            [attr.title]="cardItem.tooltip"
-                            [innerHTML]="cardItem.label"
-                          ></h3>
-                        </div>
+                        @if (cardItem.source.expandable) {
+                          <h3 class="edit-entity-card-toggle-heading">
+                            <button
+                              class="edit-entity-card-toggle"
+                              type="button"
+                              [attr.title]="cardItem.tooltip"
+                              [attr.aria-expanded]="cardItem.expanded"
+                              [attr.aria-controls]="cardItem.bodyId"
+                              (click)="toggleCard(cardItem)"
+                            >
+                              @if (cardItem.icon) {
+                                <mat-icon aria-hidden="true">{{
+                                  cardItem.icon
+                                }}</mat-icon>
+                              }
+                              <span
+                                class="edit-entity-card-toggle-label"
+                                [innerHTML]="cardItem.label"
+                              ></span>
+                              @if (cardItem.headerValueLabel !== undefined) {
+                                <span
+                                  class="edit-entity-card-header-value"
+                                  [class.edit-entity-card-header-value--badge]="
+                                    cardItem.source.headerValue?.appearance ===
+                                    'badge'
+                                  "
+                                  >{{ cardItem.headerValueLabel }}</span
+                                >
+                              }
+                              <mat-icon aria-hidden="true">{{
+                                cardItem.expanded
+                                  ? "expand_less"
+                                  : "expand_more"
+                              }}</mat-icon>
+                            </button>
+                          </h3>
+                        } @else {
+                          <div class="edit-entity-card-title">
+                            @if (cardItem.icon) {
+                              <mat-icon [attr.title]="cardItem.tooltip">{{
+                                cardItem.icon
+                              }}</mat-icon>
+                            }
+                            <h3
+                              [attr.title]="cardItem.tooltip"
+                              [innerHTML]="cardItem.label"
+                            ></h3>
+                          </div>
+                        }
 
                         <div class="edit-entity-card-header-end">
                           @if (cardItem.runtimeActions.length) {
@@ -551,17 +590,30 @@
                             </span>
                           }
 
-                          @if (cardItem.headerValueLabel !== undefined) {
-                            <span class="edit-entity-card-header-value">{{
-                              cardItem.headerValueLabel
-                            }}</span>
+                          @if (
+                            !cardItem.source.expandable &&
+                            cardItem.headerValueLabel !== undefined
+                          ) {
+                            <span
+                              class="edit-entity-card-header-value"
+                              [class.edit-entity-card-header-value--badge]="
+                                cardItem.source.headerValue?.appearance ===
+                                'badge'
+                              "
+                              >{{ cardItem.headerValueLabel }}</span
+                            >
                           }
                         </div>
                       </header>
                     }
 
                     @if (cardItem.kind === "component") {
-                      <div class="edit-entity-component-card">
+                      <div
+                        class="edit-entity-component-card"
+                        [id]="cardItem.bodyId"
+                        [attr.data-edit-card-key]="cardItem.cardActionEventsKey"
+                        [hidden]="!cardItem.expanded"
+                      >
                         @if (cardItem.component) {
                           <ng-container
                             *ngComponentOutlet="
@@ -579,6 +631,9 @@
                     } @else {
                       <div
                         class="edit-entity-field-grid"
+                        [id]="cardItem.bodyId"
+                        [attr.data-edit-card-key]="cardItem.cardActionEventsKey"
+                        [hidden]="!cardItem.expanded"
                         [ngStyle]="cardItem.gridStyles"
                         [appEditEntityResponsiveGrid]="cardItem.grid"
                       >

@@ -164,24 +164,87 @@ La politique d’activation du logger fourni est contrôlée par l’application
 
 Declare these optional CSS custom properties on an ancestor (including an overlay container when needed). The components do not declare common tokens on their hosts, so changing an ancestor updates existing instances without changing their inputs.
 
-| Token | Standalone default / role |
-| --- | --- |
-| `--ngx-mat-extended-space-1` | `4px`, small spacing |
-| `--ngx-mat-extended-space-2` | `8px`, compact surface padding and control spacing |
-| `--ngx-mat-extended-space-3` | `16px`, group and default grid gaps |
-| `--ngx-mat-extended-space-4` | `24px`, larger separation |
-| `--ngx-mat-extended-space-5` | `32px`, reserved larger separation |
-| `--ngx-mat-extended-radius` | `8px`, surface corners |
-| `--ngx-mat-extended-surface` | Surface background, with the component's existing standalone color fallback |
-| `--ngx-mat-extended-surface-hover` | Hover background |
-| `--ngx-mat-extended-surface-selected` | Selected / highlighted background |
-| `--ngx-mat-extended-border` | Surface separators and outlines |
-| `--ngx-mat-extended-border-selected` | Selected outline |
-| `--ngx-mat-extended-text` | Main text |
-| `--ngx-mat-extended-muted` | Secondary text and icons |
+| Token                                 | Standalone default / role                                                   |
+| ------------------------------------- | --------------------------------------------------------------------------- |
+| `--ngx-mat-extended-space-1`          | `4px`, small spacing                                                        |
+| `--ngx-mat-extended-space-2`          | `8px`, compact surface padding and control spacing                          |
+| `--ngx-mat-extended-space-3`          | `16px`, group and default grid gaps                                         |
+| `--ngx-mat-extended-space-4`          | `24px`, larger separation                                                   |
+| `--ngx-mat-extended-space-5`          | `32px`, reserved larger separation                                          |
+| `--ngx-mat-extended-radius`           | `8px`, surface corners                                                      |
+| `--ngx-mat-extended-surface`          | Surface background, with the component's existing standalone color fallback |
+| `--ngx-mat-extended-surface-hover`    | Hover background                                                            |
+| `--ngx-mat-extended-surface-selected` | Selected / highlighted background                                           |
+| `--ngx-mat-extended-border`           | Surface separators and outlines                                             |
+| `--ngx-mat-extended-border-selected`  | Selected outline                                                            |
+| `--ngx-mat-extended-text`             | Main text                                                                   |
+| `--ngx-mat-extended-muted`            | Secondary text and icons                                                    |
 
 Existing package-specific public color variables take precedence over the corresponding common role, which takes precedence over the standalone fallback. Action-specific colors keep their priority. Tokens only affect spacing and appearance: functional dimensions, circular controls and pill shapes remain unchanged. Material components inherit their theme; renderer headings use public Material typography roles with standalone fallbacks.
 
 Omitting a section/card grid `gap` uses `var(--ngx-mat-extended-space-3, 16px)`. An explicit value such as `12px` is retained. Responsive grids read the computed column gap when calculating available tracks and item widths.
 
 `--ngx-mat-edit-entity-dialog-background` controls the dialog container. Set `--ngx-mat-edit-entity-dialog-card-background` separately for cards (for example, white cards on a gray dialog). Cards fall back to the existing dialog background, then `--ngx-mat-extended-surface`, then white.
+
+### Expandable cards
+
+Set `expandable: true` on an `EditEntityCard` to make its title a native toggle
+button. Expandable cards start open; set `initiallyExpanded: false` to start
+collapsed. Omitting `expandable` preserves the existing always-open card.
+
+```ts
+{ id: 'connection', label: 'Connection', expandable: true, initiallyExpanded: false, fields: [] }
+```
+
+The toggle exposes `aria-expanded` and `aria-controls`, supports the native
+Enter/Space keyboard interaction, and is separate from card action buttons.
+Completion, validation summaries, actions and header values remain visible.
+Collapsed card bodies stay mounted: controls keep their values, validators and
+enabled state, and custom card components keep their instances. Declare custom
+card controls in `fields` as usual so validation exists before rendering.
+
+Expansion is independent for each full tab/section/card path. It survives form
+updates, save/reset and presentation rebuilds within an editor. Replacing the
+component's `options` starts a fresh editor and applies the configured defaults.
+The existing `focusOn` behavior opens the containing card before focusing a field.
+Cards retain their configured grid layout, including single-card section modes.
+
+### Card header values
+
+`EditEntityCard.headerValue` keeps its existing `value` provider and optional `format`. Its optional `appearance: 'text' | 'badge'` defaults to `'text'`; choose `'badge'` for a compact status using the generic selected-surface, text, spacing and radius theme tokens.
+
+```ts
+headerValue: {
+  value: (_record, form) => form.get('enabled')?.value ? 'Active' : 'Disabled',
+  appearance: 'badge',
+}
+```
+
+On expandable cards, the header value appears once inside the native toggle, after the label and before the chevron. Changes from its existing value provider continue to refresh with the form. Card actions and completion remain separate header siblings. Nonexpandable cards retain the trailing header value and default text appearance.
+
+## Champ de durée autonome
+
+`FormControlDurationComponent` est exporté par `@eherve/angular-material-edit-entity-dialog`.
+Il s’utilise directement dans un composant standalone avec `ReactiveFormsModule` ou `FormsModule` :
+
+```ts
+import { FormControlDurationComponent } from '@eherve/angular-material-edit-entity-dialog';
+```
+
+```html
+<app-form-control-duration
+  label="Durée"
+  [showDays]="true"
+  [formControl]="durationControl"
+  [min]="0"
+  [quickOptions]="[1440, 2880, 10080]" />
+```
+
+La valeur reste un nombre de minutes ou `null` : `2 j 03 h 15 min` correspond à `3075`.
+Un jour représente 24 heures. `showDays` vaut `false` par défaut (format heures:minutes).
+Le champ accepte `label`, `hint`, `appearance`, `placeholder`, `required`, `min`, `max` et `quickOptions`.
+Les limites et raccourcis sont exprimés en minutes ; les chaînes `HH:mm` restent acceptées.
+Les flèches gauche/droite déplacent le curseur et changent de segment à ses extrémités.
+Les libellés et unités passent par `EditEntityDialogIntl`.
+
+Dans une configuration de formulaire, utiliser `{ kind: 'duration', name: 'duration', label: 'Durée', showDays: true }`.
