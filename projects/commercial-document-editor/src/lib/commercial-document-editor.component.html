@@ -1,0 +1,297 @@
+<div class="document-editor" [class.embedded]="embedded()">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <div class="card-heading">
+        <h2>{{ title() }}</h2>
+        <ng-container
+          [ngTemplateOutlet]="toolbarTemplate()"
+          [ngTemplateOutletContext]="{ readOnly: readOnly() }"
+        />
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="nodes">
+        @for (
+          node of nodes();
+          track node.id;
+          let first = $first;
+          let last = $last
+        ) {
+          <ng-container
+            [ngTemplateOutlet]="nodeShell"
+            [ngTemplateOutletContext]="{
+              $implicit: node,
+              parent: null,
+              first,
+              last,
+            }"
+          />
+        } @empty {
+          <div class="empty-state">{{ emptyLabel() }}</div>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+  @if (pricing(); as totals) {
+    <section
+      class="totals-strip"
+      [class.without-discounts]="!showDiscounts()"
+      aria-label="Récapitulatif des montants"
+    >
+      @if (showDiscounts()) {
+        <div class="totals-block">
+          <div class="block-header"><span class="label">HT brut</span></div>
+          <div class="amount">
+            {{
+              totals.grossExclTax
+                | currency: currency() : "symbol" : "1.2-2" : locale()
+            }}
+          </div>
+          <div class="detail">Avant remises</div>
+        </div>
+        <div class="totals-block discounts-block">
+          <div class="block-header">
+            <span class="label">Remises</span>
+            @if (discountControl(); as control) {
+              <div class="discount-rate">
+                <span class="label">Globale</span>
+                @if (readOnly() || control.disabled) {
+                  <span
+                    >{{ control.value | number: "1.0-2" : locale() }} %</span
+                  >
+                } @else {
+                  <mat-form-field
+                    appearance="outline"
+                    subscriptSizing="dynamic"
+                    class="rate-field"
+                    ><input
+                      matInput
+                      type="number"
+                      min="0"
+                      max="100"
+                      [formControl]="control"
+                      aria-label="Remise globale (%)"
+                    /><span matTextSuffix>%</span></mat-form-field
+                  >
+                }
+              </div>
+            }
+          </div>
+          <div class="amount">
+            {{
+              totals.totalDiscountAmount
+                | currency: currency() : "symbol" : "1.2-2" : locale()
+            }}
+          </div>
+          <div class="detail">
+            Lignes :
+            {{
+              totals.lineDiscountAmount
+                | currency: currency() : "symbol" : "1.2-2" : locale()
+            }}
+            · Globale :
+            {{
+              totals.discountAmount
+                | currency: currency() : "symbol" : "1.2-2" : locale()
+            }}
+          </div>
+          @if (discountHistory().at(-1); as entry) {
+            <div class="detail last-discount">
+              {{ entry.author || "Auteur non renseigné" }} ·
+              {{ entry.date | date: "short" : "" : locale() }}
+            </div>
+          }
+          @if (warning()) {
+            <div class="discount-warning" role="status">
+              <mat-icon aria-hidden="true">warning</mat-icon
+              ><span>{{ warning() }}</span>
+            </div>
+          }
+        </div>
+      }
+      <div class="totals-block net-total">
+        <div class="block-header">
+          <span class="label">{{
+            showDiscounts() ? "Net HT" : "Total HT"
+          }}</span>
+        </div>
+        <div class="amount">
+          {{
+            totals.totalExclTax
+              | currency: currency() : "symbol" : "1.2-2" : locale()
+          }}
+        </div>
+        @if (showDiscounts()) {
+          <div class="detail">Après remises</div>
+        }
+      </div>
+      <div class="totals-block">
+        <div class="block-header"><span class="label">TVA</span></div>
+        <div class="amount">
+          {{
+            totals.totalVat
+              | currency: currency() : "symbol" : "1.2-2" : locale()
+          }}
+        </div>
+        <div class="detail">
+          @for (
+            vat of totals.vatBreakdown;
+            track vat.vatRate;
+            let last = $last
+          ) {
+            @if (totals.vatBreakdown.length === 1) {
+              <span
+                >Taux : {{ vat.vatRate | number: "1.0-2" : locale() }} %</span
+              >
+            } @else {
+              <span
+                >{{ vat.vatRate | number: "1.0-2" : locale() }} % :
+                {{
+                  vat.totalVat
+                    | currency: currency() : "symbol" : "1.2-2" : locale()
+                }}</span
+              >
+            }
+            @if (!last) {
+              <span> · </span>
+            }
+          }
+        </div>
+      </div>
+      <div class="totals-block grand-total">
+        <span class="label">Total TTC</span>
+        <div class="amount">
+          {{
+            totals.totalInclTax
+              | currency: currency() : "symbol" : "1.2-2" : locale()
+          }}
+        </div>
+      </div>
+    </section>
+  }
+  @if (warning() && (!showDiscounts() || !pricing())) {
+    <div class="discount-warning" role="status">
+      <mat-icon aria-hidden="true">warning</mat-icon
+      ><span>{{ warning() }}</span>
+    </div>
+  }
+</div>
+
+<ng-template
+  #nodeShell
+  let-node
+  let-parent="parent"
+  let-first="first"
+  let-last="last"
+>
+  <div class="node-shell" [class.child-node]="parent">
+    <mat-expansion-panel class="node-panel">
+      <mat-expansion-panel-header>
+        <div class="node-heading">
+          <mat-panel-title>{{ node.title }}</mat-panel-title>
+          <mat-panel-description>
+            @if (node.children) {
+              <span>{{ node.children.length }} éléments</span>
+            }
+            @if (node.quantity !== undefined) {
+              <span
+                >Qté : {{ node.quantity | number: "1.0-2" : locale() }}</span
+              >
+            }
+            @if (node.amounts; as amounts) {
+              <span
+                >HT {{ amountScopeLabel() }} :
+                {{
+                  amounts.totalExclTax
+                    | currency: currency() : "symbol" : "1.2-2" : locale()
+                }}</span
+              >
+              <span
+                >TVA {{ amountScopeLabel() }} :
+                {{
+                  amounts.totalVat
+                    | currency: currency() : "symbol" : "1.2-2" : locale()
+                }}</span
+              >
+              <span
+                >TTC {{ amountScopeLabel() }} :
+                {{
+                  amounts.totalInclTax
+                    | currency: currency() : "symbol" : "1.2-2" : locale()
+                }}</span
+              >
+            }
+          </mat-panel-description>
+        </div>
+      </mat-expansion-panel-header>
+      <div class="node-content">
+        <ng-container
+          [ngTemplateOutlet]="editorTemplate()"
+          [ngTemplateOutletContext]="context(node, parent)"
+        />
+      </div>
+      @if (nodeFooterTemplate()) {
+        <div class="node-footer">
+          <ng-container
+            [ngTemplateOutlet]="nodeFooterTemplate()"
+            [ngTemplateOutletContext]="context(node, parent)"
+          />
+        </div>
+      }
+      @if (node.children?.length) {
+        <div class="child-panels">
+          @for (
+            child of node.children;
+            track child.id;
+            let childFirst = $first;
+            let childLast = $last
+          ) {
+            <ng-container
+              [ngTemplateOutlet]="nodeShell"
+              [ngTemplateOutletContext]="{
+                $implicit: child,
+                parent: node,
+                first: childFirst,
+                last: childLast,
+              }"
+            />
+          }
+        </div>
+      }
+    </mat-expansion-panel>
+    <div class="panel-actions">
+      <ng-container
+        [ngTemplateOutlet]="nodeHeaderExtraTemplate()"
+        [ngTemplateOutletContext]="context(node, parent)"
+      />
+      <button
+        mat-icon-button
+        type="button"
+        [disabled]="first || locked(node, parent) || node.canMove === false"
+        (click)="move(node, parent, -1)"
+        aria-label="Monter"
+      >
+        <mat-icon>arrow_upward</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        type="button"
+        [disabled]="last || locked(node, parent) || node.canMove === false"
+        (click)="move(node, parent, 1)"
+        aria-label="Descendre"
+      >
+        <mat-icon>arrow_downward</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        type="button"
+        class="delete-action"
+        [disabled]="locked(node, parent) || node.canRemove === false"
+        (click)="remove(node, parent)"
+        aria-label="Supprimer"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+</ng-template>

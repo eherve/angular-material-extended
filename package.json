@@ -31,7 +31,9 @@
     "test:organigram:model": "node --test projects/organigram/tests/*.test.mjs",
     "test:organigram": "ng test NgxMatOrganigram --watch=false --browsers=ChromeHeadless",
     "build:organigram": "ng build NgxMatOrganigram",
-    "check:organigram": "npm run test:organigram:model && npm run test:organigram && npm run build:organigram"
+    "check:organigram": "npm run test:organigram:model && npm run test:organigram && npm run build:organigram",
+    "build:commercial-document-editor": "ng build NgxMatCommercialDocumentEditor",
+    "test:commercial-document-editor": "ng test NgxMatCommercialDocumentEditor --watch=false --browsers=ChromeHeadless"
   },
   "private": false,
   "publishConfig": {

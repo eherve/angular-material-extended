@@ -309,6 +309,39 @@
           }
         }
       }
+    },
+    "NgxMatCommercialDocumentEditor": {
+      "projectType": "library",
+      "root": "projects/commercial-document-editor",
+      "sourceRoot": "projects/commercial-document-editor/src",
+      "prefix": "NgxMat",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/commercial-document-editor/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/commercial-document-editor/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/commercial-document-editor/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/commercial-document-editor/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
     }
   },
   "schematics": {
