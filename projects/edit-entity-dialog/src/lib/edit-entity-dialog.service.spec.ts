@@ -1,8 +1,8 @@
 import { TestBed } from "@angular/core/testing";
 import { MatDialog } from "@angular/material/dialog";
-import { EditEntityDialogService } from "./edit-entity-dialog.service";
+import { EditEntityComponentOptions } from "@eherve/angular-material-forms/core";
 import { EditEntityDialog } from "./components/edit-entity-dialog/edit-entity-dialog.component";
-import { EditEntityComponentOptions } from "./edit-entity-dialog.types";
+import { EditEntityDialogService } from "./edit-entity-dialog.service";
 describe("EditEntityDialogService configuration", () => {
   it("preserves source viewport height and caller overrides", () => {
     const open = jasmine.createSpy().and.returnValue({});

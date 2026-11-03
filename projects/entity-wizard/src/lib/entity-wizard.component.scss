@@ -1,0 +1,485 @@
+/** @format */
+
+@use "@angular/material" as mat;
+
+:host {
+  --edit-entity-background: var(
+    --ngx-mat-edit-entity-dialog-background,
+    var(--ngx-mat-extended-surface, #f4f6f8)
+  );
+  --edit-entity-border: var(
+    --ngx-mat-edit-entity-dialog-border,
+    var(--ngx-mat-extended-border, rgba(14, 43, 67, 0.12))
+  );
+  --edit-entity-text: var(
+    --ngx-mat-edit-entity-dialog-text,
+    var(--ngx-mat-extended-text, #102f49)
+  );
+  --edit-entity-muted: var(
+    --ngx-mat-edit-entity-dialog-muted,
+    var(--ngx-mat-extended-muted, #61718a)
+  );
+  --edit-entity-primary: var(--ngx-mat-edit-entity-dialog-primary, #0f334d);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--edit-entity-text);
+}
+
+.edit-entity-loading,
+.edit-entity-empty-state {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 240px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--ngx-mat-extended-space-3, 16px);
+  color: var(--edit-entity-primary);
+}
+
+.edit-entity-empty-state {
+  padding: var(--ngx-mat-extended-space-4, 24px);
+  color: var(--edit-entity-muted);
+  text-align: center;
+
+  mat-icon {
+    width: 42px;
+    height: 42px;
+    color: var(--edit-entity-primary);
+    font-size: 42px;
+  }
+
+  span,
+  strong {
+    color: var(--edit-entity-text);
+    font-size: 15px;
+    font-weight: 700;
+  }
+}
+
+.edit-entity-title-bar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: start;
+  gap: var(--ngx-mat-extended-space-3, 16px);
+  min-height: 48px;
+  padding: var(--ngx-mat-extended-space-2, 8px);
+  margin: 0;
+  border-bottom: 1px solid var(--edit-entity-border);
+  box-sizing: border-box;
+  background: var(
+    --ngx-mat-edit-entity-dialog-header-background,
+    var(--ngx-mat-extended-surface, #0f334d)
+  );
+  color: var(
+    --ngx-mat-edit-entity-dialog-header-text,
+    var(--ngx-mat-extended-text, #fff)
+  );
+
+  h2 {
+    margin: 0;
+    font-size: var(--mat-sys-title-medium-size, 18px);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  p {
+    margin: var(--ngx-mat-extended-space-1, 4px) 0 0;
+    color: var(
+      --ngx-mat-edit-entity-dialog-header-text,
+      var(--ngx-mat-extended-text, #fff)
+    );
+    font-size: var(--mat-sys-body-small-size, 13px);
+  }
+}
+
+.edit-entity-title-content {
+  min-width: 0;
+  overflow: hidden;
+
+  h2,
+  p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.edit-entity-title-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--ngx-mat-extended-space-2, 8px);
+  margin-left: auto;
+
+  .mat-mdc-icon-button {
+    @include mat.icon-button-overrides(
+      (
+        icon-color: var(
+            --ngx-mat-edit-entity-dialog-header-text,
+            var(--ngx-mat-extended-text, #fff)
+          ),
+      )
+    );
+  }
+}
+
+.edit-entity-form,
+.edit-entity-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+  background: var(--edit-entity-background);
+  box-sizing: border-box;
+}
+
+.edit-entity-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ngx-mat-extended-space-2, 8px);
+  min-height: 54px;
+  padding: var(--ngx-mat-extended-space-2, 8px);
+  border-top: 1px solid var(--edit-entity-border);
+  background: var(
+    --ngx-mat-edit-entity-dialog-background,
+    var(--ngx-mat-extended-surface, #ffffff)
+  );
+  box-sizing: border-box;
+}
+
+.edit-entity-actions-left,
+.edit-entity-actions-right {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ngx-mat-extended-space-2, 8px);
+  min-width: 0;
+}
+
+.edit-entity-updating {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.action-btn {
+  @include mat.button-overrides(
+    (
+      text-label-text-color: var(--action-color),
+      filled-label-text-color: var(--action-color),
+      filled-container-color: var(--action-background-color),
+      protected-label-text-color: var(--action-color),
+      protected-container-color: var(--action-background-color),
+    )
+  );
+}
+
+:host ::ng-deep mat-form-field {
+  @include mat.form-field-overrides(
+    (
+      outlined-disabled-input-text-color: var(
+          --mat-form-field-outlined-input-text-color
+        ),
+    )
+  );
+
+  .mat-mdc-chip.mat-mdc-chip-row {
+    @include mat.chips-overrides(
+      (
+        disabled-container-opacity: 1,
+        elevated-disabled-container-color: var(
+            --mat-chip-elevated-container-color
+          ),
+      )
+    );
+  }
+}
+
+@media (max-width: 900px) {
+  .edit-entity-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .edit-entity-actions-left,
+  .edit-entity-actions-right {
+    justify-content: flex-end;
+    width: 100%;
+  }
+}
+
+.edit-entity-wizard-header {
+  background: var(--edit-entity-primary);
+  color: var(
+    --ngx-mat-edit-entity-dialog-header-text,
+    var(--mat-sys-on-primary)
+  );
+}
+
+.edit-entity-wizard {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  background: transparent;
+  @include mat.stepper-overrides(
+    (
+      header-selected-state-icon-background-color: var(
+          --ngx-mat-edit-entity-wizard-alert,
+          var(--mat-sys-primary)
+        ),
+      header-selected-state-icon-foreground-color: var(
+          --ngx-mat-edit-entity-wizard-on-alert,
+          var(--mat-sys-on-primary)
+        ),
+      header-selected-state-label-text-color: var(
+          --ngx-mat-edit-entity-wizard-toolbar-text,
+          var(--edit-entity-text)
+        ),
+      header-done-state-icon-background-color: var(
+          --ngx-mat-edit-entity-wizard-ok,
+          var(--mat-sys-tertiary)
+        ),
+      header-done-state-icon-foreground-color: var(
+          --ngx-mat-edit-entity-wizard-on-ok,
+          var(--mat-sys-on-tertiary)
+        ),
+      header-edit-state-icon-background-color: var(
+          --ngx-mat-edit-entity-wizard-ok,
+          var(--mat-sys-tertiary)
+        ),
+      header-edit-state-icon-foreground-color: var(
+          --ngx-mat-edit-entity-wizard-on-ok,
+          var(--mat-sys-on-tertiary)
+        ),
+      header-label-text-color: var(
+          --ngx-mat-edit-entity-wizard-toolbar-text,
+          var(--edit-entity-text)
+        ),
+      line-color: transparent,
+      container-color: transparent,
+      header-height: 56px,
+      header-focus-state-layer-shape: 0,
+      header-hover-state-layer-shape: 0,
+    )
+  );
+}
+
+.edit-entity-wizard-optional {
+  display: block;
+  align-self: center;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.edit-entity-wizard-optional {
+  background: var(
+    --ngx-mat-edit-entity-dialog-secondary,
+    var(--mat-sys-secondary)
+  );
+  color: var(--mat-sys-on-secondary);
+}
+
+.edit-entity-wizard-unsaved {
+  position: absolute;
+  inset-inline: 8px;
+  bottom: 1px;
+  display: block;
+  overflow: hidden;
+  color: var(--edit-entity-muted);
+  font-size: 10px;
+  line-height: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edit-entity-wizard-skip {
+  @include mat.button-overrides(
+    (
+      protected-container-color: var(
+          --ngx-mat-edit-entity-dialog-secondary,
+          var(--mat-sys-secondary)
+        ),
+      protected-label-text-color: var(--mat-sys-on-secondary),
+    )
+  );
+}
+
+.edit-entity-wizard-step-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 112px;
+  max-width: 100%;
+  white-space: normal;
+  line-height: 16px;
+  text-align: start;
+  color: var(
+    --ngx-mat-edit-entity-wizard-toolbar-text,
+    var(--edit-entity-text)
+  );
+
+  &--selected {
+    color: var(--ngx-mat-edit-entity-wizard-alert, var(--mat-sys-primary));
+  }
+}
+
+.edit-entity-wizard-step-name {
+  overflow-wrap: anywhere;
+}
+
+.edit-entity-wizard-actions {
+  flex-wrap: wrap;
+
+  .edit-entity-actions-left:empty {
+    display: none;
+  }
+
+  .edit-entity-actions-right {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+
+    button {
+      max-width: 100%;
+      white-space: normal;
+    }
+  }
+}
+
+// Material exposes header-height/color tokens but no header scrolling, content
+// inset or bounded-height layout API. Keep this exception confined to the wizard.
+:host ::ng-deep .edit-entity-wizard {
+  .mat-horizontal-stepper-wrapper,
+  .mat-horizontal-content-container {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    min-width: 0;
+  }
+
+  .mat-horizontal-stepper-header-container {
+    flex: 0 0 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border-bottom: 1px solid var(--edit-entity-border);
+    background: var(
+      --ngx-mat-edit-entity-wizard-toolbar-background,
+      var(--mat-sys-surface)
+    );
+  }
+
+  .mat-horizontal-stepper-header {
+    flex: 1 0 160px;
+    min-width: 160px;
+    padding-inline: 8px;
+    box-sizing: border-box;
+  }
+
+  .mat-stepper-horizontal-line {
+    display: none;
+  }
+
+  .mat-horizontal-content-container {
+    padding: 0;
+  }
+
+  .mat-horizontal-stepper-content.mat-horizontal-stepper-content-current {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+.edit-entity-wizard-content-heading {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px;
+
+  > div {
+    min-width: 0;
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--edit-entity-text);
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: var(--edit-entity-muted);
+    font-size: 13px;
+    line-height: 18px;
+  }
+
+  .edit-entity-wizard-optional {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    margin-block-start: 2px;
+  }
+}
+
+.edit-entity-wizard-state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  border: 1px solid var(--edit-entity-border);
+  background: var(
+    --ngx-mat-edit-entity-wizard-toolbar-background,
+    var(--mat-sys-surface)
+  );
+  color: var(--edit-entity-muted);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &--completed {
+    border-color: transparent;
+    background: var(--ngx-mat-edit-entity-wizard-ok, var(--mat-sys-tertiary));
+    color: var(--ngx-mat-edit-entity-wizard-on-ok, var(--mat-sys-on-tertiary));
+  }
+
+  &--selected {
+    border-color: transparent;
+    background: var(--ngx-mat-edit-entity-wizard-alert, var(--mat-sys-primary));
+    color: var(
+      --ngx-mat-edit-entity-wizard-on-alert,
+      var(--mat-sys-on-primary)
+    );
+  }
+}

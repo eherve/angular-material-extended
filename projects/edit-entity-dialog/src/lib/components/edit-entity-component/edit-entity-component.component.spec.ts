@@ -1,17 +1,21 @@
-import { Subject, startWith } from "rxjs";
-import { provideNoopAnimations } from "@angular/platform-browser/animations";
-import { TestBed } from "@angular/core/testing";
-import { ErrorHandler, provideZonelessChangeDetection } from "@angular/core";
-import { EditEntityComponent } from "./edit-entity-component.component";
-import { EditEntityDialogModule } from "../../edit-entity-dialog.module";
-import { EDIT_ENTITY_DIALOG_HOST } from "../../edit-entity-dialog-host";
-import { EDIT_ENTITY_LOGGER } from "../../edit-entity-logger";
-import { EditEntityDialogIntl } from "../../edit-entity-dialog.intl";
-import { Component, Input } from "@angular/core";
 import {
+  Component,
+  ErrorHandler,
+  Input,
+  provideZonelessChangeDetection,
+} from "@angular/core";
+import { TestBed } from "@angular/core/testing";
+import { provideNoopAnimations } from "@angular/platform-browser/animations";
+import {
+  EDIT_ENTITY_DIALOG_HOST,
+  EDIT_ENTITY_LOGGER,
   EditEntityComponentOptions,
   EditEntityDialogConnection,
-} from "../../edit-entity-dialog.types";
+  EditEntityDialogIntl,
+} from "@eherve/angular-material-forms/core";
+import { Subject, startWith } from "rxjs";
+import { EditEntityDialogModule } from "../../edit-entity-dialog.module";
+import { EditEntityComponent } from "./edit-entity-component.component";
 @Component({ selector: "test-edit-action", template: "" })
 class ConnectionAction {
   @Input() recordName = "";
@@ -70,8 +74,8 @@ describe("EditEntityComponent mutations", () => {
     fixture.detectChanges();
     await fixture.whenStable();
     const component = fixture.componentInstance;
-    component.formGroup.patchValue({ name: "new" });
-    component.formGroup.markAsDirty();
+    component.session.formGroup.patchValue({ name: "new" });
+    component.session.formGroup.markAsDirty();
     await new Promise((resolve) => setTimeout(resolve, 170));
     return { fixture, component };
   }
@@ -159,7 +163,7 @@ describe("EditEntityComponent mutations", () => {
       fixture.nativeElement.querySelectorAll(".edit-entity-card-header-value")
         .length,
     ).toBe(1);
-    component.formGroup.patchValue({ name: "enabled" });
+    component.session.formGroup.patchValue({ name: "enabled" });
     await new Promise((resolve) => setTimeout(resolve, 170));
     fixture.detectChanges();
     expect(
@@ -251,9 +255,9 @@ describe("EditEntityComponent mutations", () => {
     expect(toggle.type).toBe("button");
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
     expect(body?.hidden).toBeTrue();
-    component.formGroup.get("name")!.setValue("");
-    expect(component.formGroup.invalid).toBeTrue();
-    expect(component.formGroup.get("name")!.enabled).toBeTrue();
+    component.session.formGroup.get("name")!.setValue("");
+    expect(component.session.formGroup.invalid).toBeTrue();
+    expect(component.session.formGroup.get("name")!.enabled).toBeTrue();
     toggle.click();
     fixture.detectChanges();
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
@@ -341,7 +345,7 @@ describe("EditEntityComponent mutations", () => {
     tabs[1].click();
     fixture.detectChanges();
     await fixture.whenStable();
-    const state = component.renderState();
+    const state = component.session.renderState();
     const first = state.tabs![0].renderState.sections![0].items[0];
     const second = state.tabs![1].renderState.sections![0].items[0];
     if (first.type !== "card" || second.type !== "card")
@@ -377,17 +381,17 @@ describe("EditEntityComponent mutations", () => {
     expect(debug).toHaveBeenCalledTimes(1);
     expect(debug.calls.mostRecent().args[1]).toEqual({ name: "new" });
     const snapshot = debug.calls.mostRecent().args[1];
-    component.formGroup.patchValue({ name: "new" });
+    component.session.formGroup.patchValue({ name: "new" });
     await new Promise((resolve) => setTimeout(resolve, 170));
     expect(debug).toHaveBeenCalledTimes(1);
-    component.formGroup.patchValue({ name: "next" });
+    component.session.formGroup.patchValue({ name: "next" });
     await new Promise((resolve) => setTimeout(resolve, 170));
     expect(debug).toHaveBeenCalledTimes(2);
     expect(snapshot).toEqual({ name: "new" });
-    component.formGroup.patchValue({ name: "old" });
+    component.session.formGroup.patchValue({ name: "old" });
     await new Promise((resolve) => setTimeout(resolve, 170));
     expect(debug).toHaveBeenCalledTimes(2);
-    component.formGroup.patchValue({ name: "next" });
+    component.session.formGroup.patchValue({ name: "next" });
     await new Promise((resolve) => setTimeout(resolve, 170));
     expect(debug).toHaveBeenCalledTimes(3);
     fixture.destroy();
@@ -412,33 +416,33 @@ describe("EditEntityComponent mutations", () => {
         return true;
       },
     });
-    await component.update();
-    expect(component.formGroup.isUpdated).toBeTrue();
-    expect(component.updating).toBeFalse();
+    await component.session.update();
+    expect(component.session.formGroup.isUpdated).toBeTrue();
+    expect(component.session.updating).toBeFalse();
     expect(host.notify).toHaveBeenCalled();
     fail = false;
-    await component.update();
-    expect(component.formGroup.isUpdated).toBeFalse();
+    await component.session.update();
+    expect(component.session.formGroup.isUpdated).toBeFalse();
     expect(component.options.record?.name).toBe("new");
   });
   it("acceptsUpdatedRecordFromServer", async () => {
     const { component } = await setup({
       update: async () => ({ _id: "1", name: "SERVER" }),
     });
-    await component.update();
+    await component.session.update();
     expect(component.options.record?.name).toBe("SERVER");
-    expect(component.formGroup.get("name")?.value).toBe("SERVER");
-    expect(component.formGroup.isUpdated).toBeFalse();
+    expect(component.session.formGroup.get("name")?.value).toBe("SERVER");
+    expect(component.session.formGroup.isUpdated).toBeFalse();
   });
   it("does not mark false update saved", async () => {
     const { component } = await setup({ update: async () => false });
-    await component.update();
-    expect(component.formGroup.isUpdated).toBeTrue();
+    await component.session.update();
+    expect(component.session.formGroup.isUpdated).toBeTrue();
   });
   it("preservesArchiveMetadata", async () => {
     const state = { isArchived: true, user: "user-1" };
     const { component } = await setup({ archive: async () => state });
-    await component.archive();
+    await component.session.archive();
     expect(component.options.record?.__archived).toBe(state);
   });
   it("notifiesConnectionOnceAfterSave and destroys exactly once", async () => {
@@ -452,7 +456,7 @@ describe("EditEntityComponent mutations", () => {
       factory,
     );
     expect(changed).toHaveBeenCalledTimes(1);
-    await component.update();
+    await component.session.update();
     expect(changed).toHaveBeenCalledTimes(2);
     expect(factory).toHaveBeenCalledTimes(1);
     fixture.destroy();
@@ -472,8 +476,8 @@ describe("EditEntityComponent mutations", () => {
         throw Error("integration");
       },
     }));
-    await component.update();
-    expect(component.formGroup.isUpdated).toBeFalse();
+    await component.session.update();
+    expect(component.session.formGroup.isUpdated).toBeFalse();
     expect(component.options.record?.name).toBe("new");
   });
   it("creates false then record with complete payload and exact close result", async () => {
@@ -493,11 +497,11 @@ describe("EditEntityComponent mutations", () => {
     );
     const close = jasmine.createSpy();
     component.closeRequest.subscribe(close);
-    await component.create();
-    expect(component.formGroup.isUpdated).toBeTrue();
+    await component.session.create();
+    expect(component.session.formGroup.isUpdated).toBeTrue();
     expect(close).not.toHaveBeenCalled();
     accepted = true;
-    await component.create();
+    await component.session.create();
     expect(received).toEqual([{ name: "new" }, { name: "new" }]);
     expect(close).toHaveBeenCalledOnceWith({
       updated: true,
@@ -510,11 +514,11 @@ describe("EditEntityComponent mutations", () => {
     const { component } = await setup({ update });
     const result = jasmine.createSpy();
     component.result.subscribe(result);
-    await component.update();
+    await component.session.update();
     expect(update).toHaveBeenCalledOnceWith(
       "1",
       { name: "new" },
-      component.formGroup,
+      component.session.formGroup,
       component.options,
     );
     expect(result).toHaveBeenCalledOnceWith({
@@ -541,8 +545,8 @@ describe("EditEntityComponent mutations", () => {
         ],
       }),
     );
-    await component.update();
-    const action = component.actions()[0];
+    await component.session.update();
+    const action = component.session.actions()[0];
     expect(
       "componentInputs" in action && action.componentInputs["recordName"],
     ).toBe("SERVER");
@@ -563,7 +567,7 @@ describe("EditEntityComponent mutations", () => {
     intl.messages.update = "Save now";
     intl.changes.next();
     await fixture.whenStable();
-    expect(component.updateLabel).toBe("Save now");
+    expect(component.session.updateLabel).toBe("Save now");
   });
   it("does not let a late loader overwrite replacement options", async () => {
     let resolve!: (record: RecordValue) => void;
@@ -634,16 +638,16 @@ describe("EditEntityComponent mutations", () => {
       const close = jasmine.createSpy();
       component.result.subscribe(result);
       component.closeRequest.subscribe(close);
-      const stale = component[mutation]();
+      const stale = component.session[mutation]();
       await Promise.resolve();
       await replaceOptions(
         fixture,
         { update: () => second.promise },
         { connect: () => ({ recordChanged: changed }) },
       );
-      component.formGroup.patchValue({ name: "B edited" });
-      const current = component.update();
-      expect(component.updating).toBeTrue();
+      component.session.formGroup.patchValue({ name: "B edited" });
+      const current = component.session.update();
+      expect(component.session.updating).toBeTrue();
       first.resolve(
         (mutation === "archive"
           ? { isArchived: true }
@@ -656,15 +660,15 @@ describe("EditEntityComponent mutations", () => {
         _id: "B",
         name: "Replacement",
       });
-      expect(component.formGroup.get("name")?.value).toBe("B edited");
+      expect(component.session.formGroup.get("name")?.value).toBe("B edited");
       expect(changed).toHaveBeenCalledTimes(1);
       expect(result).not.toHaveBeenCalled();
       expect(close).not.toHaveBeenCalled();
       expect(host.notify).not.toHaveBeenCalled();
-      expect(component.updating).toBeTrue();
+      expect(component.session.updating).toBeTrue();
       second.resolve(false);
       await current;
-      expect(component.updating).toBeFalse();
+      expect(component.session.updating).toBeFalse();
     });
   }
   for (const mutation of ["remove", "archive", "requestClose"] as const) {
@@ -681,7 +685,7 @@ describe("EditEntityComponent mutations", () => {
       });
       const close = jasmine.createSpy();
       component.closeRequest.subscribe(close);
-      const operation = component[mutation]();
+      const operation = component.session[mutation]();
       await replaceOptions(fixture, {
         remove: mutationHandler,
         archive: archiveHandler,
@@ -703,8 +707,8 @@ describe("EditEntityComponent mutations", () => {
     removable.resolve(true);
     await removable.promise;
     await fixture.whenStable();
-    expect(component.isRemovable).toEqual({ removable: false });
-    expect(component.loading).toBeFalse();
+    expect(component.session.isRemovable).toEqual({ removable: false });
+    expect(component.session.loading).toBeFalse();
   });
   for (const outcome of ["resolve", "reject"] as const) {
     it(`ignores update ${outcome} after destruction`, async () => {
@@ -717,7 +721,7 @@ describe("EditEntityComponent mutations", () => {
       const close = jasmine.createSpy();
       component.result.subscribe(result);
       component.closeRequest.subscribe(close);
-      const operation = component.update();
+      const operation = component.session.update();
       fixture.destroy();
       if (outcome === "resolve") response.resolve({ _id: "1", name: "Late" });
       else response.reject(new Error("late failure"));
@@ -746,9 +750,10 @@ describe("EditEntityComponent mutations", () => {
         menuHandler: () => response.promise,
       };
       let operation: Promise<void>;
-      if (branch === "button") operation = component.handleAction(action);
+      if (branch === "button")
+        operation = component.session.handleAction(action);
       else {
-        const section = component.renderState().sections![0];
+        const section = component.session.renderState().sections![0];
         const card = section.items.find((item) => item.type === "card")!;
         if (card.type !== "card") throw new Error("Missing card");
         const option = {
@@ -759,8 +764,8 @@ describe("EditEntityComponent mutations", () => {
         };
         operation =
           branch === "card"
-            ? component.handleCardAction(card, action, section.source)
-            : component.handleCardMenuOption(
+            ? component.session.handleCardAction(card, action, section.source)
+            : component.session.handleCardMenuOption(
                 card,
                 { ...action, runtimeMenuOptions: [option] },
                 option,
@@ -769,12 +774,12 @@ describe("EditEntityComponent mutations", () => {
       }
       await Promise.resolve();
       await replaceOptions(fixture, { update: () => busy.promise });
-      const current = component.update();
-      expect(component.updating).toBeTrue();
+      const current = component.session.update();
+      expect(component.session.updating).toBeTrue();
       response.resolve({ _id: "1", name: "Late action" });
       await operation;
       expect(component.options.record?._id).toBe("B");
-      expect(component.updating).toBeTrue();
+      expect(component.session.updating).toBeTrue();
       expect(close).not.toHaveBeenCalled();
       busy.resolve(false);
       await current;
@@ -797,11 +802,11 @@ describe("EditEntityComponent mutations", () => {
     expect(fixture.nativeElement.textContent).not.toContain("Protected card");
     visible.next(true);
     expect(visible.observed).toBeTrue();
-    expect(component.renderState().sections?.length).toBe(1);
+    expect(component.session.renderState().sections?.length).toBe(1);
     await fixture.whenStable();
     expect(fixture.nativeElement.textContent).toContain("Protected card");
     visible.next(false);
-    expect(component.renderState().sections?.length).toBe(0);
+    expect(component.session.renderState().sections?.length).toBe(0);
     await fixture.whenStable();
     expect(fixture.nativeElement.textContent).not.toContain("Protected card");
   });
@@ -914,14 +919,14 @@ describe("EditEntityComponent mutations", () => {
         throw new Error("action failed");
       };
       if (branch === "button")
-        await component.handleAction({
+        await component.session.handleAction({
           handle: failed,
           closeOnHandle: true,
           isVisible: true,
           isDisabled: false,
         });
       else {
-        const section = component.renderState().sections?.[0];
+        const section = component.session.renderState().sections?.[0];
         const card = section?.items.find((item) => item.type === "card");
         if (!section || !card || card.type !== "card")
           throw new Error("Missing real rendered card");
@@ -942,9 +947,13 @@ describe("EditEntityComponent mutations", () => {
           ...(branch === "menu" ? { runtimeMenuOptions: [option] } : {}),
         };
         if (branch === "card")
-          await component.handleCardAction(card, action, section.source);
+          await component.session.handleCardAction(
+            card,
+            action,
+            section.source,
+          );
         else
-          await component.handleCardMenuOption(
+          await component.session.handleCardMenuOption(
             card,
             action,
             option,
@@ -953,9 +962,11 @@ describe("EditEntityComponent mutations", () => {
       }
       expect(close).not.toHaveBeenCalled();
       expect(host.notify).toHaveBeenCalled();
-      expect(component.formGroup.requireControl("name").value).toBe("new");
-      expect(component.formGroup.isUpdated).toBeTrue();
-      expect(component.updating).toBeFalse();
+      expect(component.session.formGroup.requireControl("name").value).toBe(
+        "new",
+      );
+      expect(component.session.formGroup.isUpdated).toBeTrue();
+      expect(component.session.updating).toBeFalse();
     });
   }
 });

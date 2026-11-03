@@ -1,0 +1,203 @@
+@let context = this.context();
+@let formGroup = this.formGroup();
+@let options = this.options();
+<ng-container
+  *ngTemplateOutlet="editEntityContent; context: { $implicit: state() }"
+/>
+<ng-template #editEntityContent let-state>
+  @switch (state.kind) {
+    @case ("tabs") {
+      @if (state.tabs?.length) {
+        <mat-tab-group
+          class="edit-entity-root-tabs"
+          mat-stretch-tabs="false"
+          [preserveContent]="true"
+          [selectedIndex]="context.navigationController.selectedIndex"
+          (selectedIndexChange)="context.navigationController.selectTab($event)"
+        >
+          @for (tab of state.tabs; track tab.id ?? tab.label) {
+            @if (tab.isVisible) {
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  @if (tab.svgIcon) {
+                    <mat-icon
+                      class="edit-entity-root-tab-icon"
+                      [svgIcon]="tab.svgIcon"
+                    ></mat-icon>
+                  } @else if (tab.icon) {
+                    <mat-icon class="edit-entity-root-tab-icon">{{
+                      tab.icon
+                    }}</mat-icon>
+                  }
+                  <span [innerHTML]="tab.label"></span>
+                  @if (tab.validationSummary.label) {
+                    <span
+                      class="edit-entity-root-tab-badge edit-entity-root-tab-badge--validation"
+                      [class.invalid]="
+                        tab.validationSummary.status === 'invalid'
+                      "
+                      [class.missing]="
+                        tab.validationSummary.status === 'missing'
+                      "
+                      [style.color]="tab.validationSummary.color"
+                      [attr.title]="tab.validationSummary.tooltip"
+                    >
+                      {{ tab.validationSummary.label }}
+                    </span>
+                  } @else if (tab.badge !== undefined && tab.badge !== null) {
+                    <span class="edit-entity-root-tab-badge">{{
+                      tab.badge
+                    }}</span>
+                  }
+                </ng-template>
+
+                <ng-template matTabContent>
+                  <ng-container
+                    *ngTemplateOutlet="
+                      editEntityContent;
+                      context: { $implicit: tab.renderState }
+                    "
+                  ></ng-container>
+                </ng-template>
+              </mat-tab>
+            }
+          }
+        </mat-tab-group>
+      }
+    }
+
+    @case ("sections") {
+      <ng-container
+        *ngTemplateOutlet="sectionsTemplate; context: { state }"
+      ></ng-container>
+    }
+
+    @case ("section") {
+      <ng-container
+        *ngTemplateOutlet="
+          sectionsTemplate;
+          context: { state, singleSection: true }
+        "
+      ></ng-container>
+    }
+
+    @case ("component") {
+      <div
+        class="edit-entity-component-page"
+        [class.overflow]="state.componentOverflow"
+      >
+        @if (state.component) {
+          <ng-container
+            *ngComponentOutlet="state.component; inputs: state.componentInputs"
+          ></ng-container>
+        }
+      </div>
+    }
+
+    @default {
+      <div class="edit-entity-empty-state">
+        <mat-icon>info</mat-icon>
+        <span>{{ context.intl.messages.noContent }}</span>
+      </div>
+    }
+  }
+</ng-template>
+
+<ng-template
+  #sectionsTemplate
+  let-state="state"
+  let-singleSection="singleSection"
+>
+  @if (state.sections?.length) {
+    <app-section-tabs
+      class="edit-entity-section-tabs"
+      [class.edit-entity-section-tabs--single]="singleSection === true"
+      [navigation]="state.navigation"
+    >
+      @if (state.sectionsMenuHeader) {
+        <ng-template appSectionTabsMenuHeader>
+          <div>
+            <span>{{ state.sectionsMenuHeader }}</span>
+          </div>
+        </ng-template>
+      }
+
+      @if (state.showEmptyFieldsToggle) {
+        <ng-template appSectionTabsFooter>
+          <mat-slide-toggle
+            [checked]="context.showEmptyFields"
+            (change)="context.onShowEmptyFieldsChange($event.checked)"
+          >
+            <span
+              [innerHTML]="
+                state.showEmptyFieldsLabel || context.showEmptyFieldsLabel
+              "
+            ></span>
+          </mat-slide-toggle>
+        </ng-template>
+      }
+
+      @for (section of state.sections; track section.id) {
+        <app-section-tab
+          [queryParamValue]="section.id"
+          [done]="section.done"
+          [total]="section.total"
+          [progress]="section.progress"
+          [statusColor]="section.statusColor"
+        >
+          <ng-template appSectionTabLabel>
+            @if (section.icon) {
+              <mat-icon [attr.title]="section.tooltip">{{
+                section.icon
+              }}</mat-icon>
+            }
+            <span
+              [attr.title]="section.tooltip"
+              [innerHTML]="section.label"
+            ></span>
+          </ng-template>
+
+          <ng-template appSectionTabContent>
+            <div
+              class="edit-entity-section"
+              [class.edit-entity-section--single-card]="
+                section.sectionMode === 'single-card'
+              "
+              [class.edit-entity-section--single-card-only]="
+                section.sectionMode === 'single-card' && section.cardCount === 1
+              "
+              [class.edit-entity-section--single-card-multiple]="
+                section.sectionMode === 'single-card' && section.cardCount > 1
+              "
+              [ngStyle]="section.gridStyles"
+              [appEditEntityResponsiveGrid]="section.grid"
+            >
+              @for (cardItem of section.items; track cardItem.id) {
+                @if (cardItem.type === "break") {
+                  <div class="edit-entity-grid-break" aria-hidden="true"></div>
+                } @else {
+                  <ame-field-card
+                    [singleCard]="section.sectionMode === 'single-card'"
+                    [ngStyle]="cardItem.styles"
+                    [ngClass]="cardItem.classes"
+                    [runtimeCard]="cardItem"
+                    [card]="cardItem.source"
+                    [section]="section.source"
+                    [formGroup]="formGroup"
+                    [record]="options.record"
+                    [context]="context"
+                  />
+                }
+              }
+            </div>
+          </ng-template>
+        </app-section-tab>
+      }
+    </app-section-tabs>
+  } @else {
+    <div class="edit-entity-empty-state">
+      <mat-icon>info</mat-icon>
+      <span>{{ context.intl.messages.noSection }}</span>
+    </div>
+  }
+</ng-template>

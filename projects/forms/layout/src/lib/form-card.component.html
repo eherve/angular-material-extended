@@ -1,0 +1,315 @@
+@let context = renderContext();
+@let record = this.record();
+@let formGroup = this.formGroup();
+@if (renderedCard(); as cardItem) {
+  <article
+    class="edit-entity-card section-tabs-card"
+    [ngClass]="cardItem.classes"
+    [ngStyle]="cardItem.styles"
+  >
+    @if (
+      cardItem.source.expandable ||
+      cardItem.label ||
+      cardItem.icon ||
+      cardItem.runtimeActions.length ||
+      cardItem.completionLabel ||
+      cardItem.headerValueLabel !== undefined
+    ) {
+      <header class="edit-entity-card-header card-header">
+        @if (cardItem.source.expandable) {
+          <h3 class="edit-entity-card-toggle-heading">
+            <button
+              class="edit-entity-card-toggle"
+              type="button"
+              [attr.title]="cardItem.tooltip"
+              [attr.aria-expanded]="cardItem.expanded"
+              [attr.aria-controls]="cardItem.bodyId"
+              (click)="context.toggleCard(cardItem)"
+            >
+              @if (cardItem.icon) {
+                <mat-icon aria-hidden="true">{{ cardItem.icon }}</mat-icon>
+              }
+              <span
+                class="edit-entity-card-toggle-label"
+                [innerHTML]="cardItem.label"
+              ></span>
+              @if (cardItem.headerValueLabel !== undefined) {
+                <span
+                  class="edit-entity-card-header-value"
+                  [class.edit-entity-card-header-value--badge]="
+                    cardItem.source.headerValue?.appearance === 'badge'
+                  "
+                  >{{ cardItem.headerValueLabel }}</span
+                >
+              }
+              <mat-icon aria-hidden="true">{{
+                cardItem.expanded ? "expand_less" : "expand_more"
+              }}</mat-icon>
+            </button>
+          </h3>
+        } @else {
+          <div class="edit-entity-card-title">
+            @if (cardItem.icon) {
+              <mat-icon [attr.title]="cardItem.tooltip">{{
+                cardItem.icon
+              }}</mat-icon>
+            }
+            <h3
+              [attr.title]="cardItem.tooltip"
+              [innerHTML]="cardItem.label"
+            ></h3>
+          </div>
+        }
+
+        <div class="edit-entity-card-header-end">
+          @if (cardItem.runtimeActions.length) {
+            <div class="edit-entity-card-actions">
+              @for (
+                action of cardItem.runtimeActions;
+                track action.id || action.label || action.icon || $index
+              ) {
+                @if (action.isVisible) {
+                  @if (action.type === "button") {
+                    @if (action.runtimeMenuOptions?.length) {
+                      <button
+                        mat-button
+                        type="button"
+                        [style.--action-color]="action.color"
+                        class="edit-entity-card-action"
+                        [disabled]="action.isDisabled"
+                        [matTooltip]="action.tooltip || ''"
+                        [attr.aria-label]="
+                          action.ariaLabel || action.label || action.icon
+                        "
+                        [matMenuTriggerFor]="cardActionMenu"
+                      >
+                        @if (action.icon) {
+                          <mat-icon>{{ action.icon }}</mat-icon>
+                        }
+                        <span [innerHTML]="action.label"></span>
+                      </button>
+
+                      <mat-menu #cardActionMenu="matMenu">
+                        @for (
+                          option of action.runtimeMenuOptions;
+                          track option.id
+                        ) {
+                          @if (option.isVisible) {
+                            <button
+                              mat-menu-item
+                              type="button"
+                              [disabled]="option.isDisabled"
+                              (click)="
+                                context.handleCardMenuOption(
+                                  cardItem,
+                                  action,
+                                  option,
+                                  renderedSection()
+                                )
+                              "
+                            >
+                              @if (option.icon) {
+                                <mat-icon>{{ option.icon }}</mat-icon>
+                              }
+                              <span [innerHTML]="option.label"></span>
+                            </button>
+                          }
+                        }
+                      </mat-menu>
+                    } @else {
+                      <button
+                        mat-button
+                        type="button"
+                        [style.--action-color]="action.color"
+                        class="edit-entity-card-action"
+                        [disabled]="action.isDisabled"
+                        [matTooltip]="action.tooltip || ''"
+                        (click)="
+                          context.handleCardAction(
+                            cardItem,
+                            action,
+                            renderedSection()
+                          )
+                        "
+                      >
+                        @if (action.icon) {
+                          <mat-icon>{{ action.icon }}</mat-icon>
+                        }
+                        <span [innerHTML]="action.label"></span>
+                      </button>
+                    }
+                  } @else {
+                    @if (action.runtimeMenuOptions?.length) {
+                      <button
+                        mat-icon-button
+                        type="button"
+                        class="edit-entity-card-action"
+                        [disabled]="action.isDisabled"
+                        [matTooltip]="action.tooltip || ''"
+                        [attr.aria-label]="
+                          action.ariaLabel || action.label || action.icon
+                        "
+                        [matMenuTriggerFor]="cardActionMenu"
+                      >
+                        <mat-icon>{{ action.icon || "more_vert" }}</mat-icon>
+                      </button>
+
+                      <mat-menu #cardActionMenu="matMenu">
+                        @for (
+                          option of action.runtimeMenuOptions;
+                          track option.id
+                        ) {
+                          @if (option.isVisible) {
+                            <button
+                              mat-menu-item
+                              type="button"
+                              [disabled]="option.isDisabled"
+                              (click)="
+                                context.handleCardMenuOption(
+                                  cardItem,
+                                  action,
+                                  option,
+                                  renderedSection()
+                                )
+                              "
+                            >
+                              @if (option.icon) {
+                                <mat-icon>{{ option.icon }}</mat-icon>
+                              }
+                              <span [innerHTML]="option.label"></span>
+                            </button>
+                          }
+                        }
+                      </mat-menu>
+                    } @else {
+                      <button
+                        mat-icon-button
+                        type="button"
+                        class="edit-entity-card-action"
+                        [disabled]="action.isDisabled"
+                        [matTooltip]="action.tooltip || ''"
+                        [attr.aria-label]="
+                          action.ariaLabel || action.label || action.icon
+                        "
+                        (click)="
+                          context.handleCardAction(
+                            cardItem,
+                            action,
+                            renderedSection()
+                          )
+                        "
+                      >
+                        <mat-icon>{{ action.icon }}</mat-icon>
+                      </button>
+                    }
+                  }
+                }
+              }
+            </div>
+          }
+
+          @if (cardItem.completionLabel) {
+            <span
+              class="edit-entity-completion-chip mini-chip"
+              [style.color]="cardItem.completionColor"
+              [attr.title]="cardItem.validationSummary.tooltip"
+            >
+              {{ cardItem.completionLabel }}
+            </span>
+          }
+
+          @if (
+            !cardItem.source.expandable &&
+            cardItem.headerValueLabel !== undefined
+          ) {
+            <span
+              class="edit-entity-card-header-value"
+              [class.edit-entity-card-header-value--badge]="
+                cardItem.source.headerValue?.appearance === 'badge'
+              "
+              >{{ cardItem.headerValueLabel }}</span
+            >
+          }
+        </div>
+      </header>
+    }
+
+    @if (cardItem.kind === "component") {
+      <div
+        class="edit-entity-component-card"
+        [id]="cardItem.bodyId"
+        [attr.data-edit-card-key]="cardItem.cardActionEventsKey"
+        [hidden]="!cardItem.expanded"
+      >
+        @if (cardItem.component) {
+          <ng-container
+            *ngComponentOutlet="
+              cardItem.component;
+              inputs: cardItem.componentInputs
+            "
+          ></ng-container>
+        } @else {
+          <div class="edit-entity-empty-state">
+            <mat-icon>extension_off</mat-icon>
+            <strong>{{ context.intl.messages.noComponent }}</strong>
+          </div>
+        }
+      </div>
+    } @else {
+      <div
+        class="edit-entity-field-grid"
+        [id]="cardItem.bodyId"
+        [attr.data-edit-card-key]="cardItem.cardActionEventsKey"
+        [hidden]="!cardItem.expanded"
+        [ngStyle]="cardItem.gridStyles"
+        [appEditEntityResponsiveGrid]="cardItem.grid"
+      >
+        @for (fieldItem of cardItem.items; track fieldItem.id) {
+          @if (fieldItem.type === "break") {
+            <div class="edit-entity-grid-break" aria-hidden="true"></div>
+          } @else if (fieldItem.kind === "separator") {
+            <div
+              class="edit-entity-separator"
+              [ngClass]="fieldItem.classes"
+              [ngStyle]="fieldItem.styles"
+            >
+              @if (fieldItem.separator?.divider !== false) {
+                <span
+                  class="edit-entity-separator-line"
+                  [style.borderColor]="fieldItem.separator?.dividerColor"
+                ></span>
+              }
+              @if (fieldItem.separator?.label) {
+                <span
+                  class="edit-entity-separator-label"
+                  [style.color]="fieldItem.separator?.labelColor"
+                  [innerHTML]="fieldItem.separator?.label"
+                >
+                </span>
+              }
+              @if (fieldItem.separator?.divider !== false) {
+                <span
+                  class="edit-entity-separator-line"
+                  [style.borderColor]="fieldItem.separator?.dividerColor"
+                ></span>
+              }
+            </div>
+          } @else if (fieldItem.field) {
+            <div
+              class="edit-entity-field-cell"
+              [ngClass]="fieldItem.classes"
+              [ngStyle]="fieldItem.styles"
+            >
+              <ame-field
+                [record]="record"
+                [formGroup]="formGroup"
+                [field]="fieldItem.field"
+              >
+              </ame-field>
+            </div>
+          }
+        }
+      </div>
+    }
+  </article>
+}

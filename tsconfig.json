@@ -16,6 +16,21 @@
       ],
       "@eherve/angular-material-organigram": [
         "./dist/organigram"
+      ],
+      "@eherve/angular-material-forms/core": [
+        "./dist/forms/core"
+      ],
+      "@eherve/angular-material-forms/fields": [
+        "./dist/forms/fields"
+      ],
+      "@eherve/angular-material-forms/layout": [
+        "./dist/forms/layout"
+      ],
+      "@eherve/angular-material-forms/editor": [
+        "./dist/forms/editor"
+      ],
+      "@eherve/angular-material-entity-wizard": [
+        "./dist/entity-wizard"
       ]
     },
     "outDir": "./dist/out-tsc",

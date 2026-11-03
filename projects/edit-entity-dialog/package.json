@@ -1,6 +1,6 @@
 {
   "name": "@eherve/angular-material-edit-entity-dialog",
-  "version": "22.5.0",
+  "version": "22.7.0",
   "author": "Eric Herve <eric.herve.95@gmail.com>",
   "repository": {
     "type": "git",
@@ -23,19 +23,12 @@
     "dayjs": "^1.11.20",
     "@angular/material-moment-adapter": "^22.0.0",
     "@ng-matero/extensions": "^22.1.1",
-    "@ng-matero/extensions-moment-adapter": "^22.0.0"
+    "@ng-matero/extensions-moment-adapter": "^22.0.0",
+    "@eherve/angular-material-forms": "^22.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0",
     "lodash-es": "^4.17.21",
     "subsink": "^1.0.2"
-  },
-  "sideEffects": [
-    "./styles.css"
-  ],
-  "exports": {
-    "./styles.css": {
-      "default": "./styles.css"
-    }
   }
 }

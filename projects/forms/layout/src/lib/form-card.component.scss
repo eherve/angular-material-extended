@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  height: auto;
+  min-width: 0;
+  overflow: visible;
+}
+.edit-entity-card {
+  height: 100%;
+}
+
+:host(.form-card--single) {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  .edit-entity-card {
+    height: 100%;
+    min-height: 0;
+    > .edit-entity-component-card,
+    > .edit-entity-field-grid {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+  }
+}

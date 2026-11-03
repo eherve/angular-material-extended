@@ -1,0 +1,310 @@
+<!-- @format -->
+
+@if (session.loading) {
+  <div class="edit-entity-loading">
+    <mat-spinner [diameter]="72" />
+    <span>{{ session.loadingLabel }}</span>
+  </div>
+} @else if (session.errorLabel) {
+  <div class="edit-entity-empty-state">
+    <mat-icon>info</mat-icon>
+    <span>{{ session.errorLabel }}</span>
+
+    @if (displayMode === "dialog") {
+      <button mat-stroked-button type="button" (click)="requestClose()">
+        {{ session.closeLabel }}
+      </button>
+    }
+  </div>
+} @else {
+  @if (
+    session.title ||
+    session.subtitle ||
+    displayMode === "dialog" ||
+    session.getActions("top").length
+  ) {
+    <header
+      class="edit-entity-title-bar"
+      [class.edit-entity-wizard-header]="options.wizard"
+    >
+      @if (options.wizard?.icon) {
+        <mat-icon>{{ options.wizard?.icon }}</mat-icon>
+      }
+      <div class="edit-entity-title-content">
+        @if (session.title) {
+          <h2 [innerHTML]="session.title"></h2>
+        }
+        @if (session.subtitle) {
+          <p [innerHTML]="session.subtitle"></p>
+        }
+      </div>
+
+      <div class="edit-entity-title-actions">
+        @for (
+          action of session.getActions("top");
+          track session.trackRuntimeAction($index, action)
+        ) {
+          <ng-container
+            *ngTemplateOutlet="actionTemplate; context: { action }"
+          ></ng-container>
+        }
+
+        @if (options.showJsonDataButton === true) {
+          <button
+            mat-icon-button
+            type="button"
+            [matTooltip]="session.intl.messages.showJson"
+            [attr.aria-label]="session.intl.messages.showJson"
+            (click)="session.openJsonDataDialog()"
+          >
+            <mat-icon>file_json</mat-icon>
+          </button>
+        }
+
+        @if (displayMode === "dialog") {
+          <button
+            mat-icon-button
+            type="button"
+            [attr.aria-label]="session.closeLabel"
+            (click)="requestClose()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+    </header>
+  }
+
+  <form class="edit-entity-form" [formGroup]="session.formGroup">
+    <main class="edit-entity-content">
+      @if (options.wizard; as wizard) {
+        <mat-stepper
+          class="edit-entity-wizard"
+          orientation="horizontal"
+          labelPosition="end"
+          [linear]="wizardLinear()"
+          [selectedIndex]="wizardVisualIndex()"
+          (selectionChange)="selectWizardVisualStep($event.selectedIndex)"
+        >
+          <!-- Material icon context.active also includes completed steps; selection follows the wizard index. -->
+          <ng-template matStepperIcon="number" let-index="index">
+            <ng-container
+              *ngTemplateOutlet="
+                wizardStateIcon;
+                context: { index, active: index === wizardVisualIndex() }
+              "
+            ></ng-container>
+          </ng-template>
+          <ng-template matStepperIcon="edit" let-index="index">
+            <ng-container
+              *ngTemplateOutlet="
+                wizardStateIcon;
+                context: { index, active: index === wizardVisualIndex() }
+              "
+            ></ng-container>
+          </ng-template>
+          <ng-template matStepperIcon="done" let-index="index">
+            <ng-container
+              *ngTemplateOutlet="
+                wizardStateIcon;
+                context: { index, active: index === wizardVisualIndex() }
+              "
+            ></ng-container>
+          </ng-template>
+          <ng-template #wizardStateIcon let-index="index" let-active="active">
+            <span
+              class="edit-entity-wizard-state-icon"
+              [class.edit-entity-wizard-state-icon--selected]="active"
+              [class.edit-entity-wizard-state-icon--completed]="
+                !active && wizardCompleted()[wizardVisibleIndices()[index]]
+              "
+            >
+              @if (
+                !active && wizardCompleted()[wizardVisibleIndices()[index]]
+              ) {
+                <mat-icon>check</mat-icon>
+              } @else {
+                {{ index + 1 }}
+              }
+            </span>
+          </ng-template>
+          @for (index of wizardVisibleIndices(); track index) {
+            @let step = wizard.steps[index];
+            <mat-step
+              [optional]="false"
+              [stepControl]="wizardNavigationControls[index]"
+              [completed]="
+                !wizardNavigationBlocked() && wizardCompleted()[index]
+              "
+              [editable]="
+                !wizardNavigationBlocked() &&
+                (index === 0 || !!options.record?._id)
+              "
+            >
+              <ng-template matStepLabel>
+                <div
+                  class="edit-entity-wizard-step-label"
+                  [class.edit-entity-wizard-step-label--selected]="
+                    index === wizardIndex()
+                  "
+                >
+                  <span class="edit-entity-wizard-step-name">{{
+                    step.label
+                  }}</span>
+                  @if (wizardDrafts()[index]) {
+                    <span
+                      class="edit-entity-wizard-unsaved"
+                      [title]="
+                        wizard.unsavedLabel ||
+                        session.intl.messages.wizardUnsaved
+                      "
+                      >{{
+                        wizard.unsavedLabel ||
+                          session.intl.messages.wizardUnsaved
+                      }}</span
+                    >
+                  }
+                </div>
+              </ng-template>
+              <ng-template matStepContent>
+                @if (index === wizardIndex()) {
+                  <header class="edit-entity-wizard-content-heading">
+                    <div>
+                      <h3>{{ step.label }}</h3>
+                      @if (step.description) {
+                        <p>{{ step.description }}</p>
+                      }
+                    </div>
+                    @if (step.optional && index > 0) {
+                      <span class="edit-entity-wizard-optional">{{
+                        wizard.optionalLabel ||
+                          session.intl.messages.wizardOptional
+                      }}</span>
+                    }
+                  </header>
+                  <ame-form-content
+                    [state]="
+                      session.renderState().tabs?.[index]?.renderState || {
+                        kind: 'empty',
+                      }
+                    "
+                    [formGroup]="session.formGroup"
+                    [options]="options"
+                    [context]="session"
+                  />
+                }
+              </ng-template>
+            </mat-step>
+          }
+        </mat-stepper>
+      }
+    </main>
+  </form>
+
+  <footer
+    class="edit-entity-actions"
+    [class.edit-entity-wizard-actions]="options.wizard"
+  >
+    <div class="edit-entity-actions-left">
+      @for (
+        action of session.getActions("bottom");
+        track session.trackRuntimeAction($index, action)
+      ) {
+        <ng-container
+          *ngTemplateOutlet="actionTemplate; context: { action }"
+        ></ng-container>
+      }
+    </div>
+
+    <div class="edit-entity-actions-right">
+      @for (
+        action of session.getActions("bottom-end");
+        track session.trackRuntimeAction($index, action)
+      ) {
+        <ng-container
+          *ngTemplateOutlet="actionTemplate; context: { action }"
+        ></ng-container>
+      }
+
+      @if (options.wizard; as wizard) {
+        <button
+          mat-stroked-button
+          type="button"
+          [disabled]="session.updating"
+          (click)="requestClose()"
+        >
+          {{ wizardExitLabel }}
+        </button>
+        @if (wizardStep?.optional && options.record?._id) {
+          <button
+            mat-raised-button
+            class="edit-entity-wizard-skip"
+            type="button"
+            [disabled]="wizardNavigationBlocked()"
+            (click)="skipWizardStep()"
+          >
+            {{ wizard.skipLabel || session.intl.messages.wizardSkip }}
+          </button>
+        }
+        <button
+          mat-raised-button
+          color="secondary"
+          type="button"
+          [disabled]="
+            session.updating || (!wizardStep?.componentManaged && !wizardValid)
+          "
+          (click)="wizardNext()"
+        >
+          {{ wizardPrimaryLabel }}
+        </button>
+      }
+    </div>
+  </footer>
+
+  @if (session.updating) {
+    <div class="edit-entity-updating">
+      <mat-spinner [diameter]="72" />
+    </div>
+  }
+}
+
+<ng-template #actionTemplate let-action="action">
+  @if (session.isRuntimeButtonAction(action)) {
+    @if (action.buttonType === "raised") {
+      <button
+        class="action-btn"
+        mat-raised-button
+        type="button"
+        [style.--action-color]="action.contrastColor"
+        [style.--action-background-color]="action.color"
+        [disabled]="session.updating || action.isDisabled"
+        [matTooltip]="action.tooltip || ''"
+        (click)="session.handleAction(action)"
+      >
+        @if (action.icon) {
+          <mat-icon>{{ action.icon }}</mat-icon>
+        }
+        <span [innerHTML]="action.label"></span>
+      </button>
+    } @else {
+      <button
+        class="action-btn"
+        mat-button
+        type="button"
+        [style.--action-color]="action.color"
+        [disabled]="session.updating || action.isDisabled"
+        [matTooltip]="action.tooltip || ''"
+        (click)="session.handleAction(action)"
+      >
+        @if (action.icon) {
+          <mat-icon>{{ action.icon }}</mat-icon>
+        }
+        <span [innerHTML]="action.label"></span>
+      </button>
+    }
+  } @else if (session.isRuntimeComponentAction(action)) {
+    <ng-container
+      *ngComponentOutlet="action.component; inputs: action.componentInputs"
+    ></ng-container>
+  }
+</ng-template>

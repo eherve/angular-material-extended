@@ -1,11 +1,8 @@
 import { TestBed } from "@angular/core/testing";
 import { EMPTY } from "rxjs";
 import moment from "moment";
-import {
-  EditEntityComponentOptions,
-  EditEntityDialogService,
-  EditEntityFormGroup,
-} from "@eherve/angular-material-edit-entity-dialog";
+import { EditEntityDialogService } from "@eherve/angular-material-edit-entity-dialog";
+import { EditEntityComponentOptions, EditEntityFormGroup } from "@eherve/angular-material-forms/core";
 import { EditEntityDialogDemoComponent } from "./edit-entity-dialog-demo.component";
 interface TestRecord {
   _id?: string;

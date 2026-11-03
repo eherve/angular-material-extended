@@ -4,13 +4,8 @@ import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
-import {
-  EditEntityComponentOptions,
-  EditEntityDialogService,
-  EditEntityField,
-  EditEntityFormGroup,
-  EditEntityDialogResult,
-} from "@eherve/angular-material-edit-entity-dialog";
+import { EditEntityDialogService } from "@eherve/angular-material-edit-entity-dialog";
+import { EditEntityComponentOptions, EditEntityField, EditEntityFormGroup, EditEntityDialogResult } from "@eherve/angular-material-forms/core";
 interface DemoRecord {
   _id?: string;
   name: string;

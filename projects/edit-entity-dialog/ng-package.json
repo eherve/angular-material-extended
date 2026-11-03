@@ -7,12 +7,5 @@
   "allowedNonPeerDependencies": [
     "lodash-es",
     "subsink"
-  ],
-  "assets": [
-    {
-      "glob": "styles.css",
-      "input": "src/lib",
-      "output": "."
-    }
   ]
 }

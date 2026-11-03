@@ -1,10 +1,10 @@
-import { EditEntityDialog } from "./edit-entity-dialog.component";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import {
   EditEntityDialogResult,
   EditEntityRecord,
-} from "../../edit-entity-dialog.types";
+} from "@eherve/angular-material-forms/core";
 import { EditEntityComponent } from "../edit-entity-component/edit-entity-component.component";
+import { EditEntityDialog } from "./edit-entity-dialog.component";
 describe("EditEntityDialog keyboard", () => {
   function setup(top = true) {
     const ref = { close: jasmine.createSpy() } as unknown as MatDialogRef<
