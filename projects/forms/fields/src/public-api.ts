@@ -28,3 +28,8 @@ export * from "./lib/fields/edit-entity-text-field/edit-entity-text-field.compon
 export * from "./lib/fields/edit-entity-textarea-field/edit-entity-textarea-field.component";
 export * from "./lib/fields/edit-entity-time-field/edit-entity-time-field.component";
 export * from "./lib/fields/edit-entity-time-range-field/edit-entity-time-range-field.component";
+export * from "./lib/controls/color/color.component";
+export * from "./lib/fields/edit-entity-color-field/edit-entity-color-field.component";
+export * from "./lib/controls/tags/tags.component";
+export * from "./lib/fields/edit-entity-tags-field/edit-entity-tags-field.component";
+export * from "./lib/controls/button-select/button-select.component";

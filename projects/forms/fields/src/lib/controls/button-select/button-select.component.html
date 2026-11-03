@@ -1,0 +1,46 @@
+<button
+  mat-stroked-button
+  type="button"
+  class="button-select-button"
+  [attr.color]="color()"
+  [disabled]="isDisabled()"
+  [attr.aria-label]="ariaLabel()"
+  [attr.aria-expanded]="isOpen()"
+  aria-haspopup="true"
+  cdkOverlayOrigin
+  #trigger="cdkOverlayOrigin"
+  (click)="$event.stopPropagation(); toggle()"
+  (blur)="touch()"
+>
+  <span [innerHTML]="selectedItem()?.label ?? ''"></span>
+</button>
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  (overlayOutsideClick)="close()"
+  (overlayKeydown)="handleOverlayKeydown($event)"
+  (detach)="close()"
+>
+  <div
+    class="button-select-column"
+    role="group"
+    [attr.aria-label]="ariaLabel()"
+    cdkTrapFocus
+    [cdkTrapFocusAutoCapture]="true"
+    animate.enter="button-select-enter"
+    animate.leave="button-select-leave"
+  >
+    @for (item of availableItems(); track $index) {
+      <button
+        mat-raised-button
+        type="button"
+        class="button-select-button"
+        [disabled]="isDisabled()"
+        (click)="select(item.value)"
+      >
+        <span [innerHTML]="item.label"></span>
+      </button>
+    }
+  </div>
+</ng-template>

@@ -135,6 +135,8 @@ export type EditEntityFormFieldKind =
   | "text"
   | "textarea"
   | "duration"
+  | "color"
+  | "tags"
   | "number"
   | "checkbox"
   | "radio"
@@ -169,6 +171,8 @@ export type EditEntityFormField<
   maxRows?: number;
   height?: string;
   quickOptions?: Array<number | string>;
+  colors?: string[][];
+  inline?: boolean;
   labelPosition?: "before" | "after";
   indeterminate?: boolean;
   direction?: "row" | "column";

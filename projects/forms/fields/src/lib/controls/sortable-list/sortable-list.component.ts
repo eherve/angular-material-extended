@@ -1,3 +1,5 @@
+import { MatChipsModule } from "@angular/material/chips";
+import { MatMenuModule } from "@angular/material/menu";
 import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { ReactiveFormsModule } from "@angular/forms";
 import { DragDropModule } from "@angular/cdk/drag-drop";
@@ -14,6 +16,8 @@ import { AdaptiveSearchPanelDirective } from "@eherve/angular-material-forms/cor
   standalone: true,
   styleUrls: ["../../internal/clear-button.scss"],
   imports: [
+    MatChipsModule,
+    MatMenuModule,
     ReactiveFormsModule,
     DragDropModule,
     MatAutocompleteModule,
@@ -32,5 +36,8 @@ import { AdaptiveSearchPanelDirective } from "@eherve/angular-material-forms/cor
 })
 export class FormControlSortableListComponent extends SearchControlBase {
   override multiple = true;
+  override panelWidth = "";
+  override appearance = "fill" as const;
+  override selectionLayout: "chips" | "rows" = "rows";
   override readonly sortable = true;
 }

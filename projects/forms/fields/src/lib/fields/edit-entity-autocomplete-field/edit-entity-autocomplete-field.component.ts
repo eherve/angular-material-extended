@@ -14,6 +14,9 @@ import { SearchFieldBase } from "./search-field-base";
       [hint]="hint"
       [placeholder]="field.placeholder ?? ''"
       [multiple]="multiple"
+      selectionLayout="rows"
+      panelWidth=""
+      [appearance]="field.appearance ?? (multiple ? 'fill' : 'outline')"
       [matTooltip]="tooltip ?? ''"
     />
   }`,

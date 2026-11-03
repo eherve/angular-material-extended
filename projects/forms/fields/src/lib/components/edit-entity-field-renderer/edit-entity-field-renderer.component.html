@@ -6,6 +6,20 @@
     [attr.data-edit-field-name]="field().name"
   >
     @switch (field().kind) {
+      @case ("tags") {
+        <ame-edit-entity-tags-field
+          [record]="$any(record())"
+          [formGroup]="formGroup()"
+          [field]="$any(renderedField())"
+        />
+      }
+      @case ("color") {
+        <ame-edit-entity-color-field
+          [record]="$any(record())"
+          [formGroup]="formGroup()"
+          [field]="$any(renderedField())"
+        />
+      }
       @case ("text") {
         <app-edit-entity-text-field
           [record]="$any(record())"

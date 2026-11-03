@@ -1,0 +1,54 @@
+<mat-form-field [appearance]="appearance()">
+  <mat-label>{{ label() }}</mat-label>
+  <mat-chip-grid
+    #grid
+    [disabled]="isDisabled()"
+    [required]="isRequired()"
+    [errorStateMatcher]="errorMatcher"
+    [attr.aria-label]="label() || 'Tags'"
+  >
+    @for (tag of value(); track $index) {
+      <mat-chip-row [disabled]="isDisabled()" (removed)="remove($index)">
+        {{ tag }}
+        @if (!isDisabled()) {
+          <button
+            matChipRemove
+            type="button"
+            [attr.aria-label]="intl.messages.clear + ' ' + tag"
+          >
+            <mat-icon>cancel</mat-icon>
+          </button>
+        }
+      </mat-chip-row>
+    }
+  </mat-chip-grid>
+  <input
+    #tagInput
+    [value]="currentTag()"
+    (input)="currentTag.set(tagInput.value)"
+    [disabled]="isDisabled()"
+    [matChipInputFor]="grid"
+    [matChipInputSeparatorKeyCodes]="
+      autocomplete.panelOpen && autocomplete.activeOption
+        ? commaKey
+        : separatorKeys
+    "
+    (matChipInputTokenEnd)="add($event)"
+    [matAutocomplete]="suggestions"
+    #autocomplete="matAutocompleteTrigger"
+    (blur)="touch()"
+  />
+  <mat-autocomplete
+    #suggestions="matAutocomplete"
+    (optionSelected)="selected($event, tagInput)"
+  >
+    @for (option of filteredOptions(); track option.value) {
+      <mat-option [value]="option.value" [disabled]="option.disabled">{{
+        option.name
+      }}</mat-option>
+    }
+  </mat-autocomplete>
+  @if (hasRequiredError()) {
+    <mat-error>{{ intl.messages.required }}</mat-error>
+  }
+</mat-form-field>

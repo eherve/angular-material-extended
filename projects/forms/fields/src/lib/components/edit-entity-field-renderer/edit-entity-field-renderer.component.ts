@@ -1,3 +1,5 @@
+import { EditEntityTagsFieldComponent } from "../../fields/edit-entity-tags-field/edit-entity-tags-field.component";
+import { EditEntityColorFieldComponent } from "../../fields/edit-entity-color-field/edit-entity-color-field.component";
 import { EditEntityTimeRangeFieldComponent } from "../../fields/edit-entity-time-range-field/edit-entity-time-range-field.component";
 import { EditEntityTimeFieldComponent } from "../../fields/edit-entity-time-field/edit-entity-time-field.component";
 import { EditEntityTextareaFieldComponent } from "../../fields/edit-entity-textarea-field/edit-entity-textarea-field.component";
@@ -50,6 +52,8 @@ import {
   standalone: true,
   host: { "[style.display]": "visible() ? null : 'none'" },
   imports: [
+    EditEntityTagsFieldComponent,
+    EditEntityColorFieldComponent,
     EditEntityAutocompleteFieldComponent,
     EditEntityCheckboxFieldComponent,
     EditEntityChipsFieldComponent,

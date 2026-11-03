@@ -2,7 +2,7 @@ import { provideZonelessChangeDetection } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import { FormControl, Validators } from "@angular/forms";
 import { FormControlAutocompleteComponent } from "./autocomplete.component";
-import { SearchControlService } from "./search-control-base";
+import { FormControlAutocompleteService } from "./search-control-base";
 import { EditEntityDialogIntl } from "@eherve/angular-material-forms/core";
 
 describe("autocomplete rendered interactions", () => {
@@ -11,7 +11,7 @@ describe("autocomplete rendered interactions", () => {
       providers: [provideZonelessChangeDetection()],
     }),
   );
-  async function setup(multiple = true, service?: SearchControlService) {
+  async function setup(multiple = true, service?: FormControlAutocompleteService) {
     const fixture = TestBed.createComponent(FormControlAutocompleteComponent);
     const control = new FormControl<unknown>(
       multiple ? [{ _id: "same" }] : false,
@@ -287,7 +287,7 @@ describe("autocomplete HTML prefix and required presentation", () => {
       const input: HTMLInputElement =
         fixture.nativeElement.querySelector("input");
       const selection: HTMLElement = fixture.nativeElement.querySelector(
-        multiple ? ".selected-name" : "[matPrefix]",
+        multiple ? ".selected-name" : "[matTextPrefix] .prefix-top > span",
       );
       expect(selection).not.toBeNull();
       expect(selection?.querySelector("span")?.textContent).toBe("Kanban");

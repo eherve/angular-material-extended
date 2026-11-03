@@ -10,6 +10,32 @@ import {
   ConditionalValue,
   EditEntityFieldLayout,
 } from "./edit-form-base-field";
+export interface ColorValue {
+  hex: string;
+  contrast: string;
+}
+export type ColorFormField<TRecord extends { _id?: string }> = BaseFormField<
+  TRecord,
+  ColorValue | null
+> & {
+  kind: "color";
+  colors?: string[][];
+  inline?: boolean;
+};
+export type TagsFormField<TRecord extends { _id?: string }> = BaseFormField<
+  TRecord,
+  string[]
+> & {
+  kind: "tags";
+  options?:
+    | IFormControlSelectOption<string>[]
+    | Observable<IFormControlSelectOption<string>[]>
+    | ((
+        record: TRecord | undefined,
+        formGroup: FormGroup,
+      ) => IFormControlSelectOption<string>[]);
+};
+
 export type FormControlTextType = "text" | "email" | "tel" | "password";
 export type DateRangeValue = { start: Date | null; end: Date | null } | null;
 export type DatetimeRangeValue = {
@@ -264,7 +290,12 @@ export type SliderFormField<Record extends { _id?: string }> = BaseFormField<
 };
 
 export interface AutocompleteFormFieldService<Record, Value> {
-  display(value: Value): { name: string; prefix?: string; color?: string };
+  display(value: Value): {
+    name: string;
+    prefix?: string;
+    color?: string;
+    prefixColor?: string;
+  };
   search(
     limit: number,
     skip: number,

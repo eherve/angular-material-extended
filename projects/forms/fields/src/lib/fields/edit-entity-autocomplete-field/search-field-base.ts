@@ -12,7 +12,7 @@ import {
   AutocompleteFormField,
   SortableListFormField,
 } from "@eherve/angular-material-forms/core";
-import { SearchControlService } from "../../controls/autocomplete/search-control-base";
+import { FormControlAutocompleteService } from "../../controls/autocomplete/search-control-base";
 @Directive()
 export abstract class SearchFieldBase<TRecord extends { _id?: string }>
   implements OnChanges, OnDestroy
@@ -22,7 +22,7 @@ export abstract class SearchFieldBase<TRecord extends { _id?: string }>
   @Input({ required: true }) field!:
     | AutocompleteFormField<TRecord>
     | SortableListFormField<TRecord>;
-  service!: SearchControlService;
+  service!: FormControlAutocompleteService;
   hint?: string;
   tooltip?: string;
   private subscriptions = new Subscription();
