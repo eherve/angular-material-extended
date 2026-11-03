@@ -1,5 +1,6 @@
 /** @format */
 
+import { DialogNavigationOptions } from "@eherve/angular-material-section-tabs";
 import { ComponentType } from "@angular/cdk/overlay";
 import { Type } from "@angular/core";
 import { FormGroup } from "@angular/forms";
@@ -436,6 +437,7 @@ export interface EditEntityComponentDisplayOptions<
 export interface EditEntityTabOptions<
   TRecord extends EditEntityRecord = EditEntityRecord,
 > {
+  id?: string;
   label: string;
   icon?: string;
   svgIcon?: string;
@@ -559,6 +561,7 @@ export interface EditEntityDataService<
 export interface EditEntityComponentOptions<
   TRecord extends EditEntityRecord = EditEntityRecord,
 > {
+  navigation?: DialogNavigationOptions;
   record?: TRecord;
   loadRecord?: () =>
     | Promise<TRecord | null | undefined>
@@ -719,6 +722,7 @@ export interface EditEntityRuntimeSection<
 export interface EditEntityTabRenderState<
   TRecord extends EditEntityRecord = EditEntityRecord,
 > {
+  id?: string;
   label: string;
   icon?: string;
   svgIcon?: string;
@@ -732,6 +736,7 @@ export interface EditEntityTabRenderState<
 export interface EditEntityRenderState<
   TRecord extends EditEntityRecord = EditEntityRecord,
 > {
+  navigation?: DialogNavigationOptions;
   kind: EditEntityRenderKind;
   tabs?: EditEntityTabRenderState<TRecord>[];
   sections?: EditEntityRuntimeSection<TRecord>[];

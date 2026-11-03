@@ -1,5 +1,6 @@
 /** @format */
 
+import { DialogNavigationOptions } from '../dialog-navigation';
 import { formatDate } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type { SafeHtml } from '@angular/platform-browser';
@@ -157,6 +158,7 @@ export class SectionTabsDisplayComponent implements OnChanges {
 
   @Input({ required: true }) options!: SectionTabsDisplayOptions;
   @Input() selectedIndex = 0;
+  @Input() navigation?: DialogNavigationOptions;
   @Input() queryParamKey?: string;
   @Input() menuHeader?: string;
   @Input() showEmptyFields?: boolean;

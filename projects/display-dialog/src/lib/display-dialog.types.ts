@@ -1,3 +1,4 @@
+import { DialogNavigationOptions } from "@eherve/angular-material-section-tabs";
 import { Type } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SectionTabsDisplayCard, SectionTabsDisplayCardAction, SectionTabsDisplayOptions, SectionTabsDisplaySection } from '@eherve/angular-material-section-tabs';
@@ -108,6 +109,7 @@ export type DisplayDialogTabDisplayOptions<TRecord extends object = DisplayDialo
   | DisplayDialogSingleSectionOptions<TRecord>;
 
 export interface DisplayDialogTabOptions<TRecord extends object = DisplayDialogRecord> {
+  id?: string;
   label: string;
   icon?: string;
   svgIcon?: string;
@@ -181,6 +183,7 @@ export interface DisplayDialogRuntimeActionButton<TRecord extends object = Displ
 }
 
 export interface DisplayDialogDataCommon<TRecord extends object> {
+  navigation?: DialogNavigationOptions;
   title?: DisplayDialogTitle<TRecord>;
   subtitle?: DisplayDialogTitle<TRecord>;
   loadingLabel?: string;

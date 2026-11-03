@@ -9,3 +9,5 @@ export * from "./lib/directives/section-tabs-menu-header.directive";
 export * from "./lib/section-tabs-intl";
 export * from "./lib/section-tabs-display/section-tabs-display.component";
 export * from "./lib/section-tabs-display/section-tabs-display.types";
+
+export * from "./lib/dialog-navigation";

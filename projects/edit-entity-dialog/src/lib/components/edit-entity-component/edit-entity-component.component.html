@@ -192,8 +192,10 @@
           class="edit-entity-root-tabs"
           mat-stretch-tabs="false"
           [preserveContent]="true"
+          [selectedIndex]="navigationController.selectedIndex"
+          (selectedIndexChange)="navigationController.selectTab($event)"
         >
-          @for (tab of state.tabs; track tab.label) {
+          @for (tab of state.tabs; track tab.id ?? tab.label) {
             @if (tab.isVisible) {
               <mat-tab>
                 <ng-template mat-tab-label>
@@ -290,6 +292,7 @@
     <app-section-tabs
       class="edit-entity-section-tabs"
       [class.edit-entity-section-tabs--single]="singleSection === true"
+      [navigation]="state.navigation"
     >
       @if (state.sectionsMenuHeader) {
         <ng-template appSectionTabsMenuHeader>
@@ -314,6 +317,7 @@
 
       @for (section of state.sections; track section.id) {
         <app-section-tab
+          [queryParamValue]="section.id"
           [done]="section.done"
           [total]="section.total"
           [progress]="section.progress"

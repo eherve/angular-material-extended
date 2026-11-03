@@ -88,8 +88,10 @@
   @switch (state.kind) {
     @case ('tabs') {
       @if (state.tabs?.length) {
-        <mat-tab-group class="display-dialog-root-tabs" mat-stretch-tabs="false">
-          @for (tab of state.tabs; track tab.label) {
+        <mat-tab-group class="display-dialog-root-tabs" mat-stretch-tabs="false"
+          [selectedIndex]="navigationController.selectedIndex"
+          (selectedIndexChange)="navigationController.selectTab($event)">
+          @for (tab of state.tabs; track tab.id ?? tab.label) {
             <mat-tab>
               <ng-template mat-tab-label>
                 @if (tab.svgIcon) {
@@ -116,6 +118,7 @@
         <app-section-tabs-display
           class="display-dialog-section-tabs-display"
           [menuHeader]="state.sectionsMenuHeader"
+          [navigation]="state.navigation"
           [options]="state.sectionsOptions">
         </app-section-tabs-display>
       }
@@ -133,6 +136,7 @@
       @if (state.singleSectionOptions) {
         <app-section-tabs-display
           class="display-dialog-section-tabs-display display-dialog-single-section-display"
+          [navigation]="state.navigation"
           [options]="state.singleSectionOptions">
         </app-section-tabs-display>
       }

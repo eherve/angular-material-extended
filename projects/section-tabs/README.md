@@ -117,3 +117,29 @@ Omitting a section/card grid `gap` uses `var(--ngx-mat-extended-space-3, 16px)`.
 Readonly field grids use borderless cells with compact padding and an 8px inherited spacing-token inset, preserving configured gaps and responsive spans. The empty-fields toggle uses a compact 40×24px visual track while retaining Material’s 48px touch target. Its selected track and checkmark inherit the accent token; the selected handle uses the surface token in normal, focus, hover and pressed states.
 
 `--ngx-mat-section-tabs-background` controls the section container. Set `--ngx-mat-section-tabs-card-background` separately for sidebar and content cards (for example, white cards on a gray container). Cards fall back to the existing section background, then `--ngx-mat-extended-surface`, then white.
+
+## Dialog navigation (22.2.0)
+
+`DialogNavigationState` is `{ tab?: string; section?: string }`.
+`DialogNavigationOptions` accepts `initialState`, an optional RxJS `stateChanges`
+observable for external restoration, and `onChange(state)` for actual user selection
+or normalization of an unavailable identifier. Valid restored states do not echo.
+The library never reads or writes the Router. URL ownership stays in the host.
+
+Both `app-section-tabs` and `app-section-tabs-display` accept `[navigation]`.
+For sections, use the existing `queryParamValue` (display configurations default to
+`section.id`). Disabled or missing sections select the first enabled section.
+Navigation takes precedence over the legacy `queryParamKey` handler. Keep a stable
+navigation object and unsubscribe the host's state source when the owner closes.
+
+`DialogNavigationController` is the root-tab adapter used by the edit/display
+packages. It resolves stable tab ids after visibility filtering, preserves a
+requested section until embedded content mounts, forwards section-only child
+adapters, ignores inactive/disposed child callbacks, and releases subscriptions
+when destroyed. Tab indices and translated labels are never serialized.
+
+Run the Router-free navigation regressions with Node 22.6 or later:
+
+```sh
+node --experimental-strip-types --test projects/section-tabs/tests/dialog-navigation.test.mjs
+```

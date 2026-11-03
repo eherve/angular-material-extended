@@ -230,6 +230,7 @@ export class EditEntityRenderService<
       renderState.validationStats ?? this.createEmptyValidationStats();
 
     return {
+      id: tab.id,
       label: tab.label,
       icon: tab.icon,
       svgIcon: tab.svgIcon,

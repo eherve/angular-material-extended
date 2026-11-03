@@ -248,3 +248,27 @@ Les flèches gauche/droite déplacent le curseur et changent de segment à ses e
 Les libellés et unités passent par `EditEntityDialogIntl`.
 
 Dans une configuration de formulaire, utiliser `{ kind: 'duration', name: 'duration', label: 'Durée', showDays: true }`.
+
+## Opt-in dialog navigation (22.5.0)
+
+Set `options.navigation` to `DialogNavigationOptions` from
+`@eherve/angular-material-section-tabs` (22.2.0 or later). Give every linked root
+`EditEntityTabOptions` a unique stable `id`. Section ids already identify sections.
+The adapter filters hidden tabs before resolving ids and reports unavailable ids
+using the first accessible tab/section. Existing configurations without navigation
+continue to use normal index selection.
+
+```ts
+const navigation: DialogNavigationOptions = {
+  initialState: { tab: 'technical', section: 'motor' },
+  stateChanges: restoredState$,
+  onChange: state => hostNavigationChanged(state),
+};
+```
+
+A custom tab component can declare `@Input() navigation?: DialogNavigationOptions`
+and pass that value to its embedded editor's `options.navigation`. The parent sends
+section-only state; it retains ownership of the root tab. Only declared Angular
+inputs are forwarded, and explicitly configured inputs retain priority. Embedded
+editors must not acquire their own URL identity. Initial/external valid selection
+is applied silently; user selection and invalid-state normalization call `onChange`.

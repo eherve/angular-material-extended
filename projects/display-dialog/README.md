@@ -137,3 +137,18 @@ Declare these optional CSS custom properties on an ancestor (including an overla
 Existing package-specific public color variables take precedence over the corresponding common role, which takes precedence over the standalone fallback. Action-specific colors keep their priority. Tokens only affect spacing and appearance: functional dimensions, circular controls and pill shapes remain unchanged. Material components inherit their theme; renderer headings use public Material typography roles with standalone fallbacks.
 
 Omitting a section/card grid `gap` uses `var(--ngx-mat-extended-space-3, 16px)`. An explicit value such as `12px` is retained. Responsive grids read the computed column gap when calculating available tracks and item widths.
+
+## Opt-in dialog navigation (22.2.0)
+
+`DisplayDialogData.navigation` accepts `DialogNavigationOptions` exported by
+`@eherve/angular-material-section-tabs` 22.2.0. Give linked tabs stable unique
+`DisplayDialogTabOptions.id` values and sections stable `id`/`queryParamValue`
+values. `initialState` restores a tab/section, `stateChanges` restores later states,
+and `onChange` reports actual user selection or normalization. Valid restoration
+does not echo, and no Router provider is required.
+
+Custom tab content receives section-only navigation when it declares a public
+`navigation` input. Forward this to embedded editor options; the display dialog
+retains root-tab ownership. Explicit component inputs keep priority. The host is
+responsible for a single main-dialog URL owner and for preventing nested overlays
+from consuming its initial URL state.

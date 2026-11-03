@@ -13,6 +13,7 @@ import {
 } from "@angular/core/testing";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { BehaviorSubject, Observable, finalize } from "rxjs";
+import { DialogNavigationOptions } from "./dialog-navigation";
 import { SectionTabsIntl } from "./section-tabs-intl";
 import { SectionTabsModule } from "./section-tabs.module";
 import { SectionTabsComponent } from "./section-tabs.component";
@@ -26,6 +27,7 @@ import {
   changeDetection: ChangeDetectionStrategy.Eager,
   template: ` <app-section-tabs
     [queryParamKey]="key"
+    [navigation]="navigation"
     [selectedIndex]="initialIndex"
     (selectedIndexChange)="events.push($event)"
   >
@@ -60,6 +62,7 @@ import {
 class Host {
   key: string | undefined = "groupA";
   initialIndex = 0;
+  navigation?: DialogNavigationOptions;
   disabled = false;
   disableAll = false;
   showLate = false;
@@ -313,5 +316,46 @@ describe("SectionTabsComponent", () => {
     expect(
       f.nativeElement.querySelector("aside").getAttribute("aria-label"),
     ).toBe("Sections translated");
+  });
+  it("restores stable sections without legacy handler writes and reports real clicks", async () => {
+    const changes: Array<{ section?: string }> = [];
+    const external = new BehaviorSubject({ section: "history" });
+    const fixture = create();
+    fixture.componentInstance.navigation = {
+      initialState: { section: "details" },
+      stateChanges: external,
+      onChange: (state) => changes.push(state),
+    };
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(
+      fixture.componentInstance.tabs.selectedTabItem?.queryParamValue,
+    ).toBe("history");
+    expect(changes).toEqual([]);
+    expect(handler.select).not.toHaveBeenCalled();
+    const details = fixture.componentInstance.tabs.tabItems.find(
+      (item) => item.queryParamValue === "details",
+    )!;
+    fixture.componentInstance.tabs.selectTab(details);
+    expect(changes).toEqual([{ section: "details" }]);
+    expect(handler.select).not.toHaveBeenCalled();
+    fixture.destroy();
+  });
+
+  it("normalizes disabled section ids to an accessible selection", async () => {
+    const changes: Array<{ section?: string }> = [];
+    const fixture = create();
+    fixture.componentInstance.disabled = true;
+    fixture.componentInstance.navigation = {
+      initialState: { section: "history" },
+      onChange: (state) => changes.push(state),
+    };
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(
+      fixture.componentInstance.tabs.selectedTabItem?.queryParamValue,
+    ).toBe("details");
+    expect(changes).toEqual([{ section: "details" }]);
+    fixture.destroy();
   });
 });

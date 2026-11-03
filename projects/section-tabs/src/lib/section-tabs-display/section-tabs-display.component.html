@@ -8,6 +8,7 @@
   <app-section-tabs
     class="section-tabs-display"
     [selectedIndex]="selectedIndex"
+    [navigation]="navigation"
     [queryParamKey]="queryParamKey"
     (selectedIndexChange)="onSelectedIndexChange($event)">
     @if (menuHeader) {

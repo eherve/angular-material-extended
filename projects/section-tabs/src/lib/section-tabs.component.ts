@@ -28,6 +28,10 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
 } from "@angular/core";
+import {
+  DialogNavigationOptions,
+  DialogNavigationState,
+} from "./dialog-navigation";
 import { Subscription } from "rxjs";
 import { SectionTabsIntl } from "./section-tabs-intl";
 import { SECTION_SELECTION_HANDLER } from "./section-selection-handler";
@@ -157,6 +161,9 @@ export class SectionTabsComponent
 
   @Input() selectedIndex = 0;
   @Input() queryParamKey?: string;
+  @Input() navigation?: DialogNavigationOptions;
+  private navigationSubscription?: Subscription;
+  private navigationState: DialogNavigationState = {};
 
   @Output() selectedIndexChange = new EventEmitter<number>();
 
@@ -196,6 +203,7 @@ export class SectionTabsComponent
     this.subscriptions.add(
       this.intl.changes.subscribe(() => this.changeDetectorRef.markForCheck()),
     );
+    this.bindNavigation();
     this.refreshProjectedTemplates();
     this.refreshTabItems();
     this.synchronizeSelectionWithQueryParameter();
@@ -207,6 +215,11 @@ export class SectionTabsComponent
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!this.contentInitialized) return;
+    if (changes["navigation"]) {
+      this.bindNavigation();
+      this.bindSelectionHandler();
+      this.synchronizeSelectionWithQueryParameter();
+    }
     if (changes["queryParamKey"]) {
       this.bindSelectionHandler();
       this.synchronizeSelectionWithQueryParameter();
@@ -217,6 +230,7 @@ export class SectionTabsComponent
   }
 
   ngOnDestroy(): void {
+    this.navigationSubscription?.unsubscribe();
     this.handlerGeneration++;
     this.handlerSubscription?.unsubscribe();
     this.subscriptions.unsubscribe();
@@ -226,7 +240,12 @@ export class SectionTabsComponent
   selectTab(tabItem: SectionTabItem): void {
     if (!this.isSelectableTabItem(tabItem)) return;
     this.applySelectedIndex(tabItem.index, true);
-    this.updateQueryParameter(tabItem);
+    if (this.navigation) {
+      this.navigationState = tabItem.queryParamValue
+        ? { section: tabItem.queryParamValue }
+        : {};
+      this.navigation.onChange?.({ ...this.navigationState });
+    } else this.updateQueryParameter(tabItem);
   }
 
   private handleTabsChange(): void {
@@ -301,6 +320,21 @@ export class SectionTabsComponent
   }
 
   private synchronizeSelectionWithQueryParameter(): void {
+    if (this.navigation) {
+      const requested = this.tabItems.find(
+        (item) =>
+          item.queryParamValue === this.navigationState.section &&
+          this.isSelectableTabItem(item),
+      );
+      this.applySelectedIndex(requested?.index ?? 0, false);
+      if (!this.selectedTabItem) return;
+      const section = this.selectedTabItem.queryParamValue;
+      if (section !== this.navigationState.section) {
+        this.navigationState = section ? { section } : {};
+        this.navigation.onChange?.({ ...this.navigationState });
+      }
+      return;
+    }
     const queryParamValue = this.getQueryParameterValue();
     if (queryParamValue === null) {
       this.applySelectedIndex(this.selectedIndex, false);
@@ -318,12 +352,24 @@ export class SectionTabsComponent
     this.applySelectedIndex(queryParamTabItem.index, true);
   }
 
+  private bindNavigation(): void {
+    this.navigationSubscription?.unsubscribe();
+    this.navigationState = { ...this.navigation?.initialState };
+    this.navigationSubscription = this.navigation?.stateChanges?.subscribe(
+      (state) => {
+        this.navigationState = { ...state };
+        this.synchronizeSelectionWithQueryParameter();
+        this.changeDetectorRef.markForCheck();
+      },
+    );
+  }
+
   private bindSelectionHandler(): void {
     const generation = ++this.handlerGeneration;
     this.handlerSubscription?.unsubscribe();
     this.externalValue = null;
     const key = this.queryParamKey;
-    if (!this.handler || !key?.trim()) return;
+    if (this.navigation || !this.handler || !key?.trim()) return;
     try {
       this.handlerSubscription = this.handler.observe(key).subscribe({
         next: (value): void => {

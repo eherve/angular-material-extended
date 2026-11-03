@@ -21,6 +21,8 @@ import {
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subject, firstValueFrom, isObservable, takeUntil } from 'rxjs';
 import {
+  DialogNavigationController,
+  DialogNavigationOptions,
   SectionTabsDisplayCard,
   SectionTabsDisplayCardAction,
   SectionTabsDisplayOptions,
@@ -84,6 +86,7 @@ interface DisplayDialogRuntimeCardAction {
 type DisplayDialogRenderKind = 'tabs' | 'sections' | 'component' | 'section' | 'empty';
 
 interface DisplayDialogTabRenderState<TRecord extends object> {
+  id?: string;
   label: string;
   icon?: string;
   svgIcon?: string;
@@ -92,6 +95,7 @@ interface DisplayDialogTabRenderState<TRecord extends object> {
 }
 
 interface DisplayDialogRenderState<TRecord extends object> {
+  navigation?: DialogNavigationOptions;
   kind: DisplayDialogRenderKind;
   tabs?: DisplayDialogTabRenderState<TRecord>[];
   sectionsOptions?: SectionTabsDisplayOptions;
@@ -130,6 +134,7 @@ export class DisplayDialog<TRecord extends object> implements OnInit, OnChanges,
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
   private readonly componentInputNamesByType = new WeakMap<Type<unknown>, ReadonlySet<string>>();
+  readonly navigationController = new DialogNavigationController();
   private initializeVersion = 0;
   private destroyed = false;
   private recordErrorKind?: 'empty' | 'error';
@@ -159,6 +164,7 @@ export class DisplayDialog<TRecord extends object> implements OnInit, OnChanges,
   }
 
   ngOnDestroy(): void {
+    this.navigationController.destroy();
     this.destroyed = true;
     this.intlSubscription.unsubscribe();
     ++this.initializeVersion;
@@ -232,6 +238,7 @@ export class DisplayDialog<TRecord extends object> implements OnInit, OnChanges,
     this.cancelLoad.next();
     this.releaseConnection();
     const data = this.data ?? this.dialogData ?? undefined;
+    this.navigationController.bind(data?.navigation, () => this.changeDetectorRef.markForCheck());
 
     this.loading = true;
     this.errorLabel = '';
@@ -345,6 +352,7 @@ export class DisplayDialog<TRecord extends object> implements OnInit, OnChanges,
     record: TRecord,
   ): DisplayDialogTabRenderState<TRecord> {
     return {
+      id: tab.id,
       label: tab.label,
       icon: tab.icon,
       svgIcon: tab.svgIcon,
@@ -540,8 +548,26 @@ export class DisplayDialog<TRecord extends object> implements OnInit, OnChanges,
 
     this.title = this.resolveText(this.dialogDataResolved.title, this.record);
     this.subtitle = this.resolveText(this.dialogDataResolved.subtitle, this.record);
-    this.renderState = this.buildRenderState(this.dialogDataResolved, this.record);
+    const state = this.buildRenderState(this.dialogDataResolved, this.record);
+    this.navigationController.setTabs(state.kind === 'tabs' ? (state.tabs ?? []).map(tab => tab.id) : []);
+    this.renderState = this.attachNavigation(state);
     this.refreshActions();
+  }
+
+  private attachNavigation(state: DisplayDialogRenderState<TRecord>, tab?: string): DisplayDialogRenderState<TRecord> {
+    if (!this.dialogDataResolved?.navigation) return state;
+    if (state.kind === 'tabs') return {
+      ...state,
+      tabs: state.tabs?.map(item => ({ ...item, renderState: this.attachNavigation(item.renderState, item.id) })),
+    };
+    const navigation = this.navigationController.child(tab);
+    return {
+      ...state,
+      navigation,
+      ...(state.kind === 'component' ? {
+        componentInputs: this.pickDeclaredComponentInputs(state.component, { navigation, ...state.componentInputs }),
+      } : {}),
+    };
   }
 
   private refreshActions(): void {

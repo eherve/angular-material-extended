@@ -15,6 +15,7 @@ import {
   inject,
   signal,
 } from "@angular/core";
+import { DialogNavigationController } from "@eherve/angular-material-section-tabs";
 import { cloneDeep, isEqual } from "lodash-es";
 import { EDIT_ENTITY_LOGGER } from "../../edit-entity-logger";
 import { FormControlStatus } from "@angular/forms";
@@ -94,6 +95,8 @@ export class EditEntityComponent<
   @Output() readonly closeRequest = new EventEmitter<
     EditEntityDialogResult<TRecord>
   >();
+
+  readonly navigationController = new DialogNavigationController();
 
   loading = true;
   updating = false;
@@ -196,6 +199,7 @@ export class EditEntityComponent<
   }
 
   ngOnDestroy(): void {
+    this.navigationController.destroy();
     this.destroyConnection();
 
     this.intlSub.unsubscribe();
@@ -646,6 +650,9 @@ export class EditEntityComponent<
 
   private async initialize(): Promise<void> {
     const version = ++this.initializeVersion;
+    this.navigationController.bind(this.options?.navigation, () =>
+      this.changeDetectorRef.markForCheck(),
+    );
     this.expandedCards.clear();
     this.loadCancelled.next();
     clearTimeout(this.focusTimer);
@@ -885,8 +892,50 @@ export class EditEntityComponent<
         ),
       ),
     );
+    const state = this.renderState();
+    if (state.kind === "tabs") {
+      this.navigationController.setTabs(
+        (state.tabs ?? []).filter((tab) => tab.isVisible).map((tab) => tab.id),
+        "tabs" in this.options.displayOptions
+          ? (this.options.displayOptions.tabIndex ?? 0)
+          : 0,
+      );
+    }
+    if (state.kind !== "tabs") this.navigationController.setTabs([]);
+    this.renderState.set(this.attachNavigation(state));
     this.refreshTitles();
     this.refreshActionStates();
+  }
+
+  private attachNavigation(
+    state: EditEntityRenderState<TRecord>,
+    tab?: string,
+  ): EditEntityRenderState<TRecord> {
+    if (!this.options.navigation) return state;
+    if (state.kind === "tabs")
+      return {
+        ...state,
+        tabs: state.tabs?.map((item) => ({
+          ...item,
+          renderState: this.attachNavigation(item.renderState, item.id),
+        })),
+      };
+    const navigation = this.navigationController.child(tab);
+    return {
+      ...state,
+      navigation,
+      ...(state.kind === "component"
+        ? {
+            componentInputs: this.renderService.filterDeclaredComponentInputs(
+              state.component,
+              {
+                navigation,
+                ...state.componentInputs,
+              },
+            ),
+          }
+        : {}),
+    };
   }
 
   private refreshTitles(): void {
