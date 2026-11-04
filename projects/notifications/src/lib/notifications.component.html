@@ -1,0 +1,86 @@
+@for (notification of notifications(); track notification.id) {
+  <article
+    class="notification"
+    [class]="'notification level-' + notification.level"
+    [style.--ngx-mat-notification-accent]="notification.color"
+    [attr.role]="
+      notification.level === 'error' || notification.status === 'error'
+        ? 'alert'
+        : 'status'
+    "
+    (mouseenter)="pauseFor(notification.id, 'hover')"
+    (mouseleave)="resumeFor(notification.id, 'hover')"
+    (focusin)="pauseFor(notification.id, 'focus')"
+    (focusout)="focusLeft(notification.id, $event)"
+  >
+    <div class="heading">
+      @switch (notification.status) {
+        @case ("queued") {
+          <mat-icon aria-hidden="true">schedule</mat-icon>
+        }
+        @case ("wip") {
+          <mat-progress-spinner
+            diameter="24"
+            [mode]="
+              notification.progress == null ? 'indeterminate' : 'determinate'
+            "
+            [value]="(notification.progress ?? 0) * 100"
+            [attr.aria-label]="notification.progressLabel ?? 'Task progress'"
+          />
+        }
+        @case ("done") {
+          <mat-icon class="status-success" aria-hidden="true"
+            >task_alt</mat-icon
+          >
+        }
+        @case ("error") {
+          <mat-icon class="status-error" aria-hidden="true">error</mat-icon>
+        }
+        @default {
+          @if (notification.icon) {
+            <mat-icon aria-hidden="true">{{ notification.icon }}</mat-icon>
+          }
+        }
+      }
+      @if (notification.html) {
+        <span class="message" [innerHTML]="notification.message"></span>
+      } @else {
+        <span class="message">{{ notification.message }}</span>
+      }
+      <button
+        type="button"
+        mat-icon-button
+        class="close"
+        [attr.aria-label]="notification.closeLabel ?? 'Dismiss notification'"
+        (click)="dismiss.emit(notification.id)"
+      >
+        <mat-icon aria-hidden="true">close</mat-icon>
+      </button>
+    </div>
+    @if (notification.info) {
+      @if (notification.html) {
+        <div class="info" [innerHTML]="notification.info"></div>
+      } @else {
+        <div class="info">{{ notification.info }}</div>
+      }
+    }
+    @if (notification.error) {
+      @if (notification.html) {
+        <div class="error" [innerHTML]="notification.error"></div>
+      } @else {
+        <div class="error">{{ notification.error }}</div>
+      }
+    }
+    @if (countdowns()[notification.id]; as countdown) {
+      @for (state of [countdown]; track state) {
+        <div
+          class="countdown"
+          aria-hidden="true"
+          [style.--remaining]="state.remaining / state.duration"
+          [style.animation-duration]="state.remaining + 'ms'"
+          [style.animation-play-state]="state.paused ? 'paused' : 'running'"
+        ></div>
+      }
+    }
+  </article>
+}
