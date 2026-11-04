@@ -119,6 +119,8 @@ export type DatatableSearchSelectColumn<Record> = DatatableSelectColumn<Record> 
     multiple?: boolean;
     placeholder?: string;
     hasGroup?: boolean;
+    /** Fits content by default; 'auto' matches the field; numbers are pixels. */
+    panelWidth?: string | number | null;
   };
 
 // AUTOCOMPLETE

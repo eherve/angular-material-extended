@@ -71,3 +71,44 @@ mat-form-field {
   align-items: center;
   flex-direction: row;
 }
+
+// Avoid inline baseline space when the selected value contains an icon.
+mat-select {
+  display: flex;
+}
+
+// Keep selected values on one line without changing the option list's layout.
+mat-select mat-select-trigger {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+
+  .options {
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+
+  .option {
+    min-width: 0;
+    flex: 0 1 auto;
+    overflow: hidden;
+  }
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    min-width: 18px;
+    min-height: 18px;
+    line-height: 18px;
+    font-size: 18px;
+    flex: 0 0 18px;
+  }
+
+  mat-label {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

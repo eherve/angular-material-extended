@@ -137,8 +137,6 @@ export class HeaderSelectFilterComponent<Record>
         this.selectOptionsCache
           .resolve(this.column.options)
           .subscribe((data) => {
-            this.options = [];
-            this.groups = [];
             this.buildOptions(data);
           }),
       );
@@ -150,13 +148,15 @@ export class HeaderSelectFilterComponent<Record>
   }
 
   private buildOptions(data: DatatableSearchListOption[]): void {
-    data.forEach((d) => {
-      this.options.push(d);
+    this.options = [...data];
+    this.groups = [];
+    this.options.forEach((d) => {
       const name = d.group ?? "";
       const group = this.groups.find((g) => g.name === name);
       if (!group) this.groups.push({ name, options: [d] });
       else group.options.push(d);
     });
+    this.changeDetectorRef.markForCheck();
   }
 
   private isEmptyValue(value: any): boolean {

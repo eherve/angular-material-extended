@@ -11,6 +11,7 @@
       [formControl]="selectControl"
       [placeholder]="column.placeholder!"
       [multiple]="column.multiple"
+      [panelWidth]="column.panelWidth ?? null"
       (closed)="onTouched()"
     >
       <mat-select-trigger>

@@ -20,6 +20,16 @@ describe('HeaderSelectFilterComponent', () => {
     fixture.detectChanges();
   });
 
+  it('refreshes the option collection when options arrive after a restored value', () => {
+    component.writeValue({ value: 'stopped' });
+    const initialOptions = component.options;
+    const options = [{ value: 'stopped', name: 'À l’arrêt' }];
+    Reflect.get(component, 'buildOptions').call(component, options);
+    expect(component.options).not.toBe(initialOptions);
+    expect(component.options).toEqual(options);
+    expect(component.selectControl.value).toBe('stopped');
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });

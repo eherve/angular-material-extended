@@ -88,3 +88,27 @@ responses after editing, clearing, replacing the filter or destroying the contro
 the stored filter unchanged; successful resolution refreshes the input without emitting a filter change.
 For columns with a resolver, an unresolved value is never displayed as raw text: the input stays blank until its label
 is known, including when lookup fails or returns no option. Columns without a resolver keep their existing display.
+
+## Select filter layout
+
+Selected filter values stay on one line with compact icons and ellipsis for long labels.
+This also applies to multiple selections; the open menu keeps all option labels available.
+
+Searchable `select` columns accept `panelWidth`, forwarded to Angular Material's public
+`MatSelect.panelWidth` input:
+
+- omitted, `null` or `''`: size the menu to its option content, within the viewport (default);
+- `'auto'`: match the form field width;
+- a number (pixels) or CSS width string: use an explicit menu width.
+
+```ts
+{
+  type: 'select',
+  columnDef: 'actionType',
+  property: 'actionType',
+  header: 'Type d’action',
+  searchable: true,
+  options: actionTypeOptions,
+  panelWidth: null,
+}
+```
