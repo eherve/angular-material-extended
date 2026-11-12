@@ -300,17 +300,17 @@
           </div>
         }
         @if (options.actions?.export) {
-          <div class="action">
+          <div class="action" [matTooltip]="datatableIntl.exportActionLabel">
             <button
               mat-icon-button
               color="primary"
               [attr.aria-label]="datatableIntl.exportActionLabel"
-              [disabled]="exporting"
+              [disabled]="exporting()"
               (click)="export()"
             >
               <mat-icon>download</mat-icon>
             </button>
-            @if (exporting) {
+            @if (exporting()) {
               <div class="action-loader" @fade>
                 <mat-spinner [diameter]="32"></mat-spinner>
               </div>

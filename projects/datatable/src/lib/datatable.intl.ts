@@ -56,7 +56,7 @@ const LABELS: { [locale: string]: Labels } = {
     incrementalLoadingLabel: 'Chargement...',
     incrementalLoadMoreLabel: 'Charger plus',
     columnsActionLabel: 'Configurer les colonnes',
-    exportActionLabel: 'Exporter les données',
+    exportActionLabel: 'Télécharger les données',
     refreshActionLabel: 'Actualiser les données',
     showColumnActionLabel: 'Afficher la colonne',
     hideColumnActionLabel: 'Masquer la colonne',

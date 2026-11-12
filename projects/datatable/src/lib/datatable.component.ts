@@ -14,6 +14,7 @@ import {
 } from "@angular/cdk/drag-drop";
 import { CommonModule } from "@angular/common";
 import {
+  signal,
   ChangeDetectorRef,
   Component,
   ContentChildren,
@@ -384,9 +385,9 @@ export class NgxMatDatatableComponent<Record = any>
     this.buildDisplayColumns();
   }
 
-  exporting = false;
+  readonly exporting = signal(false);
   async export(): Promise<void> {
-    this.exporting = true;
+    this.exporting.set(true);
     try {
       await exportDatatable({
         options: this.options,
@@ -395,7 +396,7 @@ export class NgxMatDatatableComponent<Record = any>
         rowSize: this.dataSource.rowSize,
       });
     } finally {
-      this.exporting = false;
+      this.exporting.set(false);
     }
   }
 

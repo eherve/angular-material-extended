@@ -14,7 +14,7 @@ describe('NgxMatDatatableIntl', () => {
     expect(intl.itemsPerPageLabel).toBe('Éléments par page :');
     expect(intl.incrementalLoadMoreLabel).toBe('Charger plus');
     expect(intl.columnsActionLabel).toBe('Configurer les colonnes');
-    expect(intl.exportActionLabel).toBe('Exporter les données');
+    expect(intl.exportActionLabel).toBe('Télécharger les données');
     expect(intl.clearFilterLabel).toBe('Effacer le filtre');
     expect(intl.numberOptions.separator).toBe(' ');
     expect(intl.numberOptions.decimal).toBe(',');
