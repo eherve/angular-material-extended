@@ -1,0 +1,15 @@
+@use "@angular/material" as mat;
+
+:host,
+mat-form-field {
+  display: block;
+  width: 100%;
+}
+
+mat-chip-row {
+  @include mat.chips-overrides(
+    (
+      container-shape-radius: 8px,
+    )
+  );
+}

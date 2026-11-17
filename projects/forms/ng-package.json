@@ -1,0 +1,18 @@
+{
+  "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "../../dist/forms",
+  "lib": {
+    "entryFile": "src/public-api.ts"
+  },
+  "allowedNonPeerDependencies": [
+    "lodash-es",
+    "subsink"
+  ],
+  "assets": [
+    {
+      "glob": "styles.css",
+      "input": "src",
+      "output": "."
+    }
+  ]
+}

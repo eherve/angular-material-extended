@@ -1,0 +1,50 @@
+:host {
+  display: block;
+  width: 100%;
+}
+mat-form-field {
+  width: 100%;
+}
+.palette {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  max-height: 360px;
+  overflow: auto;
+}
+.palette-row {
+  display: flex;
+  gap: 2px;
+}
+.swatch {
+  width: 15px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid var(--mat-sys-outline);
+  border-radius: 2px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.swatch[aria-pressed="true"] {
+  outline: 2px solid var(--mat-sys-on-surface);
+  outline-offset: 1px;
+}
+.swatch:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+.swatch:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.contrast {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+}
+
+:host(.inline) {
+  display: inline-flex;
+  width: auto;
+}

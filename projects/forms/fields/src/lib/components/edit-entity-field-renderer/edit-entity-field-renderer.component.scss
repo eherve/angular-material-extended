@@ -1,0 +1,21 @@
+/** @format */
+
+:host,
+.edit-entity-field-renderer {
+  display: block;
+  min-width: 0;
+  width: 100%;
+}
+
+:host ::ng-deep .form-field,
+:host ::ng-deep mat-form-field,
+:host ::ng-deep app-form-control-text,
+:host ::ng-deep app-form-control-textarea,
+:host ::ng-deep app-form-control-number,
+:host ::ng-deep app-form-control-select,
+:host ::ng-deep app-form-control-autocomplete,
+:host ::ng-deep app-form-control-sortable-list,
+:host ::ng-deep app-form-control-duration,
+:host ::ng-deep app-quill-editor {
+  width: 100%;
+}

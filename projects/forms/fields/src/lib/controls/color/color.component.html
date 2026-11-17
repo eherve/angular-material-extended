@@ -1,0 +1,89 @@
+@if (!inline()) {
+  <mat-form-field [appearance]="appearance()">
+    <mat-label>{{ label() }}</mat-label>
+    <input
+      matInput
+      readonly
+      [value]="value()?.hex ?? ''"
+      [required]="isRequired()"
+      [disabled]="isDisabled()"
+      [errorStateMatcher]="errorMatcher"
+      (blur)="touch()"
+      [matMenuTriggerFor]="paletteMenu"
+    />
+    <button
+      mat-icon-button
+      matSuffix
+      type="button"
+      [disabled]="isDisabled()"
+      [matMenuTriggerFor]="paletteMenu"
+      [attr.aria-label]="label() || 'Color'"
+    >
+      <mat-icon [style.color]="value()?.hex">palette</mat-icon>
+    </button>
+    @if (value() && !isDisabled()) {
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        [attr.aria-label]="intl.messages.clear"
+        (click)="clearValue(); $event.stopPropagation()"
+      >
+        <mat-icon>clear</mat-icon>
+      </button>
+    }
+    @if (hasRequiredError()) {
+      <mat-error>{{ intl.messages.required }}</mat-error>
+    }
+  </mat-form-field>
+} @else {
+  <button
+    mat-icon-button
+    type="button"
+    [disabled]="isDisabled()"
+    [matMenuTriggerFor]="paletteMenu"
+    [attr.aria-label]="label() || 'Color'"
+    (menuOpened)="touch()"
+  >
+    <mat-icon [style.color]="value()?.hex">palette</mat-icon>
+  </button>
+}
+<mat-menu #paletteMenu="matMenu">
+  <div (click)="$event.stopPropagation()">
+    <div class="palette" [attr.aria-label]="label() || 'Color'">
+      @for (row of colors() ?? defaultColors; track $index) {
+        <div class="palette-row">
+          @for (hex of row; track $index) {
+            <button
+              type="button"
+              class="swatch"
+              [style.background-color]="hex"
+              [disabled]="isDisabled()"
+              [attr.aria-label]="hex"
+              [attr.aria-pressed]="value()?.hex === hex"
+              (click)="setColor(hex)"
+            ></button>
+          }
+        </div>
+      }
+    </div>
+    @if (inline() && value()) {
+      <div class="contrast" aria-label="Contrast">
+        @for (contrast of ["#ffffff", "#000000"]; track contrast) {
+          <button
+            mat-button
+            type="button"
+            [disabled]="isDisabled()"
+            [style.color]="contrast"
+            [style.background-color]="value()?.hex"
+            [attr.aria-label]="contrast"
+            [attr.aria-pressed]="value()?.contrast === contrast"
+            (click)="setContrast(contrast)"
+          >
+            Aa
+          </button>
+        }
+      </div>
+    }
+  </div>
+</mat-menu>
