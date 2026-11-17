@@ -342,6 +342,39 @@
           }
         }
       }
+    },
+    "NgxMatCircularGauge": {
+      "projectType": "library",
+      "root": "projects/circular-gauge",
+      "sourceRoot": "projects/circular-gauge/src",
+      "prefix": "NgxMat",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "projects/circular-gauge/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/circular-gauge/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/circular-gauge/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/circular-gauge/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
     }
   },
   "schematics": {

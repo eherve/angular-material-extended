@@ -19,6 +19,9 @@
       ],
       "@eherve/angular-material-notifications": [
         "./dist/notifications"
+      ],
+      "@eherve/angular-material-circular-gauge": [
+        "./dist/circular-gauge"
       ]
     },
     "outDir": "./dist/out-tsc",

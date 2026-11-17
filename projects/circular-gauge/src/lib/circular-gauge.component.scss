@@ -1,0 +1,52 @@
+/** @format */
+:host {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+.gauge {
+  position: relative;
+  display: grid;
+  width: 148px;
+  height: 148px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--gauge-color) var(--gauge-progress),
+    var(--ngx-mat-circular-gauge-track-color, var(--mat-sys-surface-container-highest, transparent)) 0
+  );
+  &::before {
+    position: absolute;
+    width: 116px;
+    height: 116px;
+    border-radius: 50%;
+    background: var(--ngx-mat-circular-gauge-surface-color, var(--mat-sys-surface, transparent));
+    content: '';
+  }
+}
+:host(.compact) .gauge {
+  width: 85px;
+  height: 85px;
+  &::before {
+    width: 70px;
+    height: 70px;
+  }
+  .gauge-inner strong {
+    font-size: var(--ngx-mat-circular-gauge-value-font-size, 1.2rem);
+  }
+}
+.gauge-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  strong {
+    font-size: var(--ngx-mat-circular-gauge-value-font-size, 2.2rem);
+    line-height: 1;
+  }
+  span {
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+}
