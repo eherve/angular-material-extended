@@ -140,9 +140,12 @@
   [panelWidth]="panelWidth"
   (optionSelected)="select($event.option.value)"
 >
-  @if (state.loading()) {
-  <mat-option disabled><span role="status">…</span></mat-option> } @for (group
-  of groups(); track group.name) { @if (group.name) {
+  @if (state.loading() && !state.options().length) {
+  <!-- Material opens the panel only when it contains an option. -->
+  <mat-option disabled>
+    <ng-container [ngTemplateOutlet]="searchProgress" />
+  </mat-option>
+  } @for (group of groups(); track group.name) { @if (group.name) {
   <mat-optgroup>
     <mat-label [innerHTML]="group.name"></mat-label>
     @for (option of group.options; track $index) { @let displayValue =
@@ -171,14 +174,15 @@
       [innerHTML]="displayValue.name"
     ></span
   ></mat-option>
-  } } } @if (!state.loading() && state.hasMore() && !state.failed()) {
-  <mat-option disabled
-    ><span (editSearchPage)="state.more()"
-      >{{ intl.messages.loadMore }}</span
-    ></mat-option
-  >
+  } } } @if (state.loading() && state.options().length) {
+  <ng-container [ngTemplateOutlet]="searchProgress" />
+  } @if (!state.loading() && state.hasMore() && !state.failed()) {
+  <div editSearchPage (editSearchPage)="state.more()" aria-hidden="true" style="height: 1px"></div>
   }
 </mat-autocomplete>
+<ng-template #searchProgress>
+  <mat-progress-bar mode="indeterminate" [attr.aria-label]="intl.messages.loading" />
+</ng-template>
 @if (sortable || (multiple && selectionLayout === 'rows')) {
 <div
   cdkDropList

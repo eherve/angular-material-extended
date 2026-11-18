@@ -1,5 +1,6 @@
 import { NgTemplateOutlet } from "@angular/common";
 import { MatChipsModule } from "@angular/material/chips";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatMenuModule } from "@angular/material/menu";
 import { ChangeDetectionStrategy, Component, forwardRef } from "@angular/core";
 import {
@@ -36,6 +37,7 @@ import { AdaptiveSearchPanelDirective } from "@eherve/angular-material-forms/cor
     NgTemplateOutlet,
     MatChipsModule,
     MatMenuModule,
+    MatProgressBarModule,
     ReactiveFormsModule,
     DragDropModule,
     MatAutocompleteModule,

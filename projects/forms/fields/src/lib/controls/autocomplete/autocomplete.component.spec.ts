@@ -58,6 +58,50 @@ describe("autocomplete rendered interactions", () => {
     expect(control.dirty).toBeTrue();
     expect(control.touched).toBeTrue();
   });
+  it("paginates from a sentinel outside the options and shows progress during the request", async () => {
+    const values = Array.from({ length: 11 }, (_, index) => `Result ${index + 1}`);
+    let completePage!: () => void;
+    let notifyIntersection!: IntersectionObserverCallback;
+    const observer = spyOn(window, "IntersectionObserver").and.callFake(function (callback) {
+      notifyIntersection = callback;
+      return {
+        observe: jasmine.createSpy("observe"),
+        disconnect: jasmine.createSpy("disconnect"),
+      } as unknown as IntersectionObserver;
+    });
+    const { fixture, overlay } = await setup(false, {
+      display: (value) => ({ name: String(value) }),
+      search: (limit, skip) => {
+        const result = { data: values.slice(skip, skip + limit), matchCount: values.length };
+        if (!skip) return Promise.resolve(result);
+        return new Promise((resolve) => {
+          completePage = () => resolve(result);
+        });
+      },
+    });
+    fixture.nativeElement.querySelector("input").focus();
+    await fixture.whenStable();
+
+    const sentinel = overlay.querySelector("[editSearchPage]")!;
+    expect(sentinel.getAttribute("aria-hidden")).toBe("true");
+    expect(sentinel.closest("mat-option")).toBeNull();
+    expect(overlay.textContent).not.toContain("Charger plus");
+    expect(overlay.querySelector("mat-progress-bar")).toBeNull();
+    expect(observer.calls.mostRecent().returnValue.observe).toHaveBeenCalledWith(sentinel);
+
+    notifyIntersection(
+      [{ isIntersecting: true } as IntersectionObserverEntry],
+      observer.calls.mostRecent().returnValue,
+    );
+    await fixture.whenStable();
+    expect(overlay.querySelector("mat-progress-bar")).not.toBeNull();
+    completePage();
+    await Promise.resolve();
+    await fixture.whenStable();
+    expect(overlay.textContent).toContain("Result 11");
+    expect(overlay.querySelector("[editSearchPage]")).toBeNull();
+    expect(overlay.querySelector("mat-progress-bar")).toBeNull();
+  });
   it("keeps false selection pristine and clears through rendered button", async () => {
     const { fixture, control } = await setup(false);
     expect(fixture.nativeElement.querySelector("input").value).toBe("false");
