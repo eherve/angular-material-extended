@@ -40,11 +40,20 @@ export class AdaptiveSearchPanelDirective implements OnDestroy {
     const panel: HTMLElement | undefined =
       this.trigger.autocomplete.panel?.nativeElement;
     if (!panel) return;
-    const rect = this.element.nativeElement.getBoundingClientRect();
-    const below = panel.getBoundingClientRect().top >= rect.bottom - 1;
-    const minHeight = Math.max(0, this.editAdaptivePanelMin);
+    const inputBounds = this.element.nativeElement.getBoundingClientRect();
+    const panelBounds = panel.getBoundingClientRect();
+    const below = panelBounds.top >= inputBounds.bottom - 1;
+    // The overlay can add a gap between the input and the panel.
+    const availableHeight = Math.max(
+      0,
+      (below ? window.innerHeight - panelBounds.top : panelBounds.bottom) - 8,
+    );
+    const minHeight = Math.min(
+      availableHeight,
+      Math.max(0, this.editAdaptivePanelMin),
+    );
     panel.style.minHeight = minHeight > 0 ? `${minHeight}px` : "";
-    panel.style.maxHeight = `${Math.max(minHeight, below ? window.innerHeight - rect.bottom - 8 : rect.top - 8)}px`;
+    panel.style.maxHeight = `${availableHeight}px`;
     panel.style.overflowY = "auto";
   }
 }
