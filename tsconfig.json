@@ -22,6 +22,15 @@
       ],
       "@eherve/angular-material-circular-gauge": [
         "./dist/circular-gauge"
+      ],
+      "@eherve/angular-material-avatar": [
+        "./dist/avatar"
+      ],
+      "@eherve/angular-material-star-rating": [
+        "./dist/star-rating"
+      ],
+      "@eherve/angular-material-thermometer": [
+        "./dist/thermometer"
       ]
     },
     "outDir": "./dist/out-tsc",

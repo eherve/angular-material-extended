@@ -33,7 +33,13 @@
     "build:organigram": "ng build NgxMatOrganigram",
     "check:organigram": "npm run test:organigram:model && npm run test:organigram && npm run build:organigram",
     "build:notifications": "ng build NgxMatNotifications",
-    "test:notifications": "ng test NgxMatNotifications --watch=false --browsers=ChromeHeadless"
+    "test:notifications": "ng test NgxMatNotifications --watch=false --browsers=ChromeHeadless",
+    "build:avatar": "ng build NgxMatAvatar",
+    "test:avatar": "ng test NgxMatAvatar --watch=false --browsers=ChromeHeadless",
+    "build:star-rating": "ng build NgxMatStarRating",
+    "test:star-rating": "ng test NgxMatStarRating --watch=false --browsers=ChromeHeadless",
+    "build:thermometer": "ng build NgxMatThermometer",
+    "test:thermometer": "ng test NgxMatThermometer --watch=false --browsers=ChromeHeadless"
   },
   "private": false,
   "publishConfig": {
@@ -63,7 +69,8 @@
     "subsink": "^1.0.2",
     "tslib": "^2.3.0",
     "xlsx": "^0.18.5",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "ts-md5": "^1.3.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^22.2.2",

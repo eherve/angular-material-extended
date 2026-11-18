@@ -1,0 +1,30 @@
+<div
+  class="avatar-container"
+  [style.width.px]="displaySize()"
+  [style.height.px]="displaySize()"
+>
+  @if (imageUrl() && !imageFailed()) {
+    <img
+      class="avatar-content"
+      [src]="imageUrl()"
+      [alt]="name() || value() || ''"
+      [width]="displaySize()"
+      [height]="displaySize()"
+      [style.border-radius]="round() ? '50%' : '0'"
+      loading="lazy"
+      (error)="onImageError()"
+    />
+  } @else {
+    <div
+      class="avatar-content avatar-text"
+      [attr.aria-label]="name() || value() || null"
+      [style.border-radius]="round() ? '50%' : '0'"
+      [style.background-color]="backgroundColor()"
+      [style.color]="fgColor()"
+      [style.font-size.px]="fontSize()"
+      [style.line-height.px]="displaySize()"
+    >
+      {{ avatarText() }}
+    </div>
+  }
+</div>

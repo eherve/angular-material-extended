@@ -1,0 +1,71 @@
+<!-- @format -->
+
+<div id="container">
+  <!-- Full -->
+  @if (!shrink()) {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      height="100%"
+      [attr.viewBox]="'0 0 ' + (starCount() || 1) * 512 + ' 512'"
+    >
+      @for (s of fills(); track $index; let index = $index) {
+        <ng-container>
+          <path
+            [attr.transform]="'translate(' + 512 * index + ', 0)'"
+            d="M480 208H308L256 48l-52 160H32l140 96-54 160 138-100 138 100-54-160z"
+            stroke-linejoin="round"
+            stroke-width="20"
+          />
+          <path
+            class="value"
+            [attr.transform]="'translate(' + 512 * index + ', 0)'"
+            d="M480 208H308L256 48l-52 160H32l140 96-54 160 138-100 138 100-54-160z"
+            stroke-linejoin="round"
+            stroke-width="20"
+            [style.transition-delay.s]="index * 0.1"
+            [style.clip-path]="
+              'polygon(0% 0%, ' + s + '% 0%, ' + s + '% 100%, 0% 100%)'
+            "
+          />
+        </ng-container>
+      }
+    </svg>
+  }
+
+  <!-- Shrinked -->
+  @if (shrink()) {
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      height="100%"
+      viewBox="0 0 512 512"
+    >
+      <path
+        d="M480 208H308L256 48l-52 160H32l140 96-54 160 138-100 138 100-54-160z"
+        stroke-linejoin="round"
+        stroke-width="20"
+      />
+      <path
+        class="value"
+        d="M480 208H308L256 48l-52 160H32l140 96-54 160 138-100 138 100-54-160z"
+        stroke-linejoin="round"
+        stroke-width="20"
+        [style.clip-path]="
+          'ellipse(' + percent() / 2 + '% ' + percent() / 2 + '% at 50% 56%)'
+        "
+      />
+      <text
+        text-anchor="middle"
+        dominant-baseline="middle"
+        font-size="7.5em"
+        x="50%"
+        y="56%"
+      >
+        {{ displayValue() | number: "1.0-1" }}
+      </text>
+    </svg>
+  }
+</div>

@@ -1,0 +1,23 @@
+#container {
+  max-height: 100%;
+  max-width: 100%;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  path {
+    stroke: var(--ngx-mat-star-rating-stroke-color, #bbb);
+    fill: none;
+  }
+
+  path.value {
+    transition: clip-path 0.2s linear;
+    fill: var(--ngx-mat-star-rating-fill-color, #f8c31d);
+  }
+
+  text {
+    fill: var(--ngx-mat-star-rating-text-color, #666);
+  }
+}
