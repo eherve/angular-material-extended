@@ -3,7 +3,7 @@ import { TestBed } from "@angular/core/testing";
 import { SearchPageDirective } from "./pagination.directive";
 @Component({
   imports: [SearchPageDirective],
-  template: '<span (editSearchPage)="pages = pages + 1"></span>',
+  template: '<span editSearchPage (editSearchPage)="pages = pages + 1"></span>',
 })
 class ObserverHost {
   pages = 0;

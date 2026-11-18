@@ -177,7 +177,13 @@
   } } } @if (state.loading() && state.options().length) {
   <ng-container [ngTemplateOutlet]="searchProgress" />
   } @if (!state.loading() && state.hasMore() && !state.failed()) {
-  <div editSearchPage (editSearchPage)="state.more()" aria-hidden="true" style="height: 1px"></div>
+  <div
+    editSearchPage
+    [editSearchPageResults]="state.options()"
+    (editSearchPage)="state.more()"
+    aria-hidden="true"
+    style="height: 1px"
+  ></div>
   }
 </mat-autocomplete>
 <ng-template #searchProgress>

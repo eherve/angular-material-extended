@@ -1,30 +1,37 @@
 import {
+  afterRenderEffect,
   Directive,
   ElementRef,
-  inject,
-  Input,
-  OnDestroy,
-  AfterViewInit,
-  Output,
   EventEmitter,
+  inject,
+  input,
   NgZone,
+  Output,
 } from "@angular/core";
+
 /** The sentinel exists only while more results are available in the open overlay. */
 @Directive({ selector: "[editSearchPage]", standalone: true })
-export class SearchPageDirective implements AfterViewInit, OnDestroy {
+export class SearchPageDirective {
+  readonly pageResults = input<readonly unknown[]>([], {
+    alias: "editSearchPageResults",
+  });
   @Output() editSearchPage = new EventEmitter<void>();
-  private element = inject<ElementRef<HTMLElement>>(ElementRef);
-  private zone = inject(NgZone);
-  private observer?: IntersectionObserver;
-  ngAfterViewInit(): void {
-    if (typeof IntersectionObserver === "undefined") return;
-    this.observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting))
-        this.zone.run(() => this.editSearchPage.emit());
+  private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly zone = inject(NgZone);
+
+  constructor() {
+    afterRenderEffect({
+      read: (onCleanup) => {
+        // Fast searches can append results without removing the visible sentinel.
+        this.pageResults();
+        if (typeof IntersectionObserver === "undefined") return;
+        const observer = new IntersectionObserver((entries) => {
+          if (entries.some((entry) => entry.isIntersecting))
+            this.zone.run(() => this.editSearchPage.emit());
+        });
+        observer.observe(this.element.nativeElement);
+        onCleanup(() => observer.disconnect());
+      },
     });
-    this.observer.observe(this.element.nativeElement);
-  }
-  ngOnDestroy(): void {
-    this.observer?.disconnect();
   }
 }

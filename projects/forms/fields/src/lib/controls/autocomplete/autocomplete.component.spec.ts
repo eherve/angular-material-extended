@@ -14,6 +14,7 @@ describe("autocomplete rendered interactions", () => {
   async function setup(
     multiple = true,
     service?: FormControlAutocompleteService,
+    limit = 10,
   ) {
     const fixture = TestBed.createComponent(FormControlAutocompleteComponent);
     const control = new FormControl<unknown>(
@@ -22,6 +23,7 @@ describe("autocomplete rendered interactions", () => {
     );
     fixture.componentRef.setInput("control", control);
     fixture.componentRef.setInput("multiple", multiple);
+    fixture.componentRef.setInput("limit", limit);
     fixture.componentRef.setInput(
       "service",
       service ?? {
@@ -101,6 +103,35 @@ describe("autocomplete rendered interactions", () => {
     expect(overlay.textContent).toContain("Result 11");
     expect(overlay.querySelector("[editSearchPage]")).toBeNull();
     expect(overlay.querySelector("mat-progress-bar")).toBeNull();
+  });
+  it("loads consecutive fast pages while the end of the list stays visible", async () => {
+    const values = Array.from({ length: 7 }, (_, index) => `Family ${index + 1}`);
+    const { fixture, overlay } = await setup(
+      false,
+      {
+        display: (value) => ({ name: String(value) }),
+        search: async (limit, skip) => ({
+          data: values.slice(skip, skip + limit),
+          matchCount: values.length,
+        }),
+      },
+      2,
+    );
+
+    Object.assign(overlay.style, { position: "fixed", inset: "0 0 auto" });
+    overlay.querySelector("input")!.focus();
+    await fixture.whenStable();
+    const { state } = fixture.componentInstance;
+    for (let frame = 0; frame < 30 && state.hasMore(); frame++) {
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => resolve()),
+      );
+    }
+
+    expect(state.options()).toEqual(values);
+    expect(overlay.querySelector("[editSearchPage]")).toBeNull();
+    expect(overlay.querySelector("mat-progress-bar")).toBeNull();
+    fixture.destroy();
   });
   it("keeps false selection pristine and clears through rendered button", async () => {
     const { fixture, control } = await setup(false);
