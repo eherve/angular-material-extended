@@ -165,7 +165,9 @@ export class EntityFormSession<
   });
 
   formGroup = new EditEntityFormGroup();
-  formStatus: FormControlStatus = "VALID";
+  get formStatus(): FormControlStatus {
+    return this.formGroup.status;
+  }
   readonly renderState = signal<EditEntityRenderState<TRecord>>({
     kind: "empty",
   });
@@ -177,7 +179,9 @@ export class EntityFormSession<
   isArchiveEnabled = false;
   isRemovable?: EditEntityRemovableState;
   updated = false;
-  valid = true;
+  get valid(): boolean {
+    return this.formGroup.valid;
+  }
 
   readonly changeDetectorRef = inject(ChangeDetectorRef);
   readonly elementRef = inject(ElementRef<HTMLElement>);
@@ -916,8 +920,6 @@ export class EntityFormSession<
           this.policy?.refresh?.();
         }),
       );
-    this.formStatus = this.formGroup.status;
-    this.valid = this.formGroup.valid;
     this.updated = this.formGroup.isUpdated;
     this.logDetectedChanges();
 
@@ -925,8 +927,6 @@ export class EntityFormSession<
       this.formGroup.events
         .pipe(filter((event) => event instanceof StatusChangeEvent))
         .subscribe(() => {
-          this.formStatus = this.formGroup.status;
-          this.valid = this.formGroup.valid;
           this.refreshRuntimeState();
           this.changeDetectorRef.markForCheck();
         }),
@@ -1441,7 +1441,6 @@ export class EntityFormSession<
     this.formGroup.updateValueAndValidity();
     this.formGroup.resetInitialValue();
     this.updated = false;
-    this.valid = this.formGroup.valid;
     this.refreshAllowedActions();
     await this.refreshRemovableState();
     if (!isCurrent()) return;

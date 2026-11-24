@@ -5,6 +5,7 @@ import {
   ErrorHandler,
   Injector,
   runInInjectionContext,
+  SimpleChange,
 } from "@angular/core";
 import {
   EDIT_ENTITY_DIALOG_HOST,
@@ -19,7 +20,7 @@ import {
 } from "@eherve/angular-material-forms/core";
 import { EntityFormSession } from "./entity-form-session";
 import { fakeAsync, tick } from "@angular/core/testing";
-import { StatusChangeEvent, ValidationErrors } from "@angular/forms";
+import { FormGroupDirective, StatusChangeEvent, ValidationErrors } from "@angular/forms";
 import { Subject } from "rxjs";
 
 describe("EntityFormSession close confirmation", () => {
@@ -180,6 +181,84 @@ describe("EntityFormSession asynchronous validity", () => {
   }
 });
 
+
+describe("EntityFormSession completed async validation and dynamic controls", () => {
+  for (const validationErrors of [null, { unique: true }] as const) {
+    it(`tracks a new silent validation settling ${validationErrors ? "INVALID" : "VALID"} after a dynamic control is mounted`, fakeAsync((): void => {
+      const session = createValiditySession();
+      const name = new EditEntityFormControl("available-name");
+      const requests: Subject<ValidationErrors | null>[] = [];
+      const emittedStatuses: string[] = [];
+      const statusEvents: string[] = [];
+      session.formGroup.setControl("name", name);
+      const directive = new FormGroupDirective([], [], undefined);
+      directive.form = session.formGroup;
+      directive.ngOnChanges({
+        form: new SimpleChange(undefined, session.formGroup, true),
+      });
+      session.bindFormState();
+      name.setAsyncValidators(() => {
+        const response = new Subject<ValidationErrors | null>();
+        requests.push(response);
+        return response;
+      });
+      const statuses = session.formGroup.statusChanges.subscribe((status) =>
+        emittedStatuses.push(status),
+      );
+      const events = session.formGroup.events.subscribe((event) => {
+        if (event instanceof StatusChangeEvent) statusEvents.push(event.status);
+      });
+      try {
+        name.updateValueAndValidity();
+        expect(session.valid).toBeFalse();
+        expect(session.formStatus).toBe("PENDING");
+        expect(requests.length).toBe(1);
+        requests[0].next(null);
+        requests[0].complete();
+        tick(110);
+        expect(name.status).toBe("VALID");
+        expect(session.valid).toBeTrue();
+        expect(session.formStatus).toBe("VALID");
+        emittedStatuses.length = 0;
+        statusEvents.length = 0;
+
+        // FormGroupDirective revalidates the tree silently on this real collection change.
+        const groups = new EditEntityFormControl([]);
+        session.formGroup.addControl("groups", groups);
+        groups.updateValueAndValidity();
+        tick(110);
+        expect(requests.length).toBe(2);
+        expect(name.status).toBe("PENDING");
+        expect(session.valid).toBeFalse();
+        expect(session.formStatus).toBe("PENDING");
+        const statusesBeforeResponse = [...emittedStatuses];
+        const eventsBeforeResponse = [...statusEvents];
+
+        requests[1].next(validationErrors);
+        requests[1].complete();
+        const expectedStatus = validationErrors ? "INVALID" : "VALID";
+        expect(name.status).toBe(expectedStatus);
+        expect(session.formGroup.status).toBe(expectedStatus);
+        expect(session.formStatus).toBe(expectedStatus);
+        expect(session.valid).toBe(!validationErrors);
+        expect(name.hasError("unique")).toBe(!!validationErrors);
+        tick(110);
+        expect(session.formStatus).toBe(expectedStatus);
+        expect(session.valid).toBe(!validationErrors);
+        expect(requests.length).toBe(2);
+        expect(statusesBeforeResponse).toEqual(["VALID", "PENDING"]);
+        expect(eventsBeforeResponse).toEqual(["VALID", "PENDING"]);
+        expect(emittedStatuses).toEqual(statusesBeforeResponse);
+        expect(statusEvents).toEqual(eventsBeforeResponse);
+      } finally {
+        statuses.unsubscribe();
+        events.unsubscribe();
+        directive.ngOnDestroy();
+        session.destroy();
+      }
+    }));
+  }
+});
 
 describe("EntityFormSession lifecycle close", () => {
   it("returns false for rejected dirty close and while updating", async () => {
