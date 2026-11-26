@@ -43,12 +43,12 @@
       }
 
       <mat-option id="searching-option" disabled>
-        @if (searching) {
+        @if (searching()) {
           <mat-progress-bar mode="indeterminate"></mat-progress-bar>
         }
       </mat-option>
 
-      @if (hasMore && !searching) {
+      @if (hasMore && !searching()) {
         <mat-option
           id="load-more-options"
           disabled

@@ -6,6 +6,8 @@ import {
   tick,
 } from "@angular/core/testing";
 import { FormControl, NgControl } from "@angular/forms";
+import { MatAutocompleteTrigger } from "@angular/material/autocomplete";
+import { By } from "@angular/platform-browser";
 import { provideNoopAnimations } from "@angular/platform-browser/animations";
 
 import { DatatableSearchListOption } from "../../types/datatable-column.type";
@@ -42,6 +44,37 @@ describe("HeaderAutocompleteFilterComponent", () => {
     expect(component).toBeTruthy();
   });
 
+  it("shows the progress bar while autocomplete options are loading", async () => {
+    let finishSearch!: (options: DatatableSearchListOption[]) => void;
+    const searchStarted = new Promise<void>((started) => {
+      component.column.options = (): Promise<DatatableSearchListOption[]> =>
+        new Promise((resolve) => {
+          finishSearch = resolve;
+          started();
+        });
+    });
+    const input = component.input.nativeElement;
+    const trigger = fixture.debugElement
+      .query(By.directive(MatAutocompleteTrigger))
+      .injector.get(MatAutocompleteTrigger);
+
+    fixture.autoDetectChanges();
+    trigger.openPanel();
+    await fixture.whenStable();
+    const panel: HTMLElement = component.auto.panel.nativeElement;
+    expect(panel.querySelector("mat-progress-bar")).toBeNull();
+    input.value = "test";
+    input.dispatchEvent(new Event("input"));
+    await searchStarted;
+    await fixture.whenStable();
+    expect(panel.querySelector("mat-progress-bar")).not.toBeNull();
+
+    finishSearch([]);
+    await Promise.resolve();
+    await fixture.whenStable();
+    expect(panel.querySelector("mat-progress-bar")).toBeNull();
+  });
+
   it("should recover after an options loading error", fakeAsync(() => {
     let callCount = 0;
     component.column.options = async () => {
@@ -55,7 +88,7 @@ describe("HeaderAutocompleteFilterComponent", () => {
     tick(300);
     flushMicrotasks();
 
-    expect(component.searching).toBeFalse();
+    expect(component.searching()).toBeFalse();
     expect(component.hasMore).toBeFalse();
     expect(callCount).toBe(1);
 
@@ -64,7 +97,7 @@ describe("HeaderAutocompleteFilterComponent", () => {
     tick(300);
     flushMicrotasks();
 
-    expect(component.searching).toBeFalse();
+    expect(component.searching()).toBeFalse();
     expect(callCount).toBe(2);
     expect(component.options).toEqual([{ value: "ok", name: "Recovered" }]);
   }));

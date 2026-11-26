@@ -11,6 +11,7 @@ import {
   Injector,
   Input,
   OnDestroy,
+  signal,
   ViewChild,
   ChangeDetectionStrategy,
 } from "@angular/core";
@@ -46,7 +47,6 @@ import {
   Subject,
   Subscription,
   switchMap,
-  tap,
 } from "rxjs";
 import { NgxMatDatatableIntl } from "../../datatable.intl";
 import { SafeHtmlPipe } from "../../pipes/safe-html.pipe";
@@ -91,7 +91,7 @@ export class HeaderAutocompleteFilterComponent<Record>
   options: DatatableSearchListOption[] = [];
   groups: { name: string; options: DatatableSearchListOption[] }[] = [];
   hasMore = false;
-  searching = false;
+  readonly searching = signal(false);
   @ViewChild("input") input!: ElementRef<HTMLInputElement>;
   @ViewChild(MatAutocomplete) auto!: MatAutocomplete;
   control!: FormControl<any>;
@@ -273,24 +273,21 @@ export class HeaderAutocompleteFilterComponent<Record>
             let skip = 0;
             return this.nextPage$.pipe(
               startWith(skip),
-              tap(() => (this.searching = true)),
               switchMap(() =>
-                defer(() =>
-                  this.column.options(
+                defer(() => {
+                  this.searching.set(true);
+                  return this.column.options(
                     this.column.limit || 10,
                     skip,
                     search,
                     this.getGlobalSearchValue(),
-                  ),
-                ).pipe(
+                  );
+                }).pipe(
                   catchError(() => {
                     this.hasMore = false;
                     return of(null);
                   }),
-                  finalize(() => {
-                    this.searching = false;
-                    this.changeDetectorRef.markForCheck();
-                  }),
+                  finalize(() => this.searching.set(false)),
                 ),
               ),
               filter((data): data is DatatableSearchListOption[] =>
